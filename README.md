@@ -3,10 +3,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/uca-pid/2023-messismo/badge.png?branch=develop)](https://coveralls.io/github/uca-pid/2023-messismo?branch=develop)
 
 # Proyecto Integral de Desarrollo
-## Alumnos:
-##### Baccari Carla,
+## Alumno:
 ####  Guido Martin,
-####  Herrmann Karen,
 ### Año: 2023
 
 ## INSTRUCCIONES PARA WINDOWS

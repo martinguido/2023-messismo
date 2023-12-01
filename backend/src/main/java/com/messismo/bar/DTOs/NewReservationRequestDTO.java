@@ -22,11 +22,12 @@ public class NewReservationRequestDTO {
 
     private LocalDate finishingDate;
 
+    private String comment;
+
     private String clientEmail;
 
     private String clientPhone;
 
-    private String comment;
 
 }
 

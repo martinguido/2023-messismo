@@ -6,6 +6,7 @@ import com.messismo.bar.Entities.Reservation;
 import com.messismo.bar.Exceptions.BarCapacityExceededException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
 import com.messismo.bar.Exceptions.ReservationStartingDateMustBeBeforeFinishinDateException;
+import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,11 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
-    private final BarService barService;
+    private final BarRepository barRepository;
 
     public String addReservation(NewReservationRequestDTO newReservationRequestDTO) throws Exception {
         try {
-            Integer maxCapacity = barService.getBarConfiguration().getCapacity();
+            Integer maxCapacity = barRepository.findAll().get(0).getCapacity();
             if (maxCapacity < newReservationRequestDTO.getCapacity()) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
@@ -52,6 +53,8 @@ public class ReservationService {
                 reservationRepository.save(newReservation);
             }
             return "Reservation added successfully";
+        } catch (BarCapacityExceededException | ReservationStartingDateMustBeBeforeFinishinDateException e) {
+            throw e;
         } catch (Exception e) {
             throw new Exception("CANNOT create a reservation at the moment");
         }

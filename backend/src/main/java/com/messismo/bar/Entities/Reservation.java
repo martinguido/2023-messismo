@@ -23,7 +23,6 @@ public class Reservation {
 
     @ManyToOne
     @JoinColumn(name = "shift_id")
-//    @Column(name = "shift")
     private Shift shift;
 
     @Column(name = "starting_date")

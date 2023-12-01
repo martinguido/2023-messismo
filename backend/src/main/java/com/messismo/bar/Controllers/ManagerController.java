@@ -29,6 +29,8 @@ public class ManagerController {
 
     private final GoalService goalService;
 
+    private final ReservationService reservationService;
+
     @PutMapping("/product/updatePrice")
     public ResponseEntity<String> updateProductPrice(@RequestBody ProductPriceDTO productPriceDTO) {
         if (productPriceDTO.getUnitPrice() == null || productPriceDTO.getProductId() == null) {
@@ -199,6 +201,29 @@ public class ManagerController {
         }
         try {
             return ResponseEntity.status(HttpStatus.OK).body(goalService.getGoals(goalFilterRequestDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/deleteReservation")
+    public ResponseEntity<String> deleteReservation(@RequestBody DeleteReservationRequestDTO deleteReservationRequestDTO){
+        if (deleteReservationRequestDTO.getReservationId() == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to delete a reservation");
+        }
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(reservationService.deleteReservation(deleteReservationRequestDTO));
+        } catch (ReservationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getAllReservations")
+    public ResponseEntity<?> getAllReservations() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(reservationService.getAllReservations());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

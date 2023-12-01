@@ -14,31 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check for Docker Compose file
-        run: |
-          if [ -f "docker-compose.yml" ]; then
-            echo "Docker Compose file found."
-          else
-            echo "Docker Compose file not found."
-          fi
-
-      - name: Run Docker Compose (if it exists)
-        run: |
-          if [ -f "docker-compose.yml" ]; then
-            echo "Running Docker Compose..."
-            docker-compose up -d
-          else
-            echo "Skipping Docker Compose, as the file is not found."
-          fi
-        id: docker-compose
-        continue-on-error: true
-
-      - name: Handle Docker Compose result
-        run: |
-          if [ -f "docker-compose.yml" ]; then
-            echo "Docker Compose was successful."
-            docker-compose down
-          fi
       - name: Change directory to /backend if it exists
         id: change-directory
         run: |

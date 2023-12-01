@@ -12,6 +12,7 @@
 
 ## INSTRUCCIONES PARA WINDOWS
 
+
 1. Descargar e instalar Java SDK 17, se consigue en [Java SDK 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 2. Abrir el proyecto en algun IDE (Visual Studio Code, Intellij IDEA, Eclipse,...)
 3. En este caso, se utilizo Intellij IDEA, se puede descargar en [Intellij IDEA](https://www.jetbrains.com/idea/download/#section=windows) :

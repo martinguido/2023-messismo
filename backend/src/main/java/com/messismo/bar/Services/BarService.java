@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,11 @@ public class BarService {
 
     private final ReservationService reservationService;
 
-    public void addBarConfiguration(NewBarRequestDTO newBarRequestDTO) throws Exception {
+    public String addBarConfiguration(NewBarRequestDTO newBarRequestDTO) throws Exception {
         try {
             Bar bar = new Bar(newBarRequestDTO.getCapacity());
             barRepository.save(bar);
+            return "Bar configuration added successfully";
         } catch (Exception e) {
             throw new Exception("CANNOT add bar configuration");
         }
@@ -36,20 +38,21 @@ public class BarService {
         try {
             Bar bar = barRepository.findById(modifyBarCapacityRequestDTO.getBarId()).orElseThrow(() -> new BarNotFoundException("Provided bar id DOES NOT match any bar id"));
             List<Reservation> allReservations = reservationService.getAllReservations();
-            HashMap<List<LocalDateTime>, Integer> reservationsByDate = new HashMap<>();
+            HashMap<List<LocalTime>, Integer> reservationsByDate = new HashMap<>();
             for (Reservation reservation : allReservations) {
-                List<LocalDateTime> dateRange = List.of(reservation.getStartingDate(), reservation.getFinishingDate());
+                List<LocalTime> dateRange = List.of(reservation.getStartingDate().toLocalTime(), reservation.getFinishingDate().toLocalTime());
                 if (!reservationsByDate.containsKey(dateRange)) {
-                    reservationsByDate.put(dateRange, 1);
+                    reservationsByDate.put(dateRange, reservation.getCapacity());
                 } else {
-                    reservationsByDate.put(dateRange, reservationsByDate.get(dateRange) + 1);
+                    reservationsByDate.put(dateRange, reservationsByDate.get(dateRange) +  reservation.getCapacity());
                 }
             }
-            for (Map.Entry<List<LocalDateTime>, Integer> entry : reservationsByDate.entrySet()) {
+            for (Map.Entry<List<LocalTime>, Integer> entry : reservationsByDate.entrySet()) {
                 if(entry.getValue()> modifyBarCapacityRequestDTO.getNewCapacity()){
                     throw new AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException("There is a shift with a higher capacity than the requested");
                 }
             }
+            System.out.println(reservationsByDate);
             bar.updateCapacity(modifyBarCapacityRequestDTO.getNewCapacity());
             barRepository.save(bar);
             return "Bar capacity updated successfully";

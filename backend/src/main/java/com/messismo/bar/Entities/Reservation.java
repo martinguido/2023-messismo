@@ -45,31 +45,43 @@ public class Reservation {
 
 
     public Reservation(Shift shift, LocalDateTime startingDate, LocalDateTime finishingDate, String clientEmail, Integer capacity, String comment) {
-        this.shift = shift;
-        this.startingDate = startingDate;
-        this.finishingDate = finishingDate;
-        this.clientEmail = clientEmail;
-        this.capacity = capacity;
-        this.comment = comment;
+        if (finishingDate.isAfter(startingDate)) {
+            this.shift = shift;
+            this.startingDate = startingDate;
+            this.finishingDate = finishingDate;
+            this.clientEmail = clientEmail;
+            this.capacity = capacity;
+            this.comment = comment;
+        } else {
+            throw new IllegalArgumentException("Starting date must be before finishing date");
+        }
     }
 
     public Reservation(Shift shift, LocalDateTime startingDate, LocalDateTime finishingDate, Integer clientPhone, Integer capacity, String comment) {
-        this.shift = shift;
-        this.startingDate = startingDate;
-        this.finishingDate = finishingDate;
-        this.clientPhone = clientPhone;
-        this.capacity = capacity;
-        this.comment = comment;
+        if (finishingDate.isAfter(startingDate)) {
+            this.shift = shift;
+            this.startingDate = startingDate;
+            this.finishingDate = finishingDate;
+            this.clientPhone = clientPhone;
+            this.capacity = capacity;
+            this.comment = comment;
+        } else {
+            throw new IllegalArgumentException("Starting date must be before finishing date");
+        }
     }
 
     public Reservation(Shift shift, LocalDateTime startingDate, LocalDateTime finishingDate, String clientEmail, Integer clientPhone, Integer capacity, String comment) {
-        this.shift = shift;
-        this.startingDate = startingDate;
-        this.finishingDate = finishingDate;
-        this.clientEmail = clientEmail;
-        this.clientPhone = clientPhone;
-        this.capacity = capacity;
-        this.comment = comment;
+        if (finishingDate.isAfter(startingDate)) {
+            this.shift = shift;
+            this.startingDate = startingDate;
+            this.finishingDate = finishingDate;
+            this.clientEmail = clientEmail;
+            this.clientPhone = clientPhone;
+            this.capacity = capacity;
+            this.comment = comment;
+        } else {
+            throw new IllegalArgumentException("Starting date must be before finishing date");
+        }
     }
 
 }

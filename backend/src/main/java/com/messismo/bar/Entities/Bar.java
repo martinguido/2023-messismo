@@ -22,10 +22,6 @@ public class Bar {
     @Column(name = "capacity")
     private Integer capacity;
 
-//    @OneToMany(mappedBy = "bar", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Column(name= "shift")
-//    private Set<Shift> shifts;
-
 
     public Bar(Integer capacity) {
         if (capacity > 0) {

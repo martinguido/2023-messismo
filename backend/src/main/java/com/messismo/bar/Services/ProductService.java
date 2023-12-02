@@ -4,7 +4,6 @@ import com.messismo.bar.DTOs.*;
 import com.messismo.bar.Entities.Category;
 import com.messismo.bar.Entities.Product;
 import com.messismo.bar.Exceptions.CategoryNotFoundException;
-import com.messismo.bar.Exceptions.ExistingCategoryFoundException;
 import com.messismo.bar.Exceptions.ExistingProductFoundException;
 import com.messismo.bar.Exceptions.ProductNotFoundException;
 import com.messismo.bar.Repositories.CategoryRepository;
@@ -33,11 +32,14 @@ public class ProductService {
                 throw new ExistingProductFoundException("The product already exists");
             }
             if (productDTO.getNewCategory() == Boolean.TRUE) {
-                CategoryRequestDTO categoryRequestDTO = CategoryRequestDTO.builder().categoryName(productDTO.getCategory()).build();
+                CategoryRequestDTO categoryRequestDTO = CategoryRequestDTO.builder()
+                        .categoryName(productDTO.getCategory()).build();
                 categoryService.addCategory(categoryRequestDTO);
             }
-            Category category = categoryRepository.findByName(productDTO.getCategory()).orElseThrow(() -> new CategoryNotFoundException("Provided category name DOES NOT match any category name"));
-            Product newProduct = new Product(productDTO.getName(), productDTO.getUnitPrice(), productDTO.getUnitCost(), productDTO.getDescription(), productDTO.getStock(), category);
+            Category category = categoryRepository.findByName(productDTO.getCategory()).orElseThrow(
+                    () -> new CategoryNotFoundException("Provided category name DOES NOT match any category name"));
+            Product newProduct = new Product(productDTO.getName(), productDTO.getUnitPrice(), productDTO.getUnitCost(),
+                    productDTO.getDescription(), productDTO.getStock(), category);
             productRepository.save(newProduct);
             return "Product created successfully";
 
@@ -54,20 +56,21 @@ public class ProductService {
 
     public String deleteProduct(Long productId) throws Exception {
         try {
-            Product product = productRepository.findByProductId(productId).orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
+            Product product = productRepository.findByProductId(productId)
+                    .orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
             productRepository.delete(product);
             return "Product deleted successfully";
         } catch (ProductNotFoundException e) {
             throw e;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             throw new Exception("Product CANNOT be deleted");
         }
     }
 
     public String modifyProductPrice(ProductPriceDTO productPriceDTO) throws Exception {
         try {
-            Product product = productRepository.findByProductId(productPriceDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
+            Product product = productRepository.findByProductId(productPriceDTO.getProductId())
+                    .orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
             product.updateUnitPrice(productPriceDTO.getUnitPrice());
             productRepository.save(product);
             return "Product price updated successfully";
@@ -80,7 +83,8 @@ public class ProductService {
 
     public String modifyProductCost(ProductPriceDTO productPriceDTO) throws Exception {
         try {
-            Product product = productRepository.findByProductId(productPriceDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
+            Product product = productRepository.findByProductId(productPriceDTO.getProductId())
+                    .orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
             product.updateUnitCost(productPriceDTO.getUnitPrice());
             productRepository.save(product);
             return "Product cost updated successfully";
@@ -91,10 +95,10 @@ public class ProductService {
         }
     }
 
-
     public String modifyProductStock(ProductStockDTO productStockDTO) throws Exception {
         try {
-            Product product = productRepository.findByProductId(productStockDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
+            Product product = productRepository.findByProductId(productStockDTO.getProductId())
+                    .orElseThrow(() -> new ProductNotFoundException("ProductId DOES NOT match any productId"));
             product.updateStock(productStockDTO.getOperation(), productStockDTO.getModifyStock());
             productRepository.save(product);
             return "Product stock updated successfully";
@@ -113,7 +117,9 @@ public class ProductService {
             List<Product> filteredProductsByCategory = new ArrayList<>();
             if (filterProductDTO.getCategories() != null) {
                 for (String aCategory : filterProductDTO.getCategories()) {
-                    Category category = categoryRepository.findByName(aCategory).orElseThrow(() -> new CategoryNotFoundException("Provided category name DOES NOT match any category name"));
+                    Category category = categoryRepository.findByName(aCategory)
+                            .orElseThrow(() -> new CategoryNotFoundException(
+                                    "Provided category name DOES NOT match any category name"));
                     filteredProductsByCategory.addAll(filterByCategory(filteredProducts, category));
                 }
                 filteredProducts = filteredProductsByCategory;
@@ -248,6 +254,7 @@ public class ProductService {
     }
 
     public Product getProductByName(String productName) throws ProductNotFoundException {
-        return productRepository.findByName(productName).orElseThrow(() -> new ProductNotFoundException("ProductName DOES NOT match any productName"));
+        return productRepository.findByName(productName)
+                .orElseThrow(() -> new ProductNotFoundException("ProductName DOES NOT match any productName"));
     }
 }

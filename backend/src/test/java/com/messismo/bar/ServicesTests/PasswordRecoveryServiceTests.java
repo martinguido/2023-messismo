@@ -1,8 +1,6 @@
 package com.messismo.bar.ServicesTests;
 
-import com.messismo.bar.DTOs.CategoryRequestDTO;
 import com.messismo.bar.DTOs.PasswordRecoveryDTO;
-import com.messismo.bar.Entities.Category;
 import com.messismo.bar.Entities.PasswordRecovery;
 import com.messismo.bar.Entities.Role;
 import com.messismo.bar.Entities.User;
@@ -27,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -69,7 +66,8 @@ public class PasswordRecoveryServiceTests {
     public void testPasswordRecoveryServiceForgotPassword() throws Exception {
 
         String email = "user@example.com";
-        User user = User.builder().id(1L).username("user").email("user@example.com").password("Password1").role(Role.EMPLOYEE).build();
+        User user = User.builder().id(1L).username("user").email("user@example.com").password("Password1")
+                .role(Role.EMPLOYEE).build();
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordRecoveryRepository.findByUser(user)).thenReturn(Optional.empty());
         String response = passwordRecoveryService.forgotPassword(email);
@@ -80,15 +78,18 @@ public class PasswordRecoveryServiceTests {
         Assertions.assertEquals("Email sent!", response);
 
     }
+
     @Test
     public void testPasswordRecoveryServiceForgotPassword_Exception() {
 
         String email = "user@example.com";
-        User user = User.builder().id(1L).username("user").email("user@example.com").password("Password1").role(Role.EMPLOYEE).build();
+        User user = User.builder().id(1L).username("user").email("user@example.com").password("Password1")
+                .role(Role.EMPLOYEE).build();
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordRecoveryRepository.findByUser(user)).thenReturn(Optional.empty());
 
-        doThrow(new DataIntegrityViolationException("Error saving")).when(passwordRecoveryRepository).save(any(PasswordRecovery.class));
+        doThrow(new DataIntegrityViolationException("Error saving")).when(passwordRecoveryRepository)
+                .save(any(PasswordRecovery.class));
         Exception exception = assertThrows(Exception.class, () -> {
             passwordRecoveryService.forgotPassword(email);
         });

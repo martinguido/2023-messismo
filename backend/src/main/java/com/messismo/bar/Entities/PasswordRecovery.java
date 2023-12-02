@@ -2,8 +2,6 @@ package com.messismo.bar.Entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,9 +10,7 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
 @Entity
-//@Builder
 @Table(name = "pins")
 public class PasswordRecovery {
 
@@ -35,14 +31,13 @@ public class PasswordRecovery {
     @Column(name = "date_created")
     private Date dateCreated;
 
-    public PasswordRecovery(String pin, User user,Date dateCreated){
-        if(pin.length()!=6){
+    public PasswordRecovery(String pin, User user, Date dateCreated) {
+        if (pin.length() != 6) {
             throw new IllegalArgumentException("Pin length must be equal to 6");
-        }
-        else{
-            this.pin=pin;
-            this.user=user;
-            this.dateCreated=dateCreated;
+        } else {
+            this.pin = pin;
+            this.user = user;
+            this.dateCreated = dateCreated;
         }
     }
 

@@ -22,7 +22,6 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +50,14 @@ public class ReservationServiceTests {
     public void testGetAllReservations() {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> expectedReservations = List.of(new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday"), new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0), "martin2@mail.com", 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2, "Birthday3"));
+        List<Reservation> expectedReservations = List.of(
+                new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0),
+                        "martin@mail.com", 2, "Birthday"),
+                new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0),
+                        "martin2@mail.com", 2, "Birthday2"),
+                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
+                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
+                        "Birthday3"));
         when(reservationRepository.findAll()).thenReturn(expectedReservations);
 
         List<Reservation> result = reservationService.getAllReservations();
@@ -63,14 +69,27 @@ public class ReservationServiceTests {
     public void testFindBetweenStartingDateAndFinishingDate() {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> allReservations = List.of(new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday"), new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0), "martin2@mail.com", 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2, "Birthday3"));
-        List<Reservation> filteredReservations = List.of(new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2, "Birthday3"));
+        List<Reservation> allReservations = List.of(
+                new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0),
+                        "martin@mail.com", 2, "Birthday"),
+                new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0),
+                        "martin2@mail.com", 2, "Birthday2"),
+                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
+                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
+                        "Birthday3"));
+        List<Reservation> filteredReservations = List.of(
+                new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0),
+                        "martin@mail.com", 2, "Birthday"),
+                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
+                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
+                        "Birthday3"));
 
         when(reservationRepository.findAll()).thenReturn(allReservations);
 
         LocalDateTime startingDate = LocalDateTime.of(2023, 1, 1, 13, 0);
         LocalDateTime finishingDate = LocalDateTime.of(2023, 1, 1, 17, 0);
-        List<Reservation> result = reservationService.findBetweenStartingDateAndFinishingDate(startingDate, finishingDate);
+        List<Reservation> result = reservationService.findBetweenStartingDateAndFinishingDate(startingDate,
+                finishingDate);
 
         assertEquals(2, result.size());
         assertEquals(filteredReservations, result);
@@ -80,7 +99,8 @@ public class ReservationServiceTests {
     public void testDeleteReservationSuccessfully() throws Exception {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        Reservation existingReservation = new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday");
+        Reservation existingReservation = new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0),
+                LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday");
         when(reservationRepository.findById(any())).thenReturn(Optional.of(existingReservation));
 
         DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(1L);
@@ -105,7 +125,8 @@ public class ReservationServiceTests {
 
     @Test
     public void testDeleteReservationWithGenericException() {
-        when(reservationRepository.findById(any())).thenThrow(new RuntimeException("CANNOT delete a reservation at the moment"));
+        when(reservationRepository.findById(any()))
+                .thenThrow(new RuntimeException("CANNOT delete a reservation at the moment"));
 
         DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(100L);
         Exception exception = Assert.assertThrows(Exception.class, () -> {
@@ -118,14 +139,15 @@ public class ReservationServiceTests {
     @Test
     public void testAddReservationSuccessfully() throws Exception {
 
-        Bar mockBar = new Bar(1L,20);
+        Bar mockBar = new Bar(1L, 20);
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
-        when(reservationService.findBetweenStartingDateAndFinishingDate(LocalDateTime.of(2023,12,1,10,0), LocalDateTime.of(2023,12,1,12,0))).thenReturn(List.of());
+        when(reservationService.findBetweenStartingDateAndFinishingDate(LocalDateTime.of(2023, 12, 1, 10, 0),
+                LocalDateTime.of(2023, 12, 1, 12, 0))).thenReturn(List.of());
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(5)
                 .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2023,12,1))
-                .finishingDate(LocalDate.of(2023,12,1))
+                .startingDate(LocalDate.of(2023, 12, 1))
+                .finishingDate(LocalDate.of(2023, 12, 1))
                 .clientEmail("test@example.com")
                 .build();
         String result = reservationService.addReservation(requestDTO);
@@ -136,24 +158,23 @@ public class ReservationServiceTests {
     @Test
     public void testAddReservationWithBarCapacityExceededException() {
 
-        Bar mockBar = new Bar(1L,20);
+        Bar mockBar = new Bar(1L, 20);
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(30)
                 .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2023,12,1))
-                .finishingDate(LocalDate.of(2023,12,1))
+                .startingDate(LocalDate.of(2023, 12, 1))
+                .finishingDate(LocalDate.of(2023, 12, 1))
                 .clientEmail("test@example.com")
                 .build();
         assertThrows(BarCapacityExceededException.class, () -> reservationService.addReservation(requestDTO));
 
     }
 
-
     @Test
     public void testAddReservationWithReservationStartingDateMustBeBeforeFinishingDateException() {
 
-        Bar mockBar = new Bar(1L,20);
+        Bar mockBar = new Bar(1L, 20);
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(5)
@@ -163,13 +184,13 @@ public class ReservationServiceTests {
                 .clientEmail("test@example.com")
                 .build();
 
-        ReservationStartingDateMustBeBeforeFinishinDateException exception = Assert.assertThrows(ReservationStartingDateMustBeBeforeFinishinDateException.class, () -> {
-            reservationService.addReservation(requestDTO);
-        });
+        ReservationStartingDateMustBeBeforeFinishinDateException exception = Assert
+                .assertThrows(ReservationStartingDateMustBeBeforeFinishinDateException.class, () -> {
+                    reservationService.addReservation(requestDTO);
+                });
         Assertions.assertEquals("The selected starting date must be before the finishing date", exception.getMessage());
 
     }
-
 
     @Test
     public void testAddReservationWithGenericException() {
@@ -178,8 +199,8 @@ public class ReservationServiceTests {
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(5)
                 .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2023,12,1))
-                .finishingDate(LocalDate.of(2023,12,1))
+                .startingDate(LocalDate.of(2023, 12, 1))
+                .finishingDate(LocalDate.of(2023, 12, 1))
                 .clientEmail("test@example.com")
                 .build();
         Exception exception = Assert.assertThrows(Exception.class, () -> {
@@ -188,6 +209,5 @@ public class ReservationServiceTests {
         Assertions.assertEquals("CANNOT create a reservation at the moment", exception.getMessage());
 
     }
-
 
 }

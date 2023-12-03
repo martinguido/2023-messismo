@@ -2,7 +2,6 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Welcome from "./screens/Welcome";
-import SignInUpForm from "./screens/SignInUpForm";
 import Home from "./screens/Home";
 import Products from "./screens/Products";
 import Orders from "./screens/Orders";
@@ -12,10 +11,10 @@ import Login from "./screens/Login";
 import Register from "./screens/Register";
 import Dashboard from "./screens/Dashboard";
 import Goals from "./screens/Goals";
+import BarConfiguration from "./screens/BarConfiguration";
 
 function App() {
   return (
-    
     <div className="App">
       <BrowserRouter>
         <Routes>
@@ -29,6 +28,7 @@ function App() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/barConfiguration" element={<BarConfiguration />} />
         </Routes>
       </BrowserRouter>
     </div>

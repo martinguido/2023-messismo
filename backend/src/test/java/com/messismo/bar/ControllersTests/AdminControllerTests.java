@@ -189,28 +189,7 @@ public class AdminControllerTests {
 
     }
 
-    @Test
-    public void testGetAllShiftsSuccessful() {
 
-        List<Shift> mockShifts = List.of(new Shift(1L, LocalTime.of(14, 0), LocalTime.of(15, 0)), new Shift(2L, LocalTime.of(15, 0), LocalTime.of(16, 0)));
-        when(shiftService.getAllShifts()).thenReturn(mockShifts);
-        ResponseEntity<?> response = adminController.getAllShifts();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockShifts, response.getBody());
-
-    }
-
-    @Test
-    public void testGetAllShiftsWithException() {
-
-        when(shiftService.getAllShifts()).thenThrow(new RuntimeException("ErrorMessage"));
-        ResponseEntity<?> response = adminController.getAllShifts();
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("ErrorMessage", response.getBody());
-
-    }
 
     @Test
     public void testAddShiftSuccessful() throws Exception {

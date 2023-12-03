@@ -4,28 +4,33 @@ import "../App.css";
 import image from "../images/signin2.png";
 import logo from "../images/logo.png";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { FaUserShield } from "react-icons/fa";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { BsFillShieldLockFill } from "react-icons/bs";
 import { MdEmail } from "react-icons/md";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import SUpPopUp from "../components/SignUpPopUp";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SInPopUp from "../components/SignInPopUp";
-import signupvalidation from "../SignUpValidation";
 import signinvalidation from "../SignInValidation";
-import { login, register } from "../redux/auth";
+import { login } from "../redux/auth";
 import { clearMessage } from "../redux/message";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import Alert from "@mui/material/Alert";
-import Dialog from "@mui/material/Dialog";
 import TextField from "@mui/material/TextField";
 import authService from "../services/auth.service";
 import RecoverPasswordValidation from "../RecoverPasswordValidation";
 import ChangePasswordValidation from "../ChangePasswordValidation";
+import MakeAReservationValidation from "../MakeAReservationValidation";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import MenuItem from "@mui/material/MenuItem";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import shiftService from "../services/shift.service";
+import reservationService from "../services/reservation.service";
+import Select from "@mui/material/Select";
 
 const ForgotPassword = styled.a`
   text-decoration: none;
@@ -57,7 +62,7 @@ function Login() {
   const [SignInPopUp, setSignInPopUp] = useState(false);
 
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const { message } = useSelector((state) => state.message);
+  // const { message } = useSelector((state) => state.message);
   const { user: currentUser } = useSelector((state) => state.auth);
 
   let navigate = useNavigate();
@@ -72,6 +77,25 @@ function Login() {
   const [alertText, setAlertText] = useState("");
   const [isOperationSuccessful, setIsOperationSuccessful] = useState(false);
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedShift, setSelectedShift] = useState("");
+  const [shifts, setShifts] = useState([]);
+  const [emailR, setEmailR] = useState("");
+  const [phone, setPhone] = useState("");
+  const [comment, setComment] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [openReservationForm, setOpenReservationForm] = useState(false);
+
+  useEffect(() => {
+    shiftService
+      .getAllShifts()
+      .then((response) => {
+        setShifts(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener turnos:", error);
+      });
+  }, [openReservationForm]);
 
   useEffect(() => {
     const validationErrors = signinvalidation(signinvalues);
@@ -162,6 +186,32 @@ function Login() {
   const handleInputChange = (e) => {
     setEmail(e.target.value);
   };
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+  const handleMakeAReservationOpenForm = () => {
+    setOpenReservationForm(true);
+  };
+
+  const handleMakeAReservationCloseForm = () => {
+    setOpenReservationForm(false);
+  };
+  const handleInputEmailRChange = (e) => {
+    setEmailR(e.target.value);
+  };
+  const handleInputPhoneChange = (e) => {
+    setPhone(e.target.value);
+  };
+  const handleInputCapacityChange = (e) => {
+    setCapacity(e.target.value);
+  };
+  const handleInputCommentChange = (e) => {
+    setComment(e.target.value);
+  };
+
+  const handleShiftChange = (event) => {
+    setSelectedShift(event.target.value);
+  };
 
   const handleSendEmail = () => {
     const validationErrors = RecoverPasswordValidation({
@@ -187,6 +237,62 @@ function Login() {
           setOpenSnackbar(true);
         });
       setEmail("");
+    }
+  };
+
+  const handleMakeAReservation = () => {
+    const validationErrors = MakeAReservationValidation({
+      phone: phone,
+      email: emailR,
+      comment: comment,
+      capacity: capacity,
+      shift: selectedShift,
+    });
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      console.log(validationErrors);
+    } else {
+      console.log(selectedShift);
+      const selectedShiftObj = shifts.find(
+        (shi) => shi.shiftId === selectedShift
+      );
+      console.log(selectedShiftObj);
+      const fechaDate = new Date(selectedDate);
+      const fechaISO = fechaDate.toISOString();
+      const indiceT = fechaISO.indexOf("T");
+      const fechaSinHora = fechaISO.substring(0, indiceT);
+      console.log(fechaSinHora);
+
+      const newReservationData = {
+        capacity: capacity,
+        shift: selectedShiftObj,
+        startingDate: fechaSinHora,
+        finishingDate: fechaSinHora,
+        comment: comment,
+        clientEmail: emailR,
+        clientPhone: phone,
+      };
+      console.log(newReservationData);
+      reservationService
+        .addReservation(newReservationData)
+        .then((response) => {
+          setAlertText("Reservation made succesfully!");
+          setIsOperationSuccessful(true);
+          setOpenSnackbar(true);
+          handleMakeAReservationCloseForm();
+        })
+        .catch((error) => {
+          setAlertText(error.response.data);
+          setIsOperationSuccessful(false);
+          setOpenSnackbar(true);
+        });
+      setCapacity("");
+      setSelectedShift("");
+      setSelectedDate("");
+      setComment("");
+      setEmailR("");
+      setPhone("");
     }
   };
 
@@ -258,7 +364,7 @@ function Login() {
           <div className="formDiv flx">
             <form action="" className="form grd">
               <div className="headerDiv">
-                <img src={logo} className="logoimg"></img>
+                <img src={logo} className="logoimg" alt="logo"></img>
               </div>
 
               <div className="inputDiv">
@@ -332,9 +438,226 @@ function Login() {
                   Forgot your Password?
                 </ForgotPassword>
               </span>
+              <Link
+                className="btn flx"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleMakeAReservationOpenForm();
+                }}
+              >
+                <span>Make a Reservation</span>
+              </Link>
+              <Dialog
+                open={openReservationForm}
+                // dividers={true}
+                onClose={handleMakeAReservationCloseForm}
+                aria-labelledby="form-dialog-title"
+                className="custom-dialog"
+                maxWidth="sm"
+                fullWidth
+              >
+                <DialogContent>
+                  <div>
+                    <h1 style={{ marginBottom: "3%", fontSize: "1.6rem" }}>
+                      Make a Reservation
+                    </h1>
+                    <hr
+                      style={{
+                        borderTop: "1px solid grey",
+                        marginBottom: "3%",
+                        width: "100%",
+                      }}
+                    />
+                    <p>Please enter you email</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={emailR}
+                      onChange={handleInputEmailRChange}
+                      variant="outlined"
+                      error={errors.emailR ? true : false}
+                      helperText={errors.emailR || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+                    <p>Please enter you phone number</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={phone}
+                      onChange={handleInputPhoneChange}
+                      variant="outlined"
+                      error={errors.phone ? true : false}
+                      helperText={errors.phone || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+
+                    <p>Please enter a capacity *</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={capacity}
+                      onChange={handleInputCapacityChange}
+                      variant="outlined"
+                      error={errors.capacity ? true : false}
+                      helperText={errors.capacity || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+                    <p>Please enter a shift *</p>
+
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={selectedShift}
+                      onChange={handleShiftChange}
+                      error={errors.shift ? true : false}
+                      helperText={errors.shift || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {shifts.map((shift) => (
+                        <MenuItem
+                          style={{
+                            color: "black",
+                          }}
+                          key={shift.shiftId}
+                          value={shift.shiftId}
+                        >
+                          {shift.startingHour.substring(0, 5) +
+                            " - " +
+                            shift.finishingHour.substring(0, 5)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+
+                    <p style={{ marginBottom: "3.5%" }}>Please enter a date</p>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        variant="outlined"
+                        error={errors.date ? true : false}
+                        helperText={errors.date || ""}
+                        label={"YYYY-MM-DD"}
+                        views={["year", "month", "day"]}
+                        format="YYYY-MM-DD"
+                        value={selectedDate}
+                        onChange={handleDateChange}
+                      />
+                    </LocalizationProvider>
+                    <p>Please enter a comment *</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={comment}
+                      onChange={handleInputCommentChange}
+                      variant="outlined"
+                      error={errors.comment ? true : false}
+                      helperText={errors.comment || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+
+                    <div
+                      className="buttons"
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <Button
+                        variant="outlined"
+                        style={{
+                          color: "grey",
+                          borderColor: "grey",
+                          fontSize: "1rem",
+                        }}
+                        onClick={handleMakeAReservationCloseForm}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
+                        style={{
+                          marginLeft: "3%",
+                          fontSize: "1rem",
+                          backgroundColor: "#a4d4cc",
+                          color: "black",
+                        }}
+                        onClick={handleMakeAReservation}
+                      >
+                        Reserve
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Dialog
                 open={openForm}
-                dividers={true}
+                // dividers={true}
                 onClose={handleCloseForm}
                 aria-labelledby="form-dialog-title"
                 className="custom-dialog"
@@ -343,8 +666,7 @@ function Login() {
               >
                 <DialogContent>
                   <div>
-  
-                    <h1 style={{ marginBottom: "3%", fontSize: "1.6rem"}}>
+                    <h1 style={{ marginBottom: "3%", fontSize: "1.6rem" }}>
                       Password Recovery
                     </h1>
                     <hr
@@ -406,7 +728,12 @@ function Login() {
                       </Button>
                       <Button
                         variant="contained"
-                        style={{ marginLeft: "3%", fontSize: "1rem", backgroundColor: "#a4d4cc", color: "black" }}
+                        style={{
+                          marginLeft: "3%",
+                          fontSize: "1rem",
+                          backgroundColor: "#a4d4cc",
+                          color: "black",
+                        }}
                         onClick={handleSendEmail}
                       >
                         Send
@@ -417,7 +744,7 @@ function Login() {
               </Dialog>
               <Dialog
                 open={openChangePasswordForm}
-                dividers={true}
+                // dividers={true}
                 onClose={handleCloseChangePasswordForm}
                 aria-labelledby="form-dialog-title"
                 className="custom-dialog"
@@ -573,7 +900,12 @@ function Login() {
                       </Button>
                       <Button
                         variant="contained"
-                        style={{ marginLeft: "3%", fontSize: "1rem", backgroundColor: "#a4d4cc", color: "black" }}
+                        style={{
+                          marginLeft: "3%",
+                          fontSize: "1rem",
+                          backgroundColor: "#a4d4cc",
+                          color: "black",
+                        }}
                         onClick={handleChangePassword}
                       >
                         Change Password
@@ -586,7 +918,7 @@ function Login() {
           </div>
 
           <div className="imageDiv">
-            <img src={image} className="imag"></img>
+            <img src={image} className="imag" alt="logo"></img>
 
             <div className="textDiv">
               <h2 className="title">Welcome Back</h2>

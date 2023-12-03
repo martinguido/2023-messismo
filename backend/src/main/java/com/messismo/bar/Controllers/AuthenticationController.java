@@ -5,10 +5,7 @@ import com.messismo.bar.DTOs.NewReservationRequestDTO;
 import com.messismo.bar.DTOs.PasswordRecoveryDTO;
 import com.messismo.bar.DTOs.RegisterRequestDTO;
 import com.messismo.bar.Exceptions.*;
-import com.messismo.bar.Services.AuthenticationService;
-import com.messismo.bar.Services.BarService;
-import com.messismo.bar.Services.PasswordRecoveryService;
-import com.messismo.bar.Services.ReservationService;
+import com.messismo.bar.Services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +24,8 @@ public class AuthenticationController {
     private final BarService barService;
 
     private final ReservationService reservationService;
+
+    private final ShiftService shiftService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) {
@@ -101,7 +100,14 @@ public class AuthenticationController {
 
     }
 
-
+    @GetMapping("/getAllShifts")
+    public ResponseEntity<?> getAllShifts() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(shiftService.getAllShifts());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 
     @GetMapping("/health")

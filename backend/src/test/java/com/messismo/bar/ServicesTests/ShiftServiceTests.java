@@ -141,6 +141,83 @@ public class ShiftServiceTests {
     }
 
     @Test
+    public void testAddShiftWithCannotCreateShiftWithSameShift() {
+        List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
+        when(shiftRepository.findAll()).thenReturn(existingShifts);
+        NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 10)).finishingHour(LocalTime.of(18, 15)).build();
+
+        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+            shiftService.addShift(requestDTO);
+        });
+        Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
+
+    }
+    @Test
+    public void testAddShiftWithCannotCreateShiftWithEqualsStartingHourAndFinishingHourAfter() {
+        List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
+        when(shiftRepository.findAll()).thenReturn(existingShifts);
+        NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 10)).finishingHour(LocalTime.of(18, 16)).build();
+
+        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+            shiftService.addShift(requestDTO);
+        });
+        Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
+
+    }
+    @Test
+    public void testAddShiftWithCannotCreateShiftWithEqualsStartingHourAndFinishingHourBefore() {
+        List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
+        when(shiftRepository.findAll()).thenReturn(existingShifts);
+        NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 10)).finishingHour(LocalTime.of(18, 14)).build();
+
+        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+            shiftService.addShift(requestDTO);
+        });
+        Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
+
+    }
+    @Test
+    public void testAddShiftWithCannotCreateShiftWithStartingHourAfterAndEqualsFinishingHour() {
+        List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
+        when(shiftRepository.findAll()).thenReturn(existingShifts);
+        NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 11)).finishingHour(LocalTime.of(18, 15)).build();
+
+        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+            shiftService.addShift(requestDTO);
+        });
+        Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
+
+    }
+    @Test
+    public void testAddShiftWithCannotCreateShiftWithStartingHourBeforeAndEqualsFinishingHour() {
+        List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
+        when(shiftRepository.findAll()).thenReturn(existingShifts);
+        NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 9)).finishingHour(LocalTime.of(18, 15)).build();
+
+        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+            shiftService.addShift(requestDTO);
+        });
+        Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
+
+    }
+
+
+   @Test
+    public void testAddShiftWithCannotCreateShiftContainingAShift() {
+        List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
+        when(shiftRepository.findAll()).thenReturn(existingShifts);
+        NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 9)).finishingHour(LocalTime.of(18, 16)).build();
+
+        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+            shiftService.addShift(requestDTO);
+        });
+        Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
+
+    }
+
+
+
+    @Test
     public void testAddShiftWithGenericException() {
 
         when(shiftRepository.findAll()).thenThrow(new RuntimeException("CANNOT create a shift at the moment"));

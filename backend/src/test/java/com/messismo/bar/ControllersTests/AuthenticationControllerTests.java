@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,6 +41,10 @@ public class AuthenticationControllerTests {
 
     @Mock
     private BarService barService;
+
+
+    @Mock
+    private ShiftService shiftService;
 
     @BeforeEach
     public void setUp() {
@@ -244,12 +249,12 @@ public class AuthenticationControllerTests {
     public void testAddReservationWithInvalidCapacity() {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(25).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("CANNOT have the capacity under 1 or higher than maximum capacity",response.getBody());
+        assertEquals("CANNOT have the capacity under 1 or higher than maximum capacity", response.getBody());
 
     }
 
@@ -257,12 +262,12 @@ public class AuthenticationControllerTests {
     public void testAddReservationWithInvalidCapacityZero() {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(0).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("CANNOT have the capacity under 1 or higher than maximum capacity",response.getBody());
+        assertEquals("CANNOT have the capacity under 1 or higher than maximum capacity", response.getBody());
 
     }
 
@@ -270,12 +275,12 @@ public class AuthenticationControllerTests {
     public void testAddReservationWithMissingInformation() {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(5));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(1).comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Missing information to add a reservation",response.getBody());
+        assertEquals("Missing information to add a reservation", response.getBody());
 
     }
 
@@ -284,7 +289,7 @@ public class AuthenticationControllerTests {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenReturn("Reservation added successfully");
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
@@ -297,12 +302,12 @@ public class AuthenticationControllerTests {
     public void testAddReservationWithMissingCapacity() {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(5));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().clientEmail("client0@gmail.com").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Missing capacity to create a reservation",response.getBody());
+        assertEquals("Missing capacity to create a reservation", response.getBody());
 
     }
 
@@ -311,7 +316,7 @@ public class AuthenticationControllerTests {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenThrow(new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity"));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
@@ -324,7 +329,7 @@ public class AuthenticationControllerTests {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenThrow(new ReservationStartingDateMustBeBeforeFinishinDateException("The selected starting date must be before the finishing date"));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2024, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
@@ -337,7 +342,7 @@ public class AuthenticationControllerTests {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenThrow(new Exception("INTERNAL_ERROR"));
-        Shift aShift = new Shift(LocalTime.of(10,0),LocalTime.of(11,0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
@@ -345,4 +350,27 @@ public class AuthenticationControllerTests {
         assertEquals("INTERNAL_ERROR", response.getBody());
     }
 
+
+    @Test
+    public void testGetAllShiftsSuccessful() {
+
+        List<Shift> mockShifts = List.of(new Shift(1L, LocalTime.of(14, 0), LocalTime.of(15, 0)), new Shift(2L, LocalTime.of(15, 0), LocalTime.of(16, 0)));
+        when(shiftService.getAllShifts()).thenReturn(mockShifts);
+        ResponseEntity<?> response = authenticationController.getAllShifts();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockShifts, response.getBody());
+
+    }
+
+    @Test
+    public void testGetAllShiftsWithException() {
+
+        when(shiftService.getAllShifts()).thenThrow(new RuntimeException("ErrorMessage"));
+        ResponseEntity<?> response = authenticationController.getAllShifts();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("ErrorMessage", response.getBody());
+
+    }
 }

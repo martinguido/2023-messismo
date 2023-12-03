@@ -24,8 +24,8 @@ import FilterRedux from "./FilterRedux";
 import Tooltip from "@mui/material/Tooltip";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const ProductsList = () => {
   const [openFormModal, setOpenFormModal] = useState(false);
@@ -51,21 +51,21 @@ const ProductsList = () => {
   const minStock = useSelector((state) => state.filters.minStock);
   const maxStock = useSelector((state) => state.filters.maxStock);
   const [sortField, setSortField] = useState(null);
-const [sortOrder, setSortOrder] = useState("asc");
-const [isLoading, setIsLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isEditFormOpen) {
-    productsService
-      .getAllProducts()
-      .then((response) => {
-        setProducts(response.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error al mostrar los productos", error);
-        setIsLoading(false);
-      });
+      productsService
+        .getAllProducts()
+        .then((response) => {
+          setProducts(response.data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al mostrar los productos", error);
+          setIsLoading(false);
+        });
     }
   }, [openFormModal, open]);
 
@@ -117,7 +117,9 @@ const [isLoading, setIsLoading] = useState(true);
   const deleteProduct = async () => {
     if (selectedProduct) {
       try {
-        const response = await productsService.deleteProduct(selectedProduct.productId);
+        const response = await productsService.deleteProduct(
+          selectedProduct.productId
+        );
         console.log(response);
         setSelectedProduct(null);
         setIsOperationSuccessful(true);
@@ -133,9 +135,9 @@ const [isLoading, setIsLoading] = useState(true);
     }
   };
 
-  const deleteProductAsync = async (productId) => {
-    return productsService.deleteProduct(productId);
-  };
+  // const deleteProductAsync = async (productId) => {
+  //   return productsService.deleteProduct(productId);
+  // };
 
   const handleEditClick = (producto) => {
     setEditingProduct(producto);
@@ -159,7 +161,7 @@ const [isLoading, setIsLoading] = useState(true);
   const handleSaveProduct = async (newProductData) => {
     try {
       const response = await addProductAsync(newProductData);
-      console.log(response)
+      console.log(response);
       setIsOperationSuccessful(true);
       setAlertText("Product added successfully!");
 
@@ -237,79 +239,65 @@ const [isLoading, setIsLoading] = useState(true);
     setShowFullDescriptions(newShowFullDescriptions);
   };
 
-  
-  
   const handleSort = (field) => {
-  
-    
     if (field === sortField) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      
       setSortField(field);
       setSortOrder("asc");
     }
-  
   };
- 
+
   useEffect(() => {
     if (sortField) {
-      if (sortField !== "category"){
-      const sortedProducts = [...products].sort((a, b) => {
-        if (sortOrder === "asc") {
-          if (a[sortField] < b[sortField]) {
-            return -1;
+      if (sortField !== "category") {
+        const sortedProducts = [...products].sort((a, b) => {
+          if (sortOrder === "asc") {
+            if (a[sortField] < b[sortField]) {
+              return -1;
+            }
+            if (a[sortField] > b[sortField]) {
+              return 1;
+            }
+            return 0;
+          } else {
+            if (a[sortField] > b[sortField]) {
+              return -1;
+            }
+            if (a[sortField] < b[sortField]) {
+              return 1;
+            }
+            return 0;
           }
-          if (a[sortField] > b[sortField]) {
-            return 1;
+        });
+        setProducts(sortedProducts);
+      } else {
+        const sortedProducts = [...products].sort((a, b) => {
+          if (sortOrder === "asc") {
+            if (a[sortField]["name"] < b[sortField]["name"]) {
+              return -1;
+            }
+            if (a[sortField]["name"] > b[sortField]["name"]) {
+              return 1;
+            }
+            return 0;
+          } else {
+            if (a[sortField]["name"] > b[sortField]["name"]) {
+              return -1;
+            }
+            if (a[sortField]["name"] < b[sortField]["name"]) {
+              return 1;
+            }
+            return 0;
           }
-          return 0;
-        } else {
-          if (a[sortField] > b[sortField]) {
-            return -1;
-          }
-          if (a[sortField] < b[sortField]) {
-            return 1;
-          }
-          return 0;
-        }
-      });
-      setProducts(sortedProducts);
-    }
-    else {
-      const sortedProducts = [...products].sort((a, b) => {
-        if (sortOrder === "asc") {
-          if (a[sortField]["name"] < b[sortField]["name"]) {
-            return -1;
-          }
-          if (a[sortField]["name"] > b[sortField]["name"]) {
-            return 1;
-          }
-          return 0;
-        } else {
-          if (a[sortField]["name"] > b[sortField]["name"]) {
-            return -1;
-          }
-          if (a[sortField]["name"] < b[sortField]["name"]) {
-            return 1;
-          }
-          return 0;
-        }
-    });
-    setProducts(sortedProducts);
-  }
-      
+        });
+        setProducts(sortedProducts);
+      }
     }
   }, [sortField, sortOrder]);
-  
-  
-  
-  
 
   return (
-   
     <div className="container">
-     
       <div className="input-container">
         <input
           type="text"
@@ -335,8 +323,7 @@ const [isLoading, setIsLoading] = useState(true);
 
       <div className="firstRow">
         <div className="add-product">
-          {role === "ADMIN" ||
-          role === "MANAGER" ? (
+          {role === "ADMIN" || role === "MANAGER" ? (
             <Button
               variant="contained"
               endIcon={<AddIcon />}
@@ -362,7 +349,7 @@ const [isLoading, setIsLoading] = useState(true);
             onClick={handleOpenFilter}
             endIcon={<FilterListIcon />}
             style={{
-              backgroundColor: '#a4d4cc',
+              backgroundColor: "#a4d4cc",
               color: "black",
               borderColor: "#007bff",
               marginTop: "4%",
@@ -411,167 +398,207 @@ const [isLoading, setIsLoading] = useState(true);
         <div className="title">
           <p style={{ color: "white", fontWeight: "bold" }}>Product details</p>
           <IconButton size="small" onClick={() => handleSort("name")}>
-      {sortField === "name" ? (
-        sortOrder === "asc" ? (
-          <ExpandLessIcon className="ExpandIcon" style={{ color: "white"}}/>
-        ) : (
-          <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-        )
-      ) : (
-        <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-      )}
-    </IconButton>
+            {sortField === "name" ? (
+              sortOrder === "asc" ? (
+                <ExpandLessIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              ) : (
+                <ExpandMoreIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              )
+            ) : (
+              <ExpandMoreIcon
+                className="ExpandIcon"
+                style={{ color: "white" }}
+              />
+            )}
+          </IconButton>
         </div>
         <div className="title">
           <p style={{ color: "white", fontWeight: "bold" }}>Category</p>
           <IconButton size="small" onClick={() => handleSort("category")}>
-      {sortField === "category" ? (
-        sortOrder === "asc" ? (
-          <ExpandLessIcon className="ExpandIcon" style={{ color: "white"}}/>
-        ) : (
-          <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-        )
-      ) : (
-        <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-      )}
-    </IconButton>
+            {sortField === "category" ? (
+              sortOrder === "asc" ? (
+                <ExpandLessIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              ) : (
+                <ExpandMoreIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              )
+            ) : (
+              <ExpandMoreIcon
+                className="ExpandIcon"
+                style={{ color: "white" }}
+              />
+            )}
+          </IconButton>
         </div>
-       
+
         <div className="title">
           <p style={{ color: "white", fontWeight: "bold" }}>Stock</p>
           <IconButton size="small" onClick={() => handleSort("stock")}>
-      {sortField === "stock" ? (
-        sortOrder === "asc" ? (
-          <ExpandLessIcon className="ExpandIcon" style={{ color: "white"}}/>
-        ) : (
-          <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-        )
-      ) : (
-        <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-      )}
-    </IconButton>
+            {sortField === "stock" ? (
+              sortOrder === "asc" ? (
+                <ExpandLessIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              ) : (
+                <ExpandMoreIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              )
+            ) : (
+              <ExpandMoreIcon
+                className="ExpandIcon"
+                style={{ color: "white" }}
+              />
+            )}
+          </IconButton>
         </div>
-        
+
         <div className="title">
           <p style={{ color: "white", fontWeight: "bold" }}>Price</p>
           <IconButton size="small" onClick={() => handleSort("unitPrice")}>
-      {sortField === "unitPrice" ? (
-        sortOrder === "asc" ? (
-          <ExpandLessIcon className="ExpandIcon" style={{ color: "white"}}/>
-        ) : (
-          <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-        )
-      ) : (
-        <ExpandMoreIcon className="ExpandIcon" style={{ color: "white"}}/>
-      )}
-    </IconButton>
+            {sortField === "unitPrice" ? (
+              sortOrder === "asc" ? (
+                <ExpandLessIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              ) : (
+                <ExpandMoreIcon
+                  className="ExpandIcon"
+                  style={{ color: "white" }}
+                />
+              )
+            ) : (
+              <ExpandMoreIcon
+                className="ExpandIcon"
+                style={{ color: "white" }}
+              />
+            )}
+          </IconButton>
         </div>
-        
+
         <div className="title">
           <p style={{ color: "white", fontWeight: "bold" }}>Actions</p>
         </div>
-        
       </div>
-      {isLoading ? ( 
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10%' }}>
-          <CircularProgress style={{ color:"#a4d4cc"}}/>
+      {isLoading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: "10%",
+          }}
+        >
+          <CircularProgress style={{ color: "#a4d4cc" }} />
         </Box>
-      
       ) : (
-        
         <>
-      {products.map((producto, index) => (
-        <div className="entradas" key={index}>
-          <div className="product">
-            <div className="firstLine">
-              <div className="names">
-                <div className="name">
-                  <p className="text" style={{ fontWeight: "bold" }}>
-                    {producto.name}
-                  </p>
+          {products.map((producto, index) => (
+            <div className="entradas" key={index}>
+              <div className="product">
+                <div className="firstLine">
+                  <div className="names">
+                    <div className="name">
+                      <p className="text" style={{ fontWeight: "bold" }}>
+                        {producto.name}
+                      </p>
+                    </div>
+                    <div className="category">
+                      <p className="text">{producto.category.name}</p>
+                    </div>
+                    <div className="category">
+                      <p className="text">{producto.stock}</p>
+                    </div>
+                    <div className="category">
+                      <p className="text">{producto.unitPrice}</p>
+                    </div>
+                  </div>
+                  <div className="buttons-edit">
+                    {role === "ADMIN" || role === "MANAGER" ? (
+                      <Tooltip arrow style={{ fontSize: "2rem" }}>
+                        <IconButton
+                          aria-label="edit"
+                          size="large"
+                          color="red"
+                          onClick={() => handleEditClick(producto)}
+                        >
+                          <EditIcon style={{ fontSize: "1.5rem" }} />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      console.log("")
+                    )}
+                    {role === "ADMIN" || role === "MANAGER" ? (
+                      <Tooltip
+                        title="Delete Product"
+                        arrow
+                        style={{ fontSize: "2rem" }}
+                      >
+                        <IconButton
+                          aria-label="delete"
+                          size="large"
+                          style={{ color: "red", fontSize: "1.5 rem" }}
+                          onClick={() => handleDeleteClick(producto)}
+                        >
+                          <DeleteIcon style={{ fontSize: "1.5rem" }} />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      <div></div>
+                    )}
+                  </div>
                 </div>
-                <div className="category">
-                  <p className="text">{producto.category.name}</p>
-                </div>
-                <div className="category">
-                  <p className="text">{producto.stock}</p>
-                </div>
-                <div className="category">
-                  <p className="text">{producto.unitPrice}</p>
-                </div>
-              </div>
-              <div className="buttons-edit">
-                {role === "ADMIN" || role === "MANAGER" ? (
-                  <Tooltip arrow style={{ fontSize: "2rem" }}>
-                    <IconButton
-                      aria-label="edit"
-                      size="large"
-                      color="red"
-                      onClick={() => handleEditClick(producto)}
-                    >
-                      <EditIcon style={{ fontSize: "1.5rem" }} />
-                    </IconButton>
-                  </Tooltip>
-                ) : (
-                  console.log("")
-                )}
-                {role === "ADMIN" || role === "MANAGER" ? (
-                  <Tooltip
-                    title="Delete Product"
-                    arrow
-                    style={{ fontSize: "2rem" }}
-                  >
-                    <IconButton
-                      aria-label="delete"
-                      size="large"
-                      style={{ color: "red", fontSize: "1.5 rem" }}
-                      onClick={() => handleDeleteClick(producto)}
-                    >
-                      <DeleteIcon style={{ fontSize: "1.5rem" }} />
-                    </IconButton>
-                  </Tooltip>
-                ) : (
-                  <div></div>
-                )}
-              </div>
-            </div>
-            <div className="final-line">
-              <p className="descripcion">
-                {showFullDescriptions[index]
-                  ? producto.description
-                  : window.innerWidth <= 600
-                    ? producto.description.substring(0, 7) + "..."
-                    : producto.description.length <= 30
+                <div className="final-line">
+                  <p className="descripcion">
+                    {showFullDescriptions[index]
+                      ? producto.description
+                      : window.innerWidth <= 600
+                      ? producto.description.substring(0, 7) + "..."
+                      : producto.description.length <= 30
                       ? producto.description
                       : producto.description.substring(0, 30) + "..."}
-
-              </p>
-              {producto.description.length > (window.innerWidth <= 600 ? 7 : 30) &&
-                !showFullDescriptions[index] && (
-                  <IconButton
-                    color="black"
-                    onClick={() => handleShowMoreClick(index)}
-                  >
-                    <ExpandMoreIcon fontSize="small"/>
-                  </IconButton>
-                )}
-                {producto.description.length > (window.innerWidth   <= 600 ? 7 : 30) &&
-                showFullDescriptions[index] && (
-                  <IconButton
-                    color="black"
-                    onClick={() => handleShowLessClick(index)}
-                  >
-                    <ExpandLessIcon fontSize="small"/>
-                  </IconButton>
-                )}
+                  </p>
+                  {producto.description.length >
+                    (window.innerWidth <= 600 ? 7 : 30) &&
+                    !showFullDescriptions[index] && (
+                      <IconButton
+                        color="black"
+                        onClick={() => handleShowMoreClick(index)}
+                      >
+                        <ExpandMoreIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  {producto.description.length >
+                    (window.innerWidth <= 600 ? 7 : 30) &&
+                    showFullDescriptions[index] && (
+                      <IconButton
+                        color="black"
+                        onClick={() => handleShowLessClick(index)}
+                      >
+                        <ExpandLessIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                </div>
+              </div>
             </div>
-          </div>
-
-        </div>
-      ))}
-      </>
+          ))}
+        </>
       )}
-      
+
       {isEditFormOpen && (
         <Dialog
           open={isEditFormOpen}
@@ -606,10 +633,12 @@ const [isLoading, setIsLoading] = useState(true);
           }}
         >
           <DialogTitle id="alert-dialog-title" style={{ fontSize: "1.5rem" }}>
-            {selectedProduct &&
+            {selectedProduct && (
               <p style={{ fontSize: "1.3rem" }}>
-              Are you sure you want to delete the product <strong>{selectedProduct.name}</strong>?
-            </p>}
+                Are you sure you want to delete the product{" "}
+                <strong>{selectedProduct.name}</strong>?
+              </p>
+            )}
           </DialogTitle>
           <DialogContent>
             <DialogContentText
@@ -648,11 +677,8 @@ const [isLoading, setIsLoading] = useState(true);
           {alertText}
         </Alert>
       </Snackbar>
-    
     </div>
-
   );
-
 };
 
 export default ProductsList;

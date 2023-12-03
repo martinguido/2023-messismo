@@ -66,14 +66,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/getAllShifts")
-    public ResponseEntity<?> getAllShifts() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(shiftService.getAllShifts());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+
 
 
     @PostMapping("/addShift")
@@ -96,6 +89,7 @@ public class AdminController {
 
     @DeleteMapping("/deleteShift")
     public ResponseEntity<String> deleteShift(@RequestBody DeleteShiftRequestDTO deleteShiftRequestDTO) {
+        System.out.println(deleteShiftRequestDTO);
         if (deleteShiftRequestDTO.getShiftId() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to delete a shift");
         } else {

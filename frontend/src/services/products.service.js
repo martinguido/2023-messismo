@@ -1,37 +1,22 @@
 import axios from "axios";
 import authHeader from "./auth-header";
-import { useSelector } from "react-redux";
 import apiUrl from "../deploy";
 
-
-
 const getAllProducts = () => {
-  return axios.get(
-    apiUrl + "/api/v1/validatedEmployee/getAllProducts",
-    { headers: authHeader(), method: "GET", "Content-Type": "application/json" }
-  );
+  return axios.get(apiUrl + "/api/v1/validatedEmployee/getAllProducts", {
+    headers: authHeader(),
+    method: "GET",
+    "Content-Type": "application/json",
+  });
 };
 
 const addProducts = (product) => {
-  const newProduct = {
-    name: product.name,
-    unitPrice: product.unitPrice,
-    description: product.description,
-    stock: product.stock,
-    category: product.category,
-  };
-
-
   return axios
-    .post(
-      apiUrl + "/api/v1/validatedEmployee/product/addProduct",
-      product,
-      {
-        headers: authHeader(),
-        method: "POST",
-        "Content-Type": "application/json",
-      }
-    )
+    .post(apiUrl + "/api/v1/validatedEmployee/product/addProduct", product, {
+      headers: authHeader(),
+      method: "POST",
+      "Content-Type": "application/json",
+    })
     .then((response) => {
       console.log("Producto agregado con éxito:", response.data);
     })
@@ -42,19 +27,15 @@ const addProducts = (product) => {
 };
 
 const deleteProduct = (productId) => {
-  return axios
-    .delete(
-      apiUrl + `api/v1/manager/product/deleteProduct/${productId}`,
-      {
-        headers: authHeader(),
-        method: "DELETE",
-        "Content-Type": "application/json",
-      }
-    )
-
-
+  return axios.delete(
+    apiUrl + `api/v1/manager/product/deleteProduct/${productId}`,
+    {
+      headers: authHeader(),
+      method: "DELETE",
+      "Content-Type": "application/json",
+    }
+  );
 };
-
 
 const updateProductPrice = (productId, updatedPrice) => {
   const newProductPrice = {
@@ -62,35 +43,29 @@ const updateProductPrice = (productId, updatedPrice) => {
     unitPrice: updatedPrice,
   };
 
-  return axios
-    .put(
-      apiUrl + "/api/v1/manager/product/updatePrice",
-      newProductPrice,
-      {
-        headers: authHeader(),
-        method: "PUT",
-        "Content-Type": "application/json",
-      }
-    )
+  return axios.put(
+    apiUrl + "/api/v1/manager/product/updatePrice",
+    newProductPrice,
+    {
+      headers: authHeader(),
+      method: "PUT",
+      "Content-Type": "application/json",
+    }
+  );
 };
 
-
 const updateProductStock = (productId, operation, updatedStock) => {
-  const newProductStock= {
+  const newProductStock = {
     productId: productId,
     addStock: updatedStock,
   };
 
   return axios
-    .put(
-      apiUrl + "/api/v1/manager/product/addStock",
-      newProductStock,
-      {
-        headers: authHeader(),
-        method: "PUT",
-        "Content-Type": "application/json",
-      }
-    )
+    .put(apiUrl + "/api/v1/manager/product/addStock", newProductStock, {
+      headers: authHeader(),
+      method: "PUT",
+      "Content-Type": "application/json",
+    })
     .then((response) => {
       console.log("Stock modificado con éxito:", response.data);
     })
@@ -120,17 +95,12 @@ const modifyProductStock = (modifiedProductStock) => {
 };
 
 const filterByName = (product) => {
-
   return axios
-    .post(
-      apiUrl + "/api/v1/validatedEmployee/filterProducts",
-      product,
-      {
-        headers: authHeader(),
-        method: "POST",
-        "Content-Type": "application/json",
-      }
-    )
+    .post(apiUrl + "/api/v1/validatedEmployee/filterProducts", product, {
+      headers: authHeader(),
+      method: "POST",
+      "Content-Type": "application/json",
+    })
     .then((response) => {
       console.log("Productos encontrados:", response.data);
       return response.data;
@@ -141,20 +111,15 @@ const filterByName = (product) => {
     });
 };
 
-
 const filter = (product) => {
   console.log(product);
-  
+
   return axios
-    .post(
-      apiUrl + "/api/v1/validatedEmployee/filterProducts",
-      product,
-      {
-        headers: authHeader(),
-        method: "POST",
-        "Content-Type": "application/json",
-      }
-    )
+    .post(apiUrl + "/api/v1/validatedEmployee/filterProducts", product, {
+      headers: authHeader(),
+      method: "POST",
+      "Content-Type": "application/json",
+    })
     .then((response) => {
       console.log("Productos encontrados:", response.data);
       return response.data;
@@ -173,8 +138,7 @@ const productsService = {
   filterByName,
   filter,
   updateProductStock,
-  modifyProductStock
-
+  modifyProductStock,
 };
 
 export default productsService;

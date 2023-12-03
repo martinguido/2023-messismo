@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import CategoriesList from "../components/CategoriesList";
+import BarConfigurationLists from "../components/BarConfigurationLists";
 
 const Container = styled.div`
   display: flex;
@@ -21,21 +21,17 @@ const MainContent = styled.div`
   font-size: 1.5rem;
 `;
 
-function Categories() {
+function BarConfiguration() {
   const { user: currentUser } = useSelector((state) => state.auth);
   const clicked = useSelector((state) => state.navigation.clicked);
 
-  const isAdminOrManager =
-    currentUser &&
-    (currentUser.role === "MANAGER" ||
-      currentUser.role === "ADMIN" ||
-      currentUser.role === "VALIDATEDEMPLOYEE");
+  const isAdmin = currentUser && currentUser.role === "ADMIN";
   const contentVisible = !clicked;
 
   if (!currentUser) {
     return <Navigate to="/" />;
   }
-  if (!isAdminOrManager) {
+  if (!isAdmin) {
     return <Navigate to="/homepage" />;
   }
 
@@ -43,10 +39,10 @@ function Categories() {
     <Container className="products">
       <Navbar />
       <MainContent visible={contentVisible}>
-        <CategoriesList />
+        <BarConfigurationLists />
       </MainContent>
     </Container>
   );
 }
 
-export default Categories;
+export default BarConfiguration;

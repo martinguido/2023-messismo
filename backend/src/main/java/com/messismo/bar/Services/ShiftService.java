@@ -25,7 +25,7 @@ public class ShiftService {
         try {
             List<Shift> allShifts = shiftRepository.findAll();
             for (Shift shift : allShifts) {
-                if ((newShiftRequestDTO.getStartingHour().isBefore(shift.getFinishingHour()) && newShiftRequestDTO.getStartingHour().isAfter(shift.getStartingHour())) || (newShiftRequestDTO.getFinishingHour().isBefore(shift.getFinishingHour()) && newShiftRequestDTO.getFinishingHour().isAfter(shift.getStartingHour()))) {
+                if (((newShiftRequestDTO.getStartingHour().isBefore(shift.getFinishingHour()) && newShiftRequestDTO.getStartingHour().isAfter(shift.getStartingHour())) || (newShiftRequestDTO.getFinishingHour().isBefore(shift.getFinishingHour()) && newShiftRequestDTO.getFinishingHour().isAfter(shift.getStartingHour()))) || (newShiftRequestDTO.getStartingHour().equals(shift.getStartingHour()) && newShiftRequestDTO.getFinishingHour().isAfter(shift.getFinishingHour())) || (newShiftRequestDTO.getStartingHour().isBefore(shift.getStartingHour()) && newShiftRequestDTO.getFinishingHour().equals(shift.getFinishingHour())) || (newShiftRequestDTO.getStartingHour().isBefore(shift.getStartingHour()) && newShiftRequestDTO.getStartingHour().isBefore(shift.getFinishingHour()) && newShiftRequestDTO.getFinishingHour().isAfter(shift.getFinishingHour()) && newShiftRequestDTO.getFinishingHour().isAfter(shift.getStartingHour())) || ((newShiftRequestDTO.getStartingHour().equals(shift.getStartingHour())) && (newShiftRequestDTO.getFinishingHour().equals(shift.getFinishingHour())))) {
                     throw new CannotCreateShiftInBetweenOtherShiftException("CANNOT create a shift with an starting hour or finishing hour in between another shift");
                 }
             }

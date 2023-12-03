@@ -5,6 +5,7 @@ import com.messismo.bar.Exceptions.*;
 import com.messismo.bar.Services.CategoryService;
 import com.messismo.bar.Services.OrderService;
 import com.messismo.bar.Services.ProductService;
+import com.messismo.bar.Services.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class ValidatedEmployeeController {
 
     private final OrderService orderService;
 
+    private final ReservationService reservationService;
     @PostMapping("/product/addProduct")
     public ResponseEntity<?> addProduct(@RequestBody ProductDTO productDTO) {
         if (productDTO.getCategory() == null || productDTO.getName() == null || productDTO.getName().isEmpty() || productDTO.getUnitPrice() == null || productDTO.getDescription() == null || productDTO.getStock() == null || productDTO.getUnitCost() == null || productDTO.getNewCategory() == null) {
@@ -100,4 +102,12 @@ public class ValidatedEmployeeController {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrders());
     }
 
+    @GetMapping("/getAllReservations")
+    public ResponseEntity<?> getAllReservations() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(reservationService.getAllReservations());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

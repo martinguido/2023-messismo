@@ -954,26 +954,6 @@ public class ManagerControllerTests {
     }
 
 
-    @Test
-    public void testGetAllReservationsSuccessful() {
 
-        List<Reservation> mockReservations = List.of(new Reservation(1L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"), new Reservation(2L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"));
-        when(reservationService.getAllReservations()).thenReturn(mockReservations);
-        ResponseEntity<?> response = managerController.getAllReservations();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockReservations, response.getBody());
-    }
-
-    @Test
-    public void testGetAllReservations_InternalServerError() {
-
-        when(reservationService.getAllReservations()).thenThrow(new RuntimeException("Internal server error"));
-        ResponseEntity<?> response = managerController.getAllReservations();
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Internal server error", response.getBody());
-
-    }
 
 }

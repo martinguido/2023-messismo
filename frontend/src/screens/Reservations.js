@@ -2,10 +2,10 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import CategoriesList from "../components/CategoriesList";
+import ReservationsList from "../components/ReservationsList";
 import { Container, MainContent } from "./ScreenStyles";
 
-function Categories() {
+function Reservations() {
   const { user: currentUser } = useSelector((state) => state.auth);
   const clicked = useSelector((state) => state.navigation.clicked);
 
@@ -27,10 +27,10 @@ function Categories() {
     <Container className="products">
       <Navbar />
       <MainContent visible={contentVisible}>
-        <CategoriesList />
+        <ReservationsList />
       </MainContent>
     </Container>
   );
 }
 
-export default Categories;
+export default Reservations;

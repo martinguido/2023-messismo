@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -84,6 +86,9 @@ public class AuthenticationController {
         }
         else if(newReservationRequestDTO.getCapacity()<=0 || newReservationRequestDTO.getCapacity()>barService.getBarConfiguration().getCapacity()){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT have the capacity under 1 or higher than maximum capacity");
+        }
+        else if(Objects.equals(newReservationRequestDTO.getClientPhone(), "") && Objects.equals(newReservationRequestDTO.getClientEmail(), "")){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing phone or email to create a reservation");
         }
         else if( newReservationRequestDTO.getShift()==null || newReservationRequestDTO.getStartingDate() == null || newReservationRequestDTO.getFinishingDate() == null || newReservationRequestDTO.getComment() == null || (newReservationRequestDTO.getClientPhone()==null && newReservationRequestDTO.getClientEmail()==null)){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to add a reservation");

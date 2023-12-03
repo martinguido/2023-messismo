@@ -110,7 +110,6 @@ const NavContainer = styled.nav`
     }
   }
 `;
-
 const BgDiv = styled.div`
   background-color: rgb(157, 187, 191, 0.3);
   position: absolute;

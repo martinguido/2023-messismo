@@ -42,10 +42,10 @@ public class ReservationService {
             if (currentCapacity + newReservationRequestDTO.getCapacity() > maxCapacity) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
-            if (newReservationRequestDTO.getClientPhone() == null && !newReservationRequestDTO.getClientEmail().isEmpty()) {
+            if ((newReservationRequestDTO.getClientPhone() == "" || newReservationRequestDTO.getClientPhone() == null) && !newReservationRequestDTO.getClientEmail().isEmpty()) {
                 Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), startingDate, finishingDate, newReservationRequestDTO.getClientEmail(), newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
                 reservationRepository.save(newReservation);
-            } else if (!newReservationRequestDTO.getClientPhone().isEmpty() && newReservationRequestDTO.getClientEmail() == null) {
+            } else if (!newReservationRequestDTO.getClientPhone().isEmpty() && (newReservationRequestDTO.getClientEmail() == "" || newReservationRequestDTO.getClientEmail() == null)) {
                 Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), startingDate, finishingDate, Integer.parseInt(newReservationRequestDTO.getClientPhone()), newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
                 reservationRepository.save(newReservation);
             } else if (!newReservationRequestDTO.getClientPhone().isEmpty() && !newReservationRequestDTO.getClientEmail().isEmpty()) {

@@ -13,14 +13,35 @@ const addReservation = (newReservationData) => {
       console.log("Reservation added successfully:", response.data);
     })
     .catch((error) => {
-      console.log(newReservationData);
       console.error("Error making a reservation:", error);
       throw error;
     });
 };
 
-const reservationService = {
-  addReservation,
+const getAllReservations = () => {
+  return axios.get(apiUrl + "/api/v1/validatedEmployee/getAllReservations", {
+    headers: authHeader(),
+    method: "GET",
+    "Content-Type": "application/json",
+  });
 };
 
-export default reservationService;
+const deleteReservation = (reservationId) => {
+  const deleteData = {
+    reservationId: reservationId,
+  };
+  return axios.delete(apiUrl + "/api/v1/manager/deleteReservation", {
+    headers: authHeader(),
+    data: deleteData,
+    method: "DELETE",
+    "Content-Type": "application/json",
+  });
+};
+
+const reservationsService = {
+  addReservation,
+  getAllReservations,
+  deleteReservation,
+};
+
+export default reservationsService;

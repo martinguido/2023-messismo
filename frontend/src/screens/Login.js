@@ -253,16 +253,13 @@ function Login() {
       setErrors(validationErrors);
       console.log(validationErrors);
     } else {
-      console.log(selectedShift);
       const selectedShiftObj = shifts.find(
         (shi) => shi.shiftId === selectedShift
       );
-      console.log(selectedShiftObj);
       const fechaDate = new Date(selectedDate);
       const fechaISO = fechaDate.toISOString();
       const indiceT = fechaISO.indexOf("T");
       const fechaSinHora = fechaISO.substring(0, indiceT);
-      console.log(fechaSinHora);
 
       const newReservationData = {
         capacity: capacity,
@@ -273,7 +270,7 @@ function Login() {
         clientEmail: emailR,
         clientPhone: phone,
       };
-      console.log(newReservationData);
+
       reservationService
         .addReservation(newReservationData)
         .then((response) => {

@@ -211,6 +211,9 @@
   .title {
     font-size: 0.5rem !important;
   }
+  .reservet {
+    font-size: 0.7rem !important;
+  }
   .custom-input {
     width: 70% !important;
     margin-left: 2%;

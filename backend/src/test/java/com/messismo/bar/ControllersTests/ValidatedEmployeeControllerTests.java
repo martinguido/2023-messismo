@@ -14,10 +14,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,12 +38,16 @@ public class ValidatedEmployeeControllerTests {
     @Mock
     private OrderService orderService;
 
+    @Mock
+    private ReservationService reservationService;
+
     @BeforeEach
     public void setUp() {
 
         MockitoAnnotations.openMocks(this);
 
     }
+
 
     @Test
     public void testAddProduct_Success() throws Exception {
@@ -387,6 +394,28 @@ public class ValidatedEmployeeControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(mockOrders, response.getBody());
+
+    }
+
+    @Test
+    public void testGetAllReservationsSuccessful() {
+
+        List<Reservation> mockReservations = List.of(new Reservation(1L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"), new Reservation(2L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"));
+        when(reservationService.getAllReservations()).thenReturn(mockReservations);
+        ResponseEntity<?> response = validatedEmployeeController.getAllReservations();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockReservations, response.getBody());
+    }
+
+    @Test
+    public void testGetAllReservations_InternalServerError() {
+
+        when(reservationService.getAllReservations()).thenThrow(new RuntimeException("Internal server error"));
+        ResponseEntity<?> response = validatedEmployeeController.getAllReservations();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Internal server error", response.getBody());
 
     }
 

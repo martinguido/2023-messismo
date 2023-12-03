@@ -12,6 +12,7 @@ import Register from "./screens/Register";
 import Dashboard from "./screens/Dashboard";
 import Goals from "./screens/Goals";
 import BarConfiguration from "./screens/BarConfiguration";
+import Reservations from "./screens/Reservations";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/resources" element={<Resources />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/barConfiguration" element={<BarConfiguration />} />
+          <Route path="/reservations" element={<Reservations />} />
         </Routes>
       </BrowserRouter>
     </div>

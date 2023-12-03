@@ -13,6 +13,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { toggleClicked } from "../redux/navSlice";
 import { logout } from "../redux/auth";
 import CategoryIcon from "@mui/icons-material/Category";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const NavLink = styled(Link)`
   align-items: center;
@@ -220,12 +222,22 @@ function Navbar() {
           </NavLink>
         )}
 
+        {(showManagerBoard || showAdminBoard || showValidatedEmployeeBoard) && (
+          <NavLink
+            to={"/reservations"}
+            onClick={clicked ? handleClick : undefined}
+          >
+            <MenuBookIcon className="icon" />
+            <span>Reservations</span>
+          </NavLink>
+        )}
+
         {showAdminBoard && (
           <NavLink
             to={"/barConfiguration"}
             onClick={clicked ? handleClick : undefined}
           >
-            <CategoryIcon className="icon" />
+            <SettingsIcon className="icon" />
             <span>Bar Configuration</span>
           </NavLink>
         )}

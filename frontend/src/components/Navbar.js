@@ -111,7 +111,6 @@ const NavContainer = styled.nav`
   }
 `;
 const BgDiv = styled.div`
-  background-color: rgb(157, 187, 191, 0.3);
   position: absolute;
   top: -1000px;
   left: -1000px;
@@ -121,6 +120,7 @@ const BgDiv = styled.div`
   transition: all 0.6s ease;
 
   &.active {
+    background-color: rgb(157, 187, 191, 0.3);
     border-radius: 0 0 70% 0;
     top: 0;
     left: 0;

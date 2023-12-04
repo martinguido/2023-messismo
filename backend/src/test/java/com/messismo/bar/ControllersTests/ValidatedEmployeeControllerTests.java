@@ -14,13 +14,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -38,12 +38,16 @@ public class ValidatedEmployeeControllerTests {
     @Mock
     private OrderService orderService;
 
+    @Mock
+    private ReservationService reservationService;
+
     @BeforeEach
     public void setUp() {
 
         MockitoAnnotations.openMocks(this);
 
     }
+
 
     @Test
     public void testAddProduct_Success() throws Exception {
@@ -128,7 +132,8 @@ public class ValidatedEmployeeControllerTests {
         productDTO.setStock(50);
         productDTO.setUnitCost(15.0);
         productDTO.setNewCategory(false);
-        when(productService.addProduct(productDTO)).thenThrow(new ExistingProductFoundException("Product already exists"));
+        when(productService.addProduct(productDTO))
+                .thenThrow(new ExistingProductFoundException("Product already exists"));
         ResponseEntity<?> response = validatedEmployeeController.addProduct(productDTO);
 
         verify(productService).addProduct(productDTO);
@@ -160,10 +165,10 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testGetAllProducts_Success() {
 
-        Product product1 = new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1"));
-        Product product2 = new Product(2L,"Product2",15.0,7.0,"Description2",100,new Category(2L,"Category2"));
-        Product product3 = new Product(3L,"Product3",20.0,10.0,"Description3",200,new Category(3L,"Category3"));
-        List<Product> productList = Arrays.asList(product1,product2,product3);
+        Product product1 = new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1"));
+        Product product2 = new Product(2L, "Product2", 15.0, 7.0, "Description2", 100, new Category(2L, "Category2"));
+        Product product3 = new Product(3L, "Product3", 20.0, 10.0, "Description3", 200, new Category(3L, "Category3"));
+        List<Product> productList = Arrays.asList(product1, product2, product3);
         when(productService.getAllProducts()).thenReturn(productList);
         ResponseEntity<?> response = validatedEmployeeController.getAllProducts();
 
@@ -175,10 +180,10 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testFilterProducts_Success() throws Exception {
 
-        Product product1 = new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1"));
-        Product product2 = new Product(2L,"Product2",15.0,7.0,"Description2",100,new Category(2L,"Category2"));
-        Product product3 = new Product(3L,"Product3",20.0,10.0,"Description3",200,new Category(3L,"Category3"));
-        List<Product> productList = Arrays.asList(product1,product2,product3);
+        Product product1 = new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1"));
+        Product product2 = new Product(2L, "Product2", 15.0, 7.0, "Description2", 100, new Category(2L, "Category2"));
+        Product product3 = new Product(3L, "Product3", 20.0, 10.0, "Description3", 200, new Category(3L, "Category3"));
+        List<Product> productList = Arrays.asList(product1, product2, product3);
         FilterProductDTO filterProductDTO = new FilterProductDTO();
         when(productService.filterProducts(any(FilterProductDTO.class)))
                 .thenReturn(productList);
@@ -217,10 +222,10 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testGetAllCategories() {
 
-        Category category1 = new Category(1L,"Category1");
-        Category category2 = new Category(2L,"Category2");
-        Category category3 = new Category(3L,"Category3");
-        List<Category> categoryList = Arrays.asList(category1,category2,category3);
+        Category category1 = new Category(1L, "Category1");
+        Category category2 = new Category(2L, "Category2");
+        Category category3 = new Category(3L, "Category3");
+        List<Category> categoryList = Arrays.asList(category1, category2, category3);
         when(categoryService.getAllCategories()).thenReturn(categoryList);
         ResponseEntity<?> response = validatedEmployeeController.getAllCategories();
 
@@ -229,11 +234,12 @@ public class ValidatedEmployeeControllerTests {
 
     }
 
-
     @Test
     public void testAddNewOrder_Success() throws Exception {
 
-        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com",new Date(),List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com", new Date(),
+                List.of(new ProductOrderDTO(
+                        new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
         when(orderService.addNewOrder(orderRequestDTO)).thenReturn("Order created successfully");
         ResponseEntity<?> response = validatedEmployeeController.addNewOrder(orderRequestDTO);
 
@@ -245,7 +251,9 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testAddNewOrder_Conflict_UserNotFound() throws Exception {
 
-        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com",new Date(),List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com", new Date(),
+                List.of(new ProductOrderDTO(
+                        new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
         when(orderService.addNewOrder(orderRequestDTO)).thenThrow(new UserNotFoundException("User not found"));
         ResponseEntity<?> response = validatedEmployeeController.addNewOrder(orderRequestDTO);
 
@@ -257,8 +265,11 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testAddNewOrder_Conflict_ProductQuantityBelowAvailableStock() throws Exception {
 
-        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com",new Date(),List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
-        when(orderService.addNewOrder(orderRequestDTO)).thenThrow(new ProductQuantityBelowAvailableStock("Product quantity below available stock"));
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com", new Date(),
+                List.of(new ProductOrderDTO(
+                        new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
+        when(orderService.addNewOrder(orderRequestDTO))
+                .thenThrow(new ProductQuantityBelowAvailableStock("Product quantity below available stock"));
         ResponseEntity<?> response = validatedEmployeeController.addNewOrder(orderRequestDTO);
 
         Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -269,7 +280,9 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testAddNewOrder_InternalServerError() throws Exception {
 
-        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com",new Date(),List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com", new Date(),
+                List.of(new ProductOrderDTO(
+                        new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
         when(orderService.addNewOrder(orderRequestDTO)).thenThrow(new Exception("Internal server error"));
         ResponseEntity<?> response = validatedEmployeeController.addNewOrder(orderRequestDTO);
 
@@ -317,7 +330,8 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testModifyOrder_Success() throws Exception {
 
-        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L,List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
+        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L, List.of(new ProductOrderDTO(
+                new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
         when(orderService.modifyOrder(modifyOrderDTO)).thenReturn("Order modified successfully");
         ResponseEntity<?> response = validatedEmployeeController.modifyOrder(modifyOrderDTO);
 
@@ -329,8 +343,10 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testModifyOrder_Conflict_ProductQuantityBelowAvailableStock() throws Exception {
 
-        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L,List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
-        when(orderService.modifyOrder(modifyOrderDTO)).thenThrow(new ProductQuantityBelowAvailableStock("Insufficient stock"));
+        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L, List.of(new ProductOrderDTO(
+                new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
+        when(orderService.modifyOrder(modifyOrderDTO))
+                .thenThrow(new ProductQuantityBelowAvailableStock("Insufficient stock"));
         ResponseEntity<?> response = validatedEmployeeController.modifyOrder(modifyOrderDTO);
 
         Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -341,7 +357,8 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testModifyOrder_Conflict_OrderNotFound() throws Exception {
 
-        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L,List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
+        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L, List.of(new ProductOrderDTO(
+                new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
         when(orderService.modifyOrder(modifyOrderDTO)).thenThrow(new OrderNotFoundException("Order not found"));
         ResponseEntity<?> response = validatedEmployeeController.modifyOrder(modifyOrderDTO);
 
@@ -353,7 +370,8 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testModifyOrder_InternalServerError() throws Exception {
 
-        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L,List.of(new ProductOrderDTO(new Product(1L,"Product1",10.0,7.0,"Description1",50,new Category(1L,"Category1")), 2)));
+        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L, List.of(new ProductOrderDTO(
+                new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
         when(orderService.modifyOrder(modifyOrderDTO)).thenThrow(new RuntimeException("Internal server error"));
         ResponseEntity<?> response = validatedEmployeeController.modifyOrder(modifyOrderDTO);
 
@@ -366,9 +384,11 @@ public class ValidatedEmployeeControllerTests {
     public void testGetAllOrders() {
 
         List<Order> mockOrders = Arrays.asList(
-                new Order( new User("user1","user1@mail.com","Password1"), new Date(), List.of(new ProductOrder("Product1",10.0,7.0,new Category(1L,"Category1"), 2)),20.0,14.0),
-                new Order( new User("user1","user1@mail.com","Password1"), new Date(), List.of(new ProductOrder("Product2",30.0,10.0,new Category(2L,"Category2"), 3)),90.0,30.0)
-        );
+                new Order(new User("user1", "user1@mail.com", "Password1"), new Date(),
+                        List.of(new ProductOrder("Product1", 10.0, 7.0, new Category(1L, "Category1"), 2)), 20.0, 14.0),
+                new Order(new User("user1", "user1@mail.com", "Password1"), new Date(),
+                        List.of(new ProductOrder("Product2", 30.0, 10.0, new Category(2L, "Category2"), 3)), 90.0,
+                        30.0));
         when(orderService.getAllOrders()).thenReturn(mockOrders);
         ResponseEntity<?> response = validatedEmployeeController.getAllOrders();
 
@@ -377,5 +397,26 @@ public class ValidatedEmployeeControllerTests {
 
     }
 
+    @Test
+    public void testGetAllReservationsSuccessful() {
+
+        List<Reservation> mockReservations = List.of(new Reservation(1L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"), new Reservation(2L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"));
+        when(reservationService.getAllReservations()).thenReturn(mockReservations);
+        ResponseEntity<?> response = validatedEmployeeController.getAllReservations();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockReservations, response.getBody());
+    }
+
+    @Test
+    public void testGetAllReservations_InternalServerError() {
+
+        when(reservationService.getAllReservations()).thenThrow(new RuntimeException("Internal server error"));
+        ResponseEntity<?> response = validatedEmployeeController.getAllReservations();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Internal server error", response.getBody());
+
+    }
 
 }

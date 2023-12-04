@@ -162,7 +162,6 @@
                 <configuration>
                     <excludes>
                         <exclude>**/Configurations/*.class</exclude>
-<!--                        <exclude>**/Controllers/*.class</exclude>-->
                         <exclude>**/DTOs/*.class</exclude>
                         <exclude>**/Entities/*.class</exclude>
                         <exclude>**/Exceptions/*.class</exclude>
@@ -190,7 +189,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <repoToken>QMAFxhUb6DWFcIf50LtrVtCeWSmjjZ6NJ</repoToken>
+                    <repoToken>SWBEjXB7TFzworj0Zndw2XgpMATZEb88X</repoToken>
                 </configuration>
             </plugin>
         </plugins>

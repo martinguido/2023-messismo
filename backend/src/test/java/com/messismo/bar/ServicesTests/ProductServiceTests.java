@@ -2,7 +2,6 @@ package com.messismo.bar.ServicesTests;
 
 import com.messismo.bar.DTOs.*;
 import com.messismo.bar.Entities.Category;
-import com.messismo.bar.Entities.Goal;
 import com.messismo.bar.Entities.Product;
 import com.messismo.bar.Exceptions.CategoryNotFoundException;
 import com.messismo.bar.Exceptions.ExistingProductFoundException;
@@ -19,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,9 +44,12 @@ public class ProductServiceTests {
         MockitoAnnotations.openMocks(this);
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
 
         List<Product> products = new ArrayList<>();
         products.add(product1);
@@ -69,9 +70,12 @@ public class ProductServiceTests {
     public void testProductServiceGetAllProducts() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -85,7 +89,8 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceAddProduct() throws Exception {
 
-        ProductDTO productDTO1 = ProductDTO.builder().category("Entrada").stock(40).description("Con aderezos").unitPrice(77.00).name("Papas Con Bacon").unitCost(5.00).newCategory(false).build();
+        ProductDTO productDTO1 = ProductDTO.builder().category("Entrada").stock(40).description("Con aderezos")
+                .unitPrice(77.00).name("Papas Con Bacon").unitCost(5.00).newCategory(false).build();
 
         assertEquals("Product created successfully", productService.addProduct(productDTO1));
         verify(productRepository, times(1)).findByName(productDTO1.getName());
@@ -95,7 +100,9 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceAddProduct_WithSameName() {
 
-        ProductDTO productDTO1 = ProductDTO.builder().name("Milanesa").category("Entrada").description("Milanesa con papas fritas").stock(50).unitPrice(70.00).unitCost(5.00).newCategory(false).build();
+        ProductDTO productDTO1 = ProductDTO.builder().name("Milanesa").category("Entrada")
+                .description("Milanesa con papas fritas").stock(50).unitPrice(70.00).unitCost(5.00).newCategory(false)
+                .build();
 
         ExistingProductFoundException exception = assertThrows(ExistingProductFoundException.class, () -> {
             productService.addProduct(productDTO1);
@@ -107,9 +114,12 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceCannotAddProduct() {
 
-        ProductDTO productDTO1 = ProductDTO.builder().name("Pizza").category("Entrada").description("Pizza con papas fritas").stock(50).unitPrice(70.00).unitCost(5.00).newCategory(false).build();
+        ProductDTO productDTO1 = ProductDTO.builder().name("Pizza").category("Entrada")
+                .description("Pizza con papas fritas").stock(50).unitPrice(70.00).unitCost(5.00).newCategory(false)
+                .build();
 
-        when(productRepository.findByName(productDTO1.getName())).thenThrow(new RuntimeException("Simulated Exception"));
+        when(productRepository.findByName(productDTO1.getName()))
+                .thenThrow(new RuntimeException("Simulated Exception"));
         Exception exception = assertThrows(Exception.class, () -> {
             productService.addProduct(productDTO1);
         });
@@ -124,8 +134,9 @@ public class ProductServiceTests {
         verify(productRepository, times(1)).findByProductId(1L);
 
     }
+
     @Test
-    public void testProductServiceDeleteProduct_Exception()  {
+    public void testProductServiceDeleteProduct_Exception() {
 
         doThrow(new RuntimeException("Runtime Exception")).when(productRepository).delete(any());
         Exception exception = assertThrows(Exception.class, () -> {
@@ -134,7 +145,6 @@ public class ProductServiceTests {
         Assertions.assertEquals("Product CANNOT be deleted", exception.getMessage());
 
     }
-
 
     @Test
     public void testProductServiceDeleteProduct_NotFound() {
@@ -146,7 +156,6 @@ public class ProductServiceTests {
         verify(productRepository, times(1)).findByProductId(10L);
 
     }
-
 
     @Test
     public void testProductServiceModifyUnitPriceProduct() throws Exception {
@@ -187,7 +196,8 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceAddProductStock() throws Exception {
 
-        ProductStockDTO productStockDTO = ProductStockDTO.builder().productId(1L).operation("add").modifyStock(50).build();
+        ProductStockDTO productStockDTO = ProductStockDTO.builder().productId(1L).operation("add").modifyStock(50)
+                .build();
 
         assertEquals("Product stock updated successfully", productService.modifyProductStock(productStockDTO));
 
@@ -196,7 +206,8 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceAddProductStock_WithANonExistantProductId() {
 
-        ProductStockDTO productStockDTO = ProductStockDTO.builder().productId(10L).operation("add").modifyStock(50).build();
+        ProductStockDTO productStockDTO = ProductStockDTO.builder().productId(10L).operation("add").modifyStock(50)
+                .build();
 
         ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
             productService.modifyProductStock(productStockDTO);
@@ -205,14 +216,16 @@ public class ProductServiceTests {
 
     }
 
-
     @Test
     public void testProductServiceFilterByName() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -228,9 +241,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByNullName() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -247,9 +263,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByNoExistentProductWithThatName() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -264,9 +283,12 @@ public class ProductServiceTests {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
         Category category2 = Category.builder().categoryId(2L).name("Plato Principal").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category2).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category2).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -283,9 +305,12 @@ public class ProductServiceTests {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
         Category category2 = Category.builder().categoryId(2L).name("Plato Principal").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category2).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category2).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -303,9 +328,12 @@ public class ProductServiceTests {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
         Category category2 = Category.builder().categoryId(2L).name("Plato Principal").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -319,9 +347,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMinStockPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(15).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(15).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -336,9 +367,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByNullMinStockPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -355,9 +389,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMinStockPrice_WithNoProductsMatching() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -371,9 +408,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMaxStockPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -388,9 +428,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByNullMaxStockPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -407,9 +450,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMaxStockPrice_WithNoProductsMatching() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -423,9 +469,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMinUnitPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -440,9 +489,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByNullMinUnitPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -459,9 +511,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMinUnitPrice_WithNoProductsMatching() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -475,9 +530,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMaxUnitPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -492,9 +550,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByNullMaxUnitPrice() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -511,9 +572,12 @@ public class ProductServiceTests {
     public void testProductServiceFilterByMaxUnitPrice_WithNoProductsMatching() {
 
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(5.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(5.00).build();
         List<Product> products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
@@ -529,7 +593,8 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().productName("Pollo").build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product3);
 
@@ -538,11 +603,12 @@ public class ProductServiceTests {
     }
 
     @Test
-    public void testGoalServiceAddGoal_Exception()  {
+    public void testGoalServiceAddGoal_Exception() {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().productName("Pollo").build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product3);
 
@@ -554,15 +620,17 @@ public class ProductServiceTests {
 
     }
 
-
     @Test
     public void testProductServiceFilterProductsByCategory() throws Exception {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().categories(List.of("Entrada")).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product1);
         response.add(product2);
@@ -577,8 +645,10 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().maxUnitPrice(20.00).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product1);
         response.add(product3);
@@ -592,7 +662,8 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().minUnitPrice(20.00).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product2);
 
@@ -605,8 +676,10 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().maxUnitCost(20.00).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product1);
         response.add(product3);
@@ -620,7 +693,8 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().minUnitCost(50.00).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product2);
 
@@ -633,7 +707,8 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().maxStock(20).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5).description("Pollo con papas fritas").unitCost(15.00).build();
+        Product product3 = Product.builder().productId(3L).name("Pollo").unitPrice(15.99).category(category1).stock(5)
+                .description("Pollo con papas fritas").unitCost(15.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product3);
 
@@ -646,8 +721,10 @@ public class ProductServiceTests {
 
         FilterProductDTO filterProductDTO = FilterProductDTO.builder().minStock(20).build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1).stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product1 = Product.builder().productId(1L).name("Milanesa").unitPrice(14.99).category(category1)
+                .stock(50).description("Milanesa con papas fritas").unitCost(5.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product1);
         response.add(product2);
@@ -659,9 +736,12 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceFilterProducts() throws Exception {
 
-        FilterProductDTO filterProductDTO = FilterProductDTO.builder().productName("Milanesa").categories(List.of("Entrada")).maxStock(30).minStock(0).maxUnitPrice(50.00).minUnitPrice(16.00).build();
+        FilterProductDTO filterProductDTO = FilterProductDTO.builder().productName("Milanesa")
+                .categories(List.of("Entrada")).maxStock(30).minStock(0).maxUnitPrice(50.00).minUnitPrice(16.00)
+                .build();
         Category category1 = Category.builder().categoryId(1L).name("Entrada").build();
-        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1).stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
+        Product product2 = Product.builder().productId(2L).name("Milanesas").unitPrice(44.99).category(category1)
+                .stock(25).description("Milanesas con papas fritas2").unitCost(55.00).build();
         List<Product> response = new ArrayList<>();
         response.add(product2);
 
@@ -672,7 +752,8 @@ public class ProductServiceTests {
     @Test
     public void testProductServiceFilterProducts_WithNonExistentCategory() throws Exception {
 
-        FilterProductDTO filterProductDTO = FilterProductDTO.builder().productName("Milanesa").categories(List.of("Plato")).maxStock(30).minStock(0).maxUnitPrice(50.00).minUnitPrice(16.00).build();
+        FilterProductDTO filterProductDTO = FilterProductDTO.builder().productName("Milanesa")
+                .categories(List.of("Plato")).maxStock(30).minStock(0).maxUnitPrice(50.00).minUnitPrice(16.00).build();
 
         CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
             productService.filterProducts(filterProductDTO);
@@ -776,7 +857,9 @@ public class ProductServiceTests {
         productStockDTO.setModifyStock(10);
         productStockDTO.setOperation("substract");
 
-        when(productRepository.findByProductId(productStockDTO.getProductId())).thenReturn(Optional.of(Product.builder().productId(5L).name("aProduct").stock(5).unitPrice(15.00).unitCost(5.00).description("aDescription").build()));
+        when(productRepository.findByProductId(productStockDTO.getProductId()))
+                .thenReturn(Optional.of(Product.builder().productId(5L).name("aProduct").stock(5).unitPrice(15.00)
+                        .unitCost(5.00).description("aDescription").build()));
         assertEquals("Product stock updated successfully", productService.modifyProductStock(productStockDTO));
         verify(productRepository, times(1)).save(any());
 

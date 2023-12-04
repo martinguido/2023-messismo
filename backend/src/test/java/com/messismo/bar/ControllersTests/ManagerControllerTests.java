@@ -2,6 +2,8 @@ package com.messismo.bar.ControllersTests;
 
 import com.messismo.bar.Controllers.ManagerController;
 import com.messismo.bar.DTOs.*;
+import com.messismo.bar.Entities.Reservation;
+import com.messismo.bar.Entities.Shift;
 import com.messismo.bar.Entities.User;
 import com.messismo.bar.Exceptions.*;
 import com.messismo.bar.Services.*;
@@ -15,7 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +43,9 @@ public class ManagerControllerTests {
 
     @Mock
     private GoalService goalService;
+
+    @Mock
+    private ReservationService reservationService;
 
     @BeforeEach
     public void setUp() {
@@ -474,9 +480,9 @@ public class ManagerControllerTests {
     public void testGetDashboardInformation_Success() throws Exception {
 
         DashboardRequestDTO dashboardRequestDTO = new DashboardRequestDTO("2023-03-01", new ArrayList<>());
-        HashMap<String,Object> response = new HashMap<>();
+        HashMap<String, Object> response = new HashMap<>();
         response.put("orderByQuantity", new TreeMap<>());
-        response.put("orderByEarnings",  new TreeMap<>());
+        response.put("orderByEarnings", new TreeMap<>());
         response.put("averageByOrder", new TreeMap<>());
         response.put("quantityProductDonut", new HashMap<>());
         response.put("earningProductDonut", new HashMap<>());
@@ -898,5 +904,56 @@ public class ManagerControllerTests {
         assertEquals("Internal server error", response.getBody());
 
     }
+
+    @Test
+    public void testDeleteReservationSuccessful() throws Exception {
+
+        when(reservationService.deleteReservation(any())).thenReturn("Reservation deleted successfully");
+        DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(1L);
+        ResponseEntity<String> response = managerController.deleteReservation(requestDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Reservation deleted successfully", response.getBody());
+
+    }
+
+    @Test
+    public void testDeleteReservationWithMissingInformation() {
+
+        DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO();
+        ResponseEntity<String> response = managerController.deleteReservation(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Missing information to delete a reservation", response.getBody());
+
+    }
+
+    @Test
+    public void testDeleteReservationWithReservationNotFoundException() throws Exception {
+
+        when(reservationService.deleteReservation(any())).thenThrow(new ReservationNotFoundException("No reservation has that id"));
+        DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(100L);
+        ResponseEntity<String> response = managerController.deleteReservation(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("No reservation has that id", response.getBody());
+
+    }
+
+    @Test
+    public void testDeleteReservationWithException() throws Exception {
+
+
+        when(reservationService.deleteReservation(any())).thenThrow(new RuntimeException("CANNOT delete a reservation at the moment"));
+        DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(1L);
+        ResponseEntity<String> response = managerController.deleteReservation(requestDTO);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("CANNOT delete a reservation at the moment", response.getBody());
+
+    }
+
+
+
 
 }

@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
 public class InitialConfiguration {
 
     @Bean
-    public CommandLineRunner commandLineRunner(AuthenticationService authenticationService, UserRepository userRepository, ProductService productService, CategoryService categoryService, OrderService orderService, OrderRepository orderRepository, ProductRepository productRepository, GoalService goalService) {
+    public CommandLineRunner commandLineRunner(AuthenticationService authenticationService, UserRepository userRepository, ProductService productService, CategoryService categoryService, OrderService orderService, OrderRepository orderRepository, ProductRepository productRepository, GoalService goalService,BarService barService, ShiftService shiftService, ReservationService reservationService) {
         return args -> {
             RegisterRequestDTO admin = new RegisterRequestDTO();
             admin.setUsername("admin");
@@ -45,9 +45,44 @@ public class InitialConfiguration {
             System.out.println("CLOSED ORDERS");
             addSampleGoals(goalService);
             System.out.println("ADDED GOALS");
+            addSampleBar(barService);
+            System.out.println("ADDED BAR CONFIGURATION");
+            addSampleShifts(shiftService);
+            System.out.println("ADDED SHIFTS");
+            addSampleReservations(shiftService, reservationService);
+            System.out.println("ADDED RESERVATIONS");
             System.out.println("FINISH INITIAL LOADING");
         };
     }
+
+    private void addSampleReservations(ShiftService shiftService, ReservationService reservationService) throws Exception {
+        List<Shift> allShifts = shiftService.getAllShifts();
+        Shift firstShift = allShifts.get(0);
+        Shift secondShift = allShifts.get(1);
+        Shift thirdShift = allShifts.get(2);
+        reservationService.addReservation(NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(firstShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build());
+        reservationService.addReservation(NewReservationRequestDTO.builder().capacity(10).clientEmail("client1@gmail.com").comment("Social event").shift(secondShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build());
+        reservationService.addReservation(NewReservationRequestDTO.builder().capacity(15).clientEmail("client2@gmail.com").clientPhone("1532837531").comment("Holidays").shift(firstShift).startingDate(LocalDate.of(2024, 1, 1)).finishingDate(LocalDate.of(2024, 1, 1)).build());
+        reservationService.addReservation(NewReservationRequestDTO.builder().capacity(12).clientPhone("1567637531").comment("Ramen").shift(thirdShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build());
+    }
+
+
+    private void addSampleShifts(ShiftService shiftService) throws Exception{
+        shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(10, 0)).finishingHour(LocalTime.of(11, 0)).build());
+        shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(12, 0)).finishingHour(LocalTime.of(13, 0)).build());
+        shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(13, 0)).finishingHour(LocalTime.of(14, 0)).build());
+        shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(14, 0)).finishingHour(LocalTime.of(15, 0)).build());
+    }
+
+    private void addSampleBar(BarService barService) throws Exception {
+        NewBarRequestDTO newBarRequestDTO = NewBarRequestDTO.builder().capacity(15).build();
+        barService.addBarConfiguration(newBarRequestDTO);
+    }
+
+
+
+
+
 
     private void addSampleGoals(GoalService goalService) throws Exception {
         // EXPIRED NOT ACHIEVED

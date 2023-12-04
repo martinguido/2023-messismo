@@ -1,18 +1,17 @@
 package com.messismo.bar.Controllers;
 
 import com.messismo.bar.DTOs.AuthenticationRequestDTO;
+import com.messismo.bar.DTOs.NewReservationRequestDTO;
 import com.messismo.bar.DTOs.PasswordRecoveryDTO;
 import com.messismo.bar.DTOs.RegisterRequestDTO;
-import com.messismo.bar.Exceptions.NoPinCreatedForUserException;
-import com.messismo.bar.Exceptions.PinExpiredException;
-import com.messismo.bar.Exceptions.UserAlreadyExistsException;
-import com.messismo.bar.Exceptions.UserNotFoundException;
-import com.messismo.bar.Services.AuthenticationService;
-import com.messismo.bar.Services.PasswordRecoveryService;
+import com.messismo.bar.Exceptions.*;
+import com.messismo.bar.Services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -23,6 +22,12 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     private final PasswordRecoveryService passwordRecoveryService;
+
+    private final BarService barService;
+
+    private final ReservationService reservationService;
+
+    private final ShiftService shiftService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) {
@@ -73,6 +78,42 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @PostMapping("/addReservation")
+    public ResponseEntity<String> addReservation(@RequestBody NewReservationRequestDTO newReservationRequestDTO){
+        if(newReservationRequestDTO.getCapacity()==null){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing capacity to create a reservation");
+        }
+        else if(newReservationRequestDTO.getCapacity()<=0 || newReservationRequestDTO.getCapacity()>barService.getBarConfiguration().getCapacity()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT have the capacity under 1 or higher than maximum capacity");
+        }
+        else if(Objects.equals(newReservationRequestDTO.getClientPhone(), "") && Objects.equals(newReservationRequestDTO.getClientEmail(), "")){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing phone or email to create a reservation");
+        }
+        else if( newReservationRequestDTO.getShift()==null || newReservationRequestDTO.getStartingDate() == null || newReservationRequestDTO.getFinishingDate() == null || newReservationRequestDTO.getComment() == null || (newReservationRequestDTO.getClientPhone()==null && newReservationRequestDTO.getClientEmail()==null)){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to add a reservation");
+        }
+        else{
+            try{
+                return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(newReservationRequestDTO));
+            }catch(BarCapacityExceededException | ReservationStartingDateMustBeBeforeFinishinDateException e){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            }catch (Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            }
+        }
+
+    }
+
+    @GetMapping("/getAllShifts")
+    public ResponseEntity<?> getAllShifts() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(shiftService.getAllShifts());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 
     @GetMapping("/health")
     public ResponseEntity<String> health() {

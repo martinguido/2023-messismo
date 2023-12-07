@@ -56,7 +56,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testRegister_Success() throws Exception {
 
-        RegisterRequestDTO request = new RegisterRequestDTO("test@example.com", "email", "password");
+        RegisterRequestDTO request = new RegisterRequestDTO("username","existing@example.com", "Password1");
         AuthenticationResponseDTO mockResponse = new AuthenticationResponseDTO("mockJwtToken", "mockRefreshToken", "mockEmail", Role.EMPLOYEE);
         when(authenticationService.register(any(RegisterRequestDTO.class))).thenReturn(mockResponse);
         ResponseEntity<?> response = authenticationController.register(request);
@@ -78,9 +78,110 @@ public class AuthenticationControllerTests {
     }
 
     @Test
+    public void testRegister_ConflictEmptyMail() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("null", "", "Password1");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong email format", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictEmptyUsername() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("", "null@gmail.com", "Password1");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Missing data for user registration", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictEmptyPassword() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("username1", "null@gmail.com", "");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+
+    @Test
+    public void testRegister_ConflictInvalidPasswordFormatExceptionTooShort() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("username","existing@example.com", "pA1");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictInvalidPasswordFormatExceptionNoNumber() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("username","existing@example.com", "PasswordsP");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictInvalidPasswordFormatExceptionNoUpperCase() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("username","existing@example.com", "apasswords2");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictInvalidPasswordFormatExceptionNoLowerCase() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("username","existing@example.com", "PASSWORDS23");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictInvalidPasswordFormatExceptionEmpty() {
+
+        RegisterRequestDTO request = new RegisterRequestDTO("username","existing@example.com", "");
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+    @Test
+    public void testRegister_ConflictInvalidEmailFormatException() throws Exception {
+
+        RegisterRequestDTO request = new RegisterRequestDTO( "username","existingexample.com", "Password1");
+        when(authenticationService.register(any(RegisterRequestDTO.class))).thenThrow(new UserAlreadyExistsException("User already exists"));
+        ResponseEntity<?> response = authenticationController.register(request);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong email format", response.getBody());
+
+    }
+
+    @Test
     public void testRegister_ConflictUserAlreadyExistsException() throws Exception {
 
-        RegisterRequestDTO request = new RegisterRequestDTO("existing@example.com", "password", "username");
+        RegisterRequestDTO request = new RegisterRequestDTO( "username","existing@example.com", "Password1");
         when(authenticationService.register(any(RegisterRequestDTO.class))).thenThrow(new UserAlreadyExistsException("User already exists"));
         ResponseEntity<?> response = authenticationController.register(request);
 
@@ -92,7 +193,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testRegister_InternalServerError() throws Exception {
 
-        RegisterRequestDTO requestDTO = new RegisterRequestDTO("test@example.com", "password", "username");
+        RegisterRequestDTO requestDTO = new RegisterRequestDTO("username","existing@example.com", "Password1");
         when(authenticationService.register(requestDTO)).thenThrow(new Exception("Internal error"));
         ResponseEntity<?> response = authenticationController.register(requestDTO);
 
@@ -105,7 +206,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testAuthenticateSuccess() throws Exception {
 
-        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("test@example.com", "testPassword");
+        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("test@example.com", "testPassword1");
         AuthenticationResponseDTO mockResponse = new AuthenticationResponseDTO("mockJwtToken", "mockRefreshToken", "test@example.com", Role.EMPLOYEE);
         when(authenticationService.authenticate(any(AuthenticationRequestDTO.class))).thenReturn(mockResponse);
         ResponseEntity<?> response = authenticationController.authenticate(mockRequest);
@@ -116,9 +217,54 @@ public class AuthenticationControllerTests {
     }
 
     @Test
+    public void testAuthenticate_ConflictEmptyEmail() {
+
+        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("", "testPassword1");
+        ResponseEntity<?> response = authenticationController.authenticate(mockRequest);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(response.getBody(), "Wrong email format");
+
+    }
+
+    @Test
+    public void testAuthenticate_ConflictEmptyPassword()  {
+
+        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("test@example.com", "");
+        ResponseEntity<?> response = authenticationController.authenticate(mockRequest);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(response.getBody(),"Password has to be at least 8 characters long, with an uppercase,lowercase and a number" );
+
+    }
+
+    @Test
+    public void testAuthenticate_ConflictWrongEmailFormat() {
+
+        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("testexample.com", "testPassword1");
+        ResponseEntity<?> response = authenticationController.authenticate(mockRequest);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(response.getBody(), "Wrong email format");
+
+    }
+
+    @Test
+    public void testAuthenticate_ConflictWrongPasswordFormat() {
+
+        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("test@example.com", "testPassw");
+        AuthenticationResponseDTO mockResponse = new AuthenticationResponseDTO("mockJwtToken", "mockRefreshToken", "test@example.com", Role.EMPLOYEE);
+        ResponseEntity<?> response = authenticationController.authenticate(mockRequest);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(response.getBody(), "Password has to be at least 8 characters long, with an uppercase,lowercase and a number");
+
+    }
+
+    @Test
     public void testAuthenticateFailure() throws Exception {
 
-        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("test@example.com", "testPassword");
+        AuthenticationRequestDTO mockRequest = new AuthenticationRequestDTO("test@example.com", "testPassword1");
         when(authenticationService.authenticate(any(AuthenticationRequestDTO.class))).thenThrow(new Exception("Invalid user credentials"));
         ResponseEntity<?> response = authenticationController.authenticate(mockRequest);
 
@@ -164,6 +310,28 @@ public class AuthenticationControllerTests {
     }
 
     @Test
+    public void testForgotPassword_ConflictWithNullEmail() {
+
+        String mockEmail = null;
+        ResponseEntity<String> response = authenticationController.forgotPassword(mockEmail);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Missing data for password recovery", response.getBody());
+
+    }
+
+    @Test
+    public void testForgotPassword_ConflictWithEmptyEmail() {
+
+        String mockEmail = "";
+        ResponseEntity<String> response = authenticationController.forgotPassword(mockEmail);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong email format", response.getBody());
+
+    }
+
+    @Test
     public void testForgotPasswordInternalServerError() throws Exception {
 
         String mockEmail = "test@example.com";
@@ -178,7 +346,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testChangeForgottenPasswordSuccess() throws Exception {
 
-        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword");
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPasswogg4rd");
         when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenReturn("Password changed successfully");
         ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
 
@@ -190,7 +358,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testChangeForgottenPasswordUserNotFound() throws Exception {
 
-        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("nonexistent@example.com", "1234", "newPassword");
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("nonexistent@example.com", "1234", "newPassword34");
         when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new UserNotFoundException("No user has that email"));
         ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
 
@@ -200,9 +368,57 @@ public class AuthenticationControllerTests {
     }
 
     @Test
+    public void testChangeForgottenPassword_ConflictNullEmailAndPassword() throws Exception {
+
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO(null, "1234", null);
+        when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new UserNotFoundException("No user has that email"));
+        ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Missing data for changing password", response.getBody());
+
+    }
+
+    @Test
+    public void testChangeForgottenPassword_ConflictEmptyPing() throws Exception {
+
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("nonexistent@example.com", "", "newPassword");
+        when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new UserNotFoundException("No user has that email"));
+        ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Missing data for changing password", response.getBody());
+
+    }
+
+    @Test
+    public void testChangeForgottenPassword_ConflictWrongEmailFormat() throws Exception {
+
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("nonexistentexample.com", "123445", "newPassword22");
+        when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new UserNotFoundException("No user has that email"));
+        ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong email format", response.getBody());
+
+    }
+
+    @Test
+    public void testChangeForgottenPassword_ConflictWrongPasswordFormat() throws Exception {
+
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("nonexiste@ntexample.com", "123445", "newPassword");
+        when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new UserNotFoundException("No user has that email"));
+        ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Password has to be at least 8 characters long, with an uppercase,lowercase and a number", response.getBody());
+
+    }
+
+    @Test
     public void testChangeForgottenPasswordNoPinCreated() throws Exception {
 
-        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword");
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword23");
         when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new NoPinCreatedForUserException("The user has no PINs created"));
         ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
 
@@ -214,7 +430,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testChangeForgottenPasswordPinExpired() throws Exception {
 
-        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword");
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword2");
         when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new PinExpiredException("PIN expired!"));
         ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
 
@@ -226,7 +442,7 @@ public class AuthenticationControllerTests {
     @Test
     public void testChangeForgottenPasswordInternalServerError() throws Exception {
 
-        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword");
+        PasswordRecoveryDTO mockDTO = new PasswordRecoveryDTO("test@example.com", "1234", "newPassword3");
         when(passwordRecoveryService.changeForgottenPassword(any(PasswordRecoveryDTO.class))).thenThrow(new Exception("Internal error"));
         ResponseEntity<String> response = authenticationController.changeForgottenPassword(mockDTO);
 
@@ -290,7 +506,7 @@ public class AuthenticationControllerTests {
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenReturn("Reservation added successfully");
         Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2024, 12, 1)).finishingDate(LocalDate.of(2024, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -312,12 +528,65 @@ public class AuthenticationControllerTests {
     }
 
     @Test
+    public void testAddReservationWithDateBeforeActual() {
+
+        when(barService.getBarConfiguration()).thenReturn(new Bar(5));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(3).clientEmail("client0@gmail.com").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2020, 12, 1)).finishingDate(LocalDate.of(2020, 12, 1)).build();
+        ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("CANNOT use a date from the past", response.getBody());
+
+    }
+
+    @Test
+    public void testAddReservation_ConflictWrongEmailFormat() {
+
+        when(barService.getBarConfiguration()).thenReturn(new Bar(5));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(3).clientEmail("client0gmail.com").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2020, 12, 1)).finishingDate(LocalDate.of(2020, 12, 1)).build();
+        ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong email format", response.getBody());
+
+    }
+
+    @Test
+    public void testAddReservation_ConflictWrongCommentFormat() {
+
+        when(barService.getBarConfiguration()).thenReturn(new Bar(5));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(3).clientEmail("client0@gmail.com").comment("My birthdavlkñxncjvklxjclkvjxclkvjxcklvjxcklvjxclkvjxclkvjxcklvjxclvkjxclvkxjcwr8ofudoifuse8oru89w24r7249045iu235y829457u4829543534terkltgñjerlñkgdkrlñgkdrñlgkmdlfñmgdñlfkmgldkfñgdfgdfgdfgdfgdfgdfdy").shift(aShift).startingDate(LocalDate.of(2020, 12, 1)).finishingDate(LocalDate.of(2020, 12, 1)).build();
+        ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong comment format", response.getBody());
+
+    }
+
+
+    @Test
+    public void testAddReservation_ConflictWrongPhoneFormat() {
+
+        when(barService.getBarConfiguration()).thenReturn(new Bar(5));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(3).clientEmail("client0@gmail.com").clientPhone("-5").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2020, 12, 1)).finishingDate(LocalDate.of(2020, 12, 1)).build();
+        ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong phone format", response.getBody());
+
+    }
+
+    @Test
     public void testAddReservationWithBarCapacityExceededException() throws Exception {
 
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenThrow(new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity"));
         Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2025, 12, 1)).finishingDate(LocalDate.of(2025, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -330,7 +599,7 @@ public class AuthenticationControllerTests {
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenThrow(new ReservationStartingDateMustBeBeforeFinishinDateException("The selected starting date must be before the finishing date"));
         Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2024, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2025, 12, 1)).finishingDate(LocalDate.of(2024, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -343,7 +612,7 @@ public class AuthenticationControllerTests {
         when(barService.getBarConfiguration()).thenReturn(new Bar(15));
         when(reservationService.addReservation(any())).thenThrow(new Exception("INTERNAL_ERROR"));
         Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2023, 12, 1)).finishingDate(LocalDate.of(2023, 12, 1)).build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).clientEmail("client0@gmail.com").clientPhone("1568837531").comment("My birthday").shift(aShift).startingDate(LocalDate.of(2025, 12, 1)).finishingDate(LocalDate.of(2025, 12, 1)).build();
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

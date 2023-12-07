@@ -1,8 +1,13 @@
 package com.messismo.bar.Configurations;
 
 import com.messismo.bar.DTOs.*;
-import com.messismo.bar.Entities.*;
-import com.messismo.bar.Repositories.*;
+import com.messismo.bar.Entities.Order;
+import com.messismo.bar.Entities.Role;
+import com.messismo.bar.Entities.Shift;
+import com.messismo.bar.Entities.User;
+import com.messismo.bar.Repositories.OrderRepository;
+import com.messismo.bar.Repositories.ProductRepository;
+import com.messismo.bar.Repositories.UserRepository;
 import com.messismo.bar.Services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +27,7 @@ import java.util.List;
 public class InitialConfiguration {
 
     @Bean
-    public CommandLineRunner commandLineRunner(AuthenticationService authenticationService, UserRepository userRepository, ProductService productService, CategoryService categoryService, OrderService orderService, OrderRepository orderRepository, ProductRepository productRepository, GoalService goalService,BarService barService, ShiftService shiftService, ReservationService reservationService) {
+    public CommandLineRunner commandLineRunner(AuthenticationService authenticationService, UserRepository userRepository, ProductService productService, CategoryService categoryService, OrderService orderService, OrderRepository orderRepository, ProductRepository productRepository, GoalService goalService, BarService barService, ShiftService shiftService, ReservationService reservationService) {
         return args -> {
             RegisterRequestDTO admin = new RegisterRequestDTO();
             admin.setUsername("admin");
@@ -67,7 +72,7 @@ public class InitialConfiguration {
     }
 
 
-    private void addSampleShifts(ShiftService shiftService) throws Exception{
+    private void addSampleShifts(ShiftService shiftService) throws Exception {
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(10, 0)).finishingHour(LocalTime.of(11, 0)).build());
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(12, 0)).finishingHour(LocalTime.of(13, 0)).build());
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(13, 0)).finishingHour(LocalTime.of(14, 0)).build());
@@ -80,27 +85,24 @@ public class InitialConfiguration {
     }
 
 
-
-
-
-
     private void addSampleGoals(GoalService goalService) throws Exception {
         // EXPIRED NOT ACHIEVED
-        addNewGoal(1,goalService,"Category: Starter goal","2023-09-05 00:00:01","2023-10-05 00:00:01","Category","Starter",500000.00);
-        addNewGoal(2,goalService, "Product: Tomato Bruschetta goal","2023-08-04 00:00:01","2023-09-04 00:00:01","Product","Tomato Bruschetta",50000.00);
-        addNewGoal(3,goalService, "Product: Fried Calamari goal","2023-08-02 00:00:01","2023-08-03 00:00:01","Product","Fried Calamari",15000.00);
+        addNewGoal(1, goalService, "Category: Starter goal", "2023-09-05 00:00:01", "2023-10-05 00:00:01", "Category", "Starter", 500000.00);
+        addNewGoal(2, goalService, "Product: Tomato Bruschetta goal", "2023-08-04 00:00:01", "2023-09-04 00:00:01", "Product", "Tomato Bruschetta", 50000.00);
+        addNewGoal(3, goalService, "Product: Fried Calamari goal", "2023-08-02 00:00:01", "2023-08-03 00:00:01", "Product", "Fried Calamari", 15000.00);
         // EXPIRED ACHIEVED
-        addNewGoal(4,goalService, "Total goal","2020-05-05 00:00:01","2020-05-07 00:00:01","Total","",25000.00);
+        addNewGoal(4, goalService, "Total goal", "2020-05-05 00:00:01", "2020-05-07 00:00:01", "Total", "", 25000.00);
         // EXPIRED FULFILLED
-        addNewGoal(5,goalService, "Category: Drink goal","2021-05-05 00:00:01","2023-05-07 00:00:01","Category","Drink",25000.00);
+        addNewGoal(5, goalService, "Category: Drink goal", "2021-05-05 00:00:01", "2023-05-07 00:00:01", "Category", "Drink", 25000.00);
         // IN PROGRESS NOT ACHIEVED
-        addNewGoal(6,goalService, "Total goal","2023-10-28 00:02:01","2023-10-30 00:00:01","Total","",25000.00);
+        addNewGoal(6, goalService, "Total goal", "2023-10-28 00:02:01", "2023-10-30 00:00:01", "Total", "", 25000.00);
         // UPCOMING NOT ACHIEVED
-        addNewGoal(7,goalService, "Total goal","2024-01-01 00:00:01","2024-04-01 00:00:01","Total","",25000.00);
-        addNewGoal(8,goalService, "Product: Chocolate Profiteroles goal","2024-05-01 00:00:01","2024-05-07 00:00:01","Product","Chocolate Profiteroles",10000.00);
-        addNewGoal(9,goalService, "Category: Dessert goal","2024-09-05 00:00:01","2024-09-07 00:00:01","Category","Dessert",10000.00);
+        addNewGoal(7, goalService, "Total goal", "2024-01-01 00:00:01", "2024-04-01 00:00:01", "Total", "", 25000.00);
+        addNewGoal(8, goalService, "Product: Chocolate Profiteroles goal", "2024-05-01 00:00:01", "2024-05-07 00:00:01", "Product", "Chocolate Profiteroles", 10000.00);
+        addNewGoal(9, goalService, "Category: Dessert goal", "2024-09-05 00:00:01", "2024-09-07 00:00:01", "Category", "Dessert", 10000.00);
     }
-    private void addNewGoal(Integer goalNumber, GoalService goalService,String name, String startingDate, String endingDate, String objectType, String goalObject, Double goalObjective) throws Exception {
+
+    private void addNewGoal(Integer goalNumber, GoalService goalService, String name, String startingDate, String endingDate, String objectType, String goalObject, Double goalObjective) throws Exception {
         GoalDTO newGoal = GoalDTO.builder().name(name).startingDate(convertToFormat(startingDate)).endingDate(convertToFormat(endingDate)).objectType(objectType).goalObject(goalObject).goalObjective(goalObjective).build();
         System.out.println("GOAL:" + goalNumber);
         goalService.addGoal(newGoal);
@@ -111,10 +113,11 @@ public class InitialConfiguration {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.parse(date);
     }
+
     private void closeOrders(OrderRepository orderRepository) {
         List<Order> allOrders = orderRepository.findAll();
         LocalDate cutoffDate = LocalDate.of(2023, 10, 1);
-        for(Order order : allOrders){
+        for (Order order : allOrders) {
             if (order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(cutoffDate)) {
                 order.setStatus("Closed");
                 orderRepository.save(order);

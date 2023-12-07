@@ -89,7 +89,6 @@ public class AdminController {
 
     @DeleteMapping("/deleteShift")
     public ResponseEntity<String> deleteShift(@RequestBody DeleteShiftRequestDTO deleteShiftRequestDTO) {
-        System.out.println(deleteShiftRequestDTO);
         if (deleteShiftRequestDTO.getShiftId() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to delete a shift");
         } else {

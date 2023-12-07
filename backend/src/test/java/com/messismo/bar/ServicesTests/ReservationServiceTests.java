@@ -140,18 +140,21 @@ public class ReservationServiceTests {
     public void testAddReservationSuccessfully() throws Exception {
 
         Bar mockBar = new Bar(1L, 20);
+        Shift aShift= new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
-        when(reservationService.findBetweenStartingDateAndFinishingDate(LocalDateTime.of(2023, 12, 1, 10, 0),
-                LocalDateTime.of(2023, 12, 1, 12, 0))).thenReturn(List.of());
+        when(reservationService.findBetweenStartingDateAndFinishingDate(LocalDateTime.of(2024, 12, 1, 10, 0),
+                LocalDateTime.of(2024, 12, 1, 12, 0))).thenReturn(List.of());
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(5)
-                .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2023, 12, 1))
-                .finishingDate(LocalDate.of(2023, 12, 1))
+                .shift(aShift)
+                .startingDate(LocalDate.of(2024, 12, 1))
+                .finishingDate(LocalDate.of(2024, 12, 1))
                 .clientEmail("test@example.com")
                 .build();
         String result = reservationService.addReservation(requestDTO);
         assertEquals("Reservation added successfully", result);
+        // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
+        assertEquals(aShift, requestDTO.getShift());
 
     }
 
@@ -163,8 +166,8 @@ public class ReservationServiceTests {
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(30)
                 .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2023, 12, 1))
-                .finishingDate(LocalDate.of(2023, 12, 1))
+                .startingDate(LocalDate.of(2024, 12, 1))
+                .finishingDate(LocalDate.of(2024, 12, 1))
                 .clientEmail("test@example.com")
                 .build();
         assertThrows(BarCapacityExceededException.class, () -> reservationService.addReservation(requestDTO));
@@ -199,8 +202,8 @@ public class ReservationServiceTests {
         NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
                 .capacity(5)
                 .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2023, 12, 1))
-                .finishingDate(LocalDate.of(2023, 12, 1))
+                .startingDate(LocalDate.of(2024, 12, 1))
+                .finishingDate(LocalDate.of(2024, 12, 1))
                 .clientEmail("test@example.com")
                 .build();
         Exception exception = Assert.assertThrows(Exception.class, () -> {

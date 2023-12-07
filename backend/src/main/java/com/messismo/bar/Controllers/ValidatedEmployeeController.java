@@ -69,10 +69,10 @@ public class ValidatedEmployeeController {
 
     @PostMapping("/addNewOrder")
     public ResponseEntity<?> addNewOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
-        if(!orderRequestDTO.getRegisteredEmployeeEmail().matches(emailRegex)){
+        if (!orderRequestDTO.getRegisteredEmployeeEmail().matches(emailRegex)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong email format");
         }
-        if (orderRequestDTO.getProductOrders().isEmpty()){
+        if (orderRequestDTO.getProductOrders().isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Product list is empty");
         }
         try {
@@ -86,7 +86,7 @@ public class ValidatedEmployeeController {
 
     @PostMapping("/closeOrder")
     public ResponseEntity<?> closeOrder(@RequestBody OrderIdDTO orderIdDTO) {
-        if(orderIdDTO.getOrderId()==null){
+        if (orderIdDTO.getOrderId() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to close order");
         }
         try {
@@ -101,11 +101,11 @@ public class ValidatedEmployeeController {
     @PostMapping("/modifyOrder")
     public ResponseEntity<?> modifyOrder(@RequestBody ModifyOrderDTO modifyOrderDTO) {
         try {
-            if(modifyOrderDTO.getProductOrders().isEmpty()){
+            if (modifyOrderDTO.getProductOrders().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("New product list must not be empty");
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(orderService.modifyOrder(modifyOrderDTO));
             }
-            else {
-            return ResponseEntity.status(HttpStatus.OK).body(orderService.modifyOrder(modifyOrderDTO));}
         } catch (ProductQuantityBelowAvailableStock | OrderNotFoundException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {

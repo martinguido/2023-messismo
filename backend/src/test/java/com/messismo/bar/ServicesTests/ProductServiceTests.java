@@ -97,6 +97,8 @@ public class ProductServiceTests {
 
     }
 
+
+
     @Test
     public void testProductServiceAddProduct_WithSameName() {
 
@@ -776,6 +778,26 @@ public class ProductServiceTests {
         Category category1 = Category.builder().categoryId(5L).name("New Category").build();
 
         when(categoryRepository.findByName("New Category")).thenReturn(Optional.ofNullable(category1));
+        when(productRepository.findByName("New Product")).thenReturn(Optional.empty());
+        when(productRepository.save(any(Product.class))).thenReturn(new Product());
+        assertEquals("Product created successfully", productService.addProduct(productDTO));
+    }
+
+    @Test
+    public void testAddProductWithDuplicateCategoryName() throws Exception {
+
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName("New Product");
+        productDTO.setUnitPrice(19.99);
+        productDTO.setCategory("New Category");
+        productDTO.setDescription("A new product");
+        productDTO.setStock(100);
+        productDTO.setUnitCost(10.0);
+        productDTO.setNewCategory(true);
+        Category category1 = Category.builder().categoryId(5L).name("New Category").build();
+
+        when(categoryRepository.findByName("New Category")).thenReturn(Optional.ofNullable(category1));
+        when(categoryService.addCategory(any())).thenReturn("DUPLICATED CATEGORY NAME");
         when(productRepository.findByName("New Product")).thenReturn(Optional.empty());
         when(productRepository.save(any(Product.class))).thenReturn(new Product());
         assertEquals("Product created successfully", productService.addProduct(productDTO));

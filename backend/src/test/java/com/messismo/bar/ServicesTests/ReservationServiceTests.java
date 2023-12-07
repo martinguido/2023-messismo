@@ -1,11 +1,11 @@
 package com.messismo.bar.ServicesTests;
 
-import com.messismo.bar.DTOs.DeleteReservationRequestDTO;
-import com.messismo.bar.DTOs.NewReservationRequestDTO;
+import com.messismo.bar.DTOs.*;
 import com.messismo.bar.Entities.Bar;
 import com.messismo.bar.Entities.Reservation;
 import com.messismo.bar.Entities.Shift;
 import com.messismo.bar.Exceptions.BarCapacityExceededException;
+import com.messismo.bar.Exceptions.ReservationAlreadyUsedException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
@@ -24,10 +24,11 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ReservationServiceTests {
 
@@ -210,6 +211,72 @@ public class ReservationServiceTests {
             reservationService.addReservation(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a reservation at the moment", exception.getMessage());
+
+    }
+
+
+    @Test
+    public void testMarkAsUsed_Success() throws Exception {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        Reservation reservation = new Reservation();
+        reservation.setUsed(false);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        String result = reservationService.markAsUsed(useReservationDTO);
+
+        assertEquals("Reservation mark as used successfully", result);
+        Assertions.assertTrue(reservation.getUsed());
+        verify(reservationRepository, times(1)).findById(1L);
+        verify(reservationRepository, times(1)).save(reservation);
+
+    }
+
+    @Test
+    public void testMarkAsUsed_ReservationAlreadyUsed() {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        Reservation reservation = new Reservation();
+        reservation.setUsed(true);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+        ReservationAlreadyUsedException exception = assertThrows(ReservationAlreadyUsedException.class, () -> {
+            reservationService.markAsUsed(useReservationDTO);
+        });
+
+        assertEquals("Reservation already used", exception.getMessage());
+        verify(reservationRepository, times(1)).findById(1L);
+        verify(reservationRepository, never()).save(any(Reservation.class));
+
+    }
+
+    @Test
+    public void testMarkAsUsed_ReservationNotFound() {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
+        ReservationNotFoundException exception = assertThrows(ReservationNotFoundException.class, () -> {
+            reservationService.markAsUsed(useReservationDTO);
+        });
+
+        assertEquals("No reservation has that id", exception.getMessage());
+        verify(reservationRepository, times(1)).findById(1L);
+        verify(reservationRepository, never()).save(any(Reservation.class));
+
+    }
+
+    @Test
+    public void testMarkAsUsed_InternalServerError() {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO();
+        useReservationDTO.setReservationId(1L);
+        when(reservationRepository.findById(1L)).thenThrow(new RuntimeException("Some unexpected exception"));
+        Exception exception = assertThrows(Exception.class, () -> {
+            reservationService.markAsUsed(useReservationDTO);
+        });
+
+        assertEquals("CANNOT use a reservation right now", exception.getMessage());
+        verify(reservationRepository, times(1)).findById(1L);
+        verify(reservationRepository, never()).save(any(Reservation.class));
 
     }
 

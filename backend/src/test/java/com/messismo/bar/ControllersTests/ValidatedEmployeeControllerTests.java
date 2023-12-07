@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -466,5 +467,72 @@ public class ValidatedEmployeeControllerTests {
         assertEquals("Internal server error", response.getBody());
 
     }
+
+
+    @Test
+    public void testMarkAsUsedReservation_Success() throws Exception {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        Reservation simulatedReservation = new Reservation();
+        when(reservationService.markAsUsed(useReservationDTO)).thenReturn("Reservation mark as used successfully");
+        ResponseEntity<?> response = validatedEmployeeController.markAsUsedReservation(useReservationDTO);
+
+        verify(reservationService, times(1)).markAsUsed(useReservationDTO);
+        assertResponseEntity(response, HttpStatus.OK, "Reservation mark as used successfully");
+
+    }
+
+    @Test
+    public void testMarkAsUsedReservation_ReservationNotFound() throws Exception {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        when(reservationService.markAsUsed(useReservationDTO)).thenThrow(new ReservationNotFoundException("Reservation not found"));
+        ResponseEntity<?> response = validatedEmployeeController.markAsUsedReservation(useReservationDTO);
+
+        verify(reservationService, times(1)).markAsUsed(useReservationDTO);
+        assertResponseEntity(response, HttpStatus.CONFLICT, "Reservation not found");
+    }
+
+    @Test
+    public void testMarkAsUsedReservation_ReservationAlreadyUsed() throws Exception {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        when(reservationService.markAsUsed(useReservationDTO)).thenThrow(new ReservationAlreadyUsedException("Reservation already used"));
+        ResponseEntity<?> response = validatedEmployeeController.markAsUsedReservation(useReservationDTO);
+
+        verify(reservationService, times(1)).markAsUsed(useReservationDTO);
+        assertResponseEntity(response, HttpStatus.CONFLICT, "Reservation already used");
+
+    }
+
+
+    @Test
+    public void testMarkAsUsedReservation_MissingReservationId() throws Exception {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO();
+        ResponseEntity<?> response = validatedEmployeeController.markAsUsedReservation(useReservationDTO);
+
+        assertResponseEntity(response, HttpStatus.CONFLICT,     "Missing information to use a reservation");
+
+    }
+    @Test
+    public void testMarkAsUsedReservation_InternalServerError() throws Exception {
+
+        UseReservationDTO useReservationDTO = new UseReservationDTO(1L);
+        when(reservationService.markAsUsed(useReservationDTO)).thenThrow(new RuntimeException("Internal server error"));
+        ResponseEntity<?> response = validatedEmployeeController.markAsUsedReservation(useReservationDTO);
+
+        verify(reservationService, times(1)).markAsUsed(useReservationDTO);
+        assertResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+
+    }
+
+    private void assertResponseEntity(ResponseEntity<?> response, HttpStatus expectedStatus, Object expectedBody) {
+        assertAll(
+                () -> assertEquals(expectedStatus, response.getStatusCode()),
+                () -> assertEquals(expectedBody, response.getBody())
+        );
+    }
+
 
 }

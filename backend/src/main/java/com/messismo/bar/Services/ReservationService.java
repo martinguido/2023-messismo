@@ -2,8 +2,10 @@ package com.messismo.bar.Services;
 
 import com.messismo.bar.DTOs.DeleteReservationRequestDTO;
 import com.messismo.bar.DTOs.NewReservationRequestDTO;
+import com.messismo.bar.DTOs.UseReservationDTO;
 import com.messismo.bar.Entities.Reservation;
 import com.messismo.bar.Exceptions.BarCapacityExceededException;
+import com.messismo.bar.Exceptions.ReservationAlreadyUsedException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
@@ -36,11 +38,11 @@ public class ReservationService {
             if (currentCapacity + newReservationRequestDTO.getCapacity() > maxCapacity) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
-            Integer clientPhoneCorrected=null;
+            Integer clientPhoneCorrected = null;
             if (newReservationRequestDTO.getClientPhone() != null) {
                 clientPhoneCorrected = Integer.parseInt(newReservationRequestDTO.getClientPhone());
             }
-            Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(),clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
+            Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(), clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
             reservationRepository.save(newReservation);
             return "Reservation added successfully";
         } catch (BarCapacityExceededException e) {
@@ -70,22 +72,40 @@ public class ReservationService {
 
     private List<Reservation> updateReservationsStates(List<Reservation> allReservations) {
         LocalDateTime today = LocalDateTime.now();
-        for(Reservation reservation : allReservations){
+        for (Reservation reservation : allReservations) {
             LocalDateTime startingDate = reservation.getReservationDate().atTime(reservation.getShift().getStartingHour());
             LocalDateTime finishingDate = reservation.getReservationDate().atTime(reservation.getShift().getFinishingHour());
-            if(Objects.equals(reservation.getState(), "Upcoming") &&  startingDate.isBefore(today) && finishingDate.isAfter(today)){
+            if (Objects.equals(reservation.getState(), "Upcoming") && startingDate.isBefore(today) && finishingDate.isAfter(today)) {
                 reservation.updateToInProcessState();
                 reservationRepository.save(reservation);
             }
-            if(startingDate.isBefore(today) && finishingDate.isBefore(today)){
+            if (startingDate.isBefore(today) && finishingDate.isBefore(today)) {
                 reservation.updateToExpiredState();
                 reservationRepository.save(reservation);
             }
-            if(startingDate.isAfter(today) && finishingDate.isAfter(today)){
+            if (startingDate.isAfter(today) && finishingDate.isAfter(today)) {
                 reservation.updateToUpcoming();
                 reservationRepository.save(reservation);
             }
         }
         return reservationRepository.findAll();
+    }
+
+    public String markAsUsed(UseReservationDTO useReservationDTO) throws Exception {
+        try {
+            Reservation reservation = reservationRepository.findById(useReservationDTO.getReservationId()).orElseThrow(() -> new ReservationNotFoundException("No reservation has that id"));
+            if (reservation.getUsed()) {
+                throw new ReservationAlreadyUsedException("Reservation already used");
+            } else {
+                reservation.setAsUsed();
+                reservationRepository.save(reservation);
+                return "Reservation mark as used successfully";
+            }
+        } catch(ReservationNotFoundException | ReservationAlreadyUsedException e){
+            throw e;
+        }catch (Exception e) {
+            throw new Exception("CANNOT use a reservation right now");
+        }
+
     }
 }

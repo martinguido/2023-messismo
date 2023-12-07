@@ -126,4 +126,20 @@ public class ValidatedEmployeeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @PutMapping("/markAsUsedReservation")
+    public ResponseEntity<?> markAsUsedReservation(@RequestBody UseReservationDTO useReservationDTO) {
+        if (useReservationDTO.getReservationId() == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to use a reservation");
+        } else {
+            try {
+                return ResponseEntity.status(HttpStatus.OK).body(reservationService.markAsUsed(useReservationDTO));
+            } catch (ReservationNotFoundException | ReservationAlreadyUsedException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            }
+        }
+
+    }
 }

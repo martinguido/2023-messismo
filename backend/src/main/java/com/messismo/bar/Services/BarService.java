@@ -39,17 +39,18 @@ public class BarService {
             Bar bar = barRepository.findById(modifyBarCapacityRequestDTO.getBarId())
                     .orElseThrow(() -> new BarNotFoundException("Provided bar id DOES NOT match any bar id"));
             List<Reservation> allReservations = reservationService.getAllReservations();
-            HashMap<List<LocalDateTime>, Integer> reservationsByDate = new HashMap<>();
+            HashMap<LocalDateTime, Integer> reservationsByDate = new HashMap<>();
             for (Reservation reservation : allReservations) {
-                List<LocalDateTime> dateRange = List.of(reservation.getStartingDate(),
-                        reservation.getFinishingDate());
-                if (!reservationsByDate.containsKey(dateRange)) {
-                    reservationsByDate.put(dateRange, reservation.getCapacity());
-                } else {
-                    reservationsByDate.put(dateRange, reservationsByDate.get(dateRange) + reservation.getCapacity());
+                if(!reservation.isExpired()) {
+                    LocalDateTime dateRange = reservation.getReservationDate().atTime(reservation.getShift().getStartingHour());
+                    if (!reservationsByDate.containsKey(dateRange)) {
+                        reservationsByDate.put(dateRange, reservation.getCapacity());
+                    } else {
+                        reservationsByDate.put(dateRange, reservationsByDate.get(dateRange) + reservation.getCapacity());
+                    }
                 }
             }
-            for (Map.Entry<List<LocalDateTime>, Integer> entry : reservationsByDate.entrySet()) {
+            for (Map.Entry<LocalDateTime, Integer> entry : reservationsByDate.entrySet()) {
                 if (entry.getValue() > modifyBarCapacityRequestDTO.getNewCapacity()) {
                     throw new AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException(
                             "There is a shift with a higher capacity than the requested");

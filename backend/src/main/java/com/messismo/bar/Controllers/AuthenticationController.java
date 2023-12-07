@@ -122,7 +122,7 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT have the capacity under 1 or higher than maximum capacity");
         } else if (Objects.equals(newReservationRequestDTO.getClientPhone(), "") && Objects.equals(newReservationRequestDTO.getClientEmail(), "")) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing phone or email to create a reservation");
-        } else if (newReservationRequestDTO.getShift() == null || newReservationRequestDTO.getStartingDate() == null || newReservationRequestDTO.getFinishingDate() == null || newReservationRequestDTO.getComment() == null || (newReservationRequestDTO.getClientPhone() == null && newReservationRequestDTO.getClientEmail() == null)) {
+        } else if (newReservationRequestDTO.getShift() == null || newReservationRequestDTO.getReservationDate() == null  || newReservationRequestDTO.getComment() == null || (newReservationRequestDTO.getClientPhone() == null && newReservationRequestDTO.getClientEmail() == null)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to add a reservation");
         } else if (newReservationRequestDTO.getClientEmail() != null && (!newReservationRequestDTO.getClientEmail().isEmpty() && !newReservationRequestDTO.getClientEmail().matches(emailRegex))) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong email format");
@@ -130,12 +130,12 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong phone format");
         } else if (!newReservationRequestDTO.getComment().matches(commentRegex)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong comment format");
-        } else if (newReservationRequestDTO.getStartingDate().isBefore(actualDate) || newReservationRequestDTO.getFinishingDate().isBefore(actualDate)) {
+        } else if (newReservationRequestDTO.getReservationDate().isBefore(actualDate)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT use a date from the past");
         } else {
             try {
                 return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(newReservationRequestDTO));
-            } catch (BarCapacityExceededException | ReservationStartingDateMustBeBeforeFinishinDateException e) {
+            } catch (BarCapacityExceededException e) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

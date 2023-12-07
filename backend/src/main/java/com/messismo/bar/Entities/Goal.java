@@ -47,4 +47,20 @@ public class Goal {
 
     @Column(name="achieved")  // ACHIEVED O NOT ACHIEVED
     private String achieved;
+
+    public void updateStatusToExpired(){
+        this.status = "Expired";
+    }
+
+    public void updateStatusToInProcess() {
+        this.status = "In Process";
+    }
+
+    public void updateStatusToUpcoming() {
+        this.status = "Upcoming";
+    }
+
+    public void updateToAchieved(){
+        this.achieved = "Achieved";
+    }
 }

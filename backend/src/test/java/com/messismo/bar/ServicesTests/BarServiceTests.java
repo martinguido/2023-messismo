@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
@@ -132,13 +133,13 @@ public class BarServiceTests {
         Bar bar = new Bar(1L, 50);
         List<Reservation> mockReservations = List.of(
                 new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2,
+                        LocalDate.of(2023, 1, 1), "martin@mail.com",null, 2,
                         "Birthday"),
                 new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0), "martin2@mail.com", 2,
+                        LocalDate.of(2023, 2, 1), "martin2@mail.com",null, 2,
                         "Birthday2"),
                 new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
+                        LocalDate.of(2023, 1, 1), "martin3@mail.com",null, 2,
                         "Birthday3"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         when(barRepository.findById(1L)).thenReturn(Optional.of(bar));
@@ -160,19 +161,19 @@ public class BarServiceTests {
         Shift shit2= new Shift(LocalTime.of(15, 0), LocalTime.of(16, 0));
         List<Reservation> mockReservations = List.of(
                 new Reservation(shit1,
-                        LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2,
+                        LocalDate.of(2023, 1, 1),  "martin@mail.com", null,2,
                         "Birthday"),
                 new Reservation(shit1,
-                        LocalDateTime.of(2024, 2, 1, 14, 0), LocalDateTime.of(2024, 2, 1, 15, 0), "martin2@mail.com", 3,
+                        LocalDate.of(2024, 2, 1),  "martin2@mail.com", null, 3,
                         "Birthday2"),
                 new Reservation(shit1,
-                        LocalDateTime.of(2025, 1, 1, 14, 0), LocalDateTime.of(2025, 1, 1, 15, 0), "martin3@mail.com", 4,
+                        LocalDate.of(2025, 1, 1),  "martin3@mail.com", null, 4,
                         "Birthday3"),
                 new Reservation(shit1,
-                        LocalDateTime.of(2025, 1, 1, 14, 0), LocalDateTime.of(2025, 1, 1, 15, 0), "martin3@mail.com", 4,
+                        LocalDate.of(2025, 1, 1),  "martin3@mail.com", null, 4,
                         "Birthday3"),
                 new Reservation(shit2,
-                        LocalDateTime.of(2025, 1, 1, 15, 0), LocalDateTime.of(2025, 1, 1, 16, 0), "martin3@mail.com", 6,
+                        LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 6,
                         "Birthday3"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         when(barRepository.findById(1L)).thenReturn(Optional.of(bar));

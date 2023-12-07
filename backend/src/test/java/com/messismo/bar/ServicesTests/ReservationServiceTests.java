@@ -7,7 +7,6 @@ import com.messismo.bar.Entities.Reservation;
 import com.messismo.bar.Entities.Shift;
 import com.messismo.bar.Exceptions.BarCapacityExceededException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
-import com.messismo.bar.Exceptions.ReservationStartingDateMustBeBeforeFinishinDateException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
 import com.messismo.bar.Services.ReservationService;
@@ -50,14 +49,7 @@ public class ReservationServiceTests {
     public void testGetAllReservations() {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> expectedReservations = List.of(
-                new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0),
-                        "martin@mail.com", 2, "Birthday"),
-                new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0),
-                        "martin2@mail.com", 2, "Birthday2"),
-                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
-                        "Birthday3"));
+        List<Reservation> expectedReservations = List.of(new Reservation(existingShift, LocalDate.of(2023, 1, 1), "martin@mail.com", 156683434, 2, "Birthday"), new Reservation(existingShift, LocalDate.of(2023, 2, 1), "martin2@mail.com", 1554209090, 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
         when(reservationRepository.findAll()).thenReturn(expectedReservations);
 
         List<Reservation> result = reservationService.getAllReservations();
@@ -65,42 +57,12 @@ public class ReservationServiceTests {
 
     }
 
-    @Test
-    public void testFindBetweenStartingDateAndFinishingDate() {
-
-        Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> allReservations = List.of(
-                new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0),
-                        "martin@mail.com", 2, "Birthday"),
-                new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0),
-                        "martin2@mail.com", 2, "Birthday2"),
-                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
-                        "Birthday3"));
-        List<Reservation> filteredReservations = List.of(
-                new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0),
-                        "martin@mail.com", 2, "Birthday"),
-                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2,
-                        "Birthday3"));
-
-        when(reservationRepository.findAll()).thenReturn(allReservations);
-
-        LocalDateTime startingDate = LocalDateTime.of(2023, 1, 1, 13, 0);
-        LocalDateTime finishingDate = LocalDateTime.of(2023, 1, 1, 17, 0);
-        List<Reservation> result = reservationService.findBetweenStartingDateAndFinishingDate(startingDate,
-                finishingDate);
-
-        assertEquals(2, result.size());
-        assertEquals(filteredReservations, result);
-    }
 
     @Test
     public void testDeleteReservationSuccessfully() throws Exception {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        Reservation existingReservation = new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0),
-                LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday");
+        Reservation existingReservation = new Reservation(existingShift, LocalDate.of(2023, 1, 1), null, 1566785465,2, "Birthday");
         when(reservationRepository.findById(any())).thenReturn(Optional.of(existingReservation));
 
         DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(1L);
@@ -125,8 +87,7 @@ public class ReservationServiceTests {
 
     @Test
     public void testDeleteReservationWithGenericException() {
-        when(reservationRepository.findById(any()))
-                .thenThrow(new RuntimeException("CANNOT delete a reservation at the moment"));
+        when(reservationRepository.findById(any())).thenThrow(new RuntimeException("CANNOT delete a reservation at the moment"));
 
         DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(100L);
         Exception exception = Assert.assertThrows(Exception.class, () -> {
@@ -140,17 +101,10 @@ public class ReservationServiceTests {
     public void testAddReservationSuccessfully() throws Exception {
 
         Bar mockBar = new Bar(1L, 20);
-        Shift aShift= new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
-        when(reservationService.findBetweenStartingDateAndFinishingDate(LocalDateTime.of(2024, 12, 1, 10, 0),
-                LocalDateTime.of(2024, 12, 1, 12, 0))).thenReturn(List.of());
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
-                .capacity(5)
-                .shift(aShift)
-                .startingDate(LocalDate.of(2024, 12, 1))
-                .finishingDate(LocalDate.of(2024, 12, 1))
-                .clientEmail("test@example.com")
-                .build();
+        when(reservationRepository.findAllByShiftAndDate(aShift, LocalDate.of(2024, 12, 1))).thenReturn(List.of());
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("test@example.com").build();
         String result = reservationService.addReservation(requestDTO);
         assertEquals("Reservation added successfully", result);
         // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
@@ -159,53 +113,99 @@ public class ReservationServiceTests {
     }
 
     @Test
+    public void testAddReservationSuccessfully_OnlyWithEmail() throws Exception {
+
+        Bar mockBar = new Bar(1L, 20);
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        when(barRepository.findAll()).thenReturn(List.of(mockBar));
+        when(reservationRepository.findAllByShiftAndDate(aShift, LocalDate.of(2024, 12, 1))).thenReturn(List.of());
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("test@example.com").build();
+        String result = reservationService.addReservation(requestDTO);
+        assertEquals("Reservation added successfully", result);
+        // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
+        assertEquals(aShift, requestDTO.getShift());
+
+    }
+
+    @Test
+    public void testAddReservationSuccessfully_OnlyWithPhone() throws Exception {
+
+        Bar mockBar = new Bar(1L, 20);
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        when(barRepository.findAll()).thenReturn(List.of(mockBar));
+        when(reservationRepository.findAllByShiftAndDate(aShift, LocalDate.of(2024, 12, 1))).thenReturn(List.of());
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientPhone("15665645").build();
+        String result = reservationService.addReservation(requestDTO);
+        assertEquals("Reservation added successfully", result);
+        // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
+        assertEquals(aShift, requestDTO.getShift());
+
+    }
+
+    @Test
+    public void testAddReservationSuccessfully_WithPhoneAndEmail() throws Exception {
+
+        Bar mockBar = new Bar(1L, 20);
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        when(barRepository.findAll()).thenReturn(List.of(mockBar));
+        when(reservationRepository.findAllByShiftAndDate(aShift, LocalDate.of(2024, 12, 1))).thenReturn(List.of());
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("guidomartin7@gmail.com").clientPhone("15665645").build();
+        String result = reservationService.addReservation(requestDTO);
+        assertEquals("Reservation added successfully", result);
+        // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
+        assertEquals(aShift, requestDTO.getShift());
+
+    }
+
+
+    @Test
     public void testAddReservationWithBarCapacityExceededException() {
 
         Bar mockBar = new Bar(1L, 20);
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
-                .capacity(30)
-                .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2024, 12, 1))
-                .finishingDate(LocalDate.of(2024, 12, 1))
-                .clientEmail("test@example.com")
-                .build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(30).shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0))).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("test@example.com").build();
         assertThrows(BarCapacityExceededException.class, () -> reservationService.addReservation(requestDTO));
 
     }
 
     @Test
-    public void testAddReservationWithReservationStartingDateMustBeBeforeFinishingDateException() {
+    public void testAddReservationWithNoPhoneOrEmailException() {
 
         Bar mockBar = new Bar(1L, 20);
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
-                .capacity(5)
-                .shift(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)))
-                .startingDate(LocalDate.now().plusDays(2))
-                .finishingDate(LocalDate.now())
-                .clientEmail("test@example.com")
-                .build();
-
-        ReservationStartingDateMustBeBeforeFinishinDateException exception = Assert
-                .assertThrows(ReservationStartingDateMustBeBeforeFinishinDateException.class, () -> {
-                    reservationService.addReservation(requestDTO);
-                });
-        Assertions.assertEquals("The selected starting date must be before the finishing date", exception.getMessage());
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(30).shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0))).reservationDate(LocalDate.of(2024, 12, 1)).build();
+        assertThrows(Exception.class, () -> reservationService.addReservation(requestDTO));
 
     }
+
+    @Test
+    public void testAddReservationWithPhoneBelowZeroException() {
+
+        Bar mockBar = new Bar(1L, 20);
+        when(barRepository.findAll()).thenReturn(List.of(mockBar));
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(30).shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0))).reservationDate(LocalDate.of(2024, 12, 1)).clientPhone("-55").build();
+        assertThrows(Exception.class, () -> reservationService.addReservation(requestDTO));
+
+    }
+
+    @Test
+    public void testAddReservationWithWrongEmailFormatException() {
+
+        Bar mockBar = new Bar(1L, 20);
+        when(barRepository.findAll()).thenReturn(List.of(mockBar));
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(30).shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0))).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("martin.com").build();
+        assertThrows(Exception.class, () -> reservationService.addReservation(requestDTO));
+
+    }
+
+
+
 
     @Test
     public void testAddReservationWithGenericException() {
 
         when(barRepository.findAll()).thenThrow(new RuntimeException("Error fetching bar capacity"));
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder()
-                .capacity(5)
-                .shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0)))
-                .startingDate(LocalDate.of(2024, 12, 1))
-                .finishingDate(LocalDate.of(2024, 12, 1))
-                .clientEmail("test@example.com")
-                .build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0))).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("test@example.com").build();
         Exception exception = Assert.assertThrows(Exception.class, () -> {
             reservationService.addReservation(requestDTO);
         });

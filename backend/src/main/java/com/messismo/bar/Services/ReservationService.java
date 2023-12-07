@@ -5,15 +5,14 @@ import com.messismo.bar.DTOs.NewReservationRequestDTO;
 import com.messismo.bar.Entities.Reservation;
 import com.messismo.bar.Exceptions.BarCapacityExceededException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
-import com.messismo.bar.Exceptions.ReservationStartingDateMustBeBeforeFinishinDateException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +28,7 @@ public class ReservationService {
             if (maxCapacity < newReservationRequestDTO.getCapacity()) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
-            LocalDateTime startingDate = LocalDateTime.of(newReservationRequestDTO.getStartingDate(), newReservationRequestDTO.getShift().getStartingHour());
-            LocalDateTime finishingDate = LocalDateTime.of(newReservationRequestDTO.getFinishingDate(), newReservationRequestDTO.getShift().getFinishingHour());
-            if (startingDate.isAfter(finishingDate)) {
-                throw new ReservationStartingDateMustBeBeforeFinishinDateException("The selected starting date must be before the finishing date");
-            }
-            List<Reservation> allReservations = findBetweenStartingDateAndFinishingDate(startingDate, finishingDate);
+            List<Reservation> allReservations = reservationRepository.findAllByShiftAndDate(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate());
             Integer currentCapacity = 0;
             for (Reservation reservation : allReservations) {
                 currentCapacity += reservation.getCapacity();
@@ -42,18 +36,14 @@ public class ReservationService {
             if (currentCapacity + newReservationRequestDTO.getCapacity() > maxCapacity) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
-            if ((newReservationRequestDTO.getClientPhone() == "" || newReservationRequestDTO.getClientPhone() == null) && !newReservationRequestDTO.getClientEmail().isEmpty()) {
-                Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), startingDate, finishingDate, newReservationRequestDTO.getClientEmail(), newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
-                reservationRepository.save(newReservation);
-            } else if (!newReservationRequestDTO.getClientPhone().isEmpty() && (newReservationRequestDTO.getClientEmail() == "" || newReservationRequestDTO.getClientEmail() == null)) {
-                Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), startingDate, finishingDate, Integer.parseInt(newReservationRequestDTO.getClientPhone()), newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
-                reservationRepository.save(newReservation);
-            } else if (!newReservationRequestDTO.getClientPhone().isEmpty() && !newReservationRequestDTO.getClientEmail().isEmpty()) {
-                Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), startingDate, finishingDate, newReservationRequestDTO.getClientEmail(), Integer.parseInt(newReservationRequestDTO.getClientPhone()), newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
-                reservationRepository.save(newReservation);
+            Integer clientPhoneCorrected=null;
+            if (newReservationRequestDTO.getClientPhone() != null) {
+                clientPhoneCorrected = Integer.parseInt(newReservationRequestDTO.getClientPhone());
             }
+            Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(),clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
+            reservationRepository.save(newReservation);
             return "Reservation added successfully";
-        } catch (BarCapacityExceededException | ReservationStartingDateMustBeBeforeFinishinDateException e) {
+        } catch (BarCapacityExceededException e) {
             throw e;
         } catch (Exception e) {
             throw new Exception("CANNOT create a reservation at the moment");
@@ -72,18 +62,30 @@ public class ReservationService {
         }
     }
 
-    public List<Reservation> findBetweenStartingDateAndFinishingDate(LocalDateTime startingDate, LocalDateTime finishingDate) {
+    public List<Reservation> getAllReservations() {
         List<Reservation> allReservations = reservationRepository.findAll();
-        List<Reservation> filteredReservations = new ArrayList<>();
-        for (Reservation reservation : allReservations) {
-            if ((reservation.getStartingDate().isAfter(startingDate) || reservation.getStartingDate().equals(startingDate)) && reservation.getStartingDate().isBefore(finishingDate) && (reservation.getFinishingDate().isBefore(finishingDate) || reservation.getFinishingDate().equals(finishingDate)) && reservation.getFinishingDate().isAfter(startingDate)) {
-                filteredReservations.add(reservation);
-            }
-        }
-        return filteredReservations;
+        List<Reservation> updateReservationsStates = updateReservationsStates(allReservations);
+        return updateReservationsStates;
     }
 
-    public List<Reservation> getAllReservations() {
+    private List<Reservation> updateReservationsStates(List<Reservation> allReservations) {
+        LocalDateTime today = LocalDateTime.now();
+        for(Reservation reservation : allReservations){
+            LocalDateTime startingDate = reservation.getReservationDate().atTime(reservation.getShift().getStartingHour());
+            LocalDateTime finishingDate = reservation.getReservationDate().atTime(reservation.getShift().getFinishingHour());
+            if(Objects.equals(reservation.getState(), "Upcoming") &&  startingDate.isBefore(today) && finishingDate.isAfter(today)){
+                reservation.updateToInProcessState();
+                reservationRepository.save(reservation);
+            }
+            if(startingDate.isBefore(today) && finishingDate.isBefore(today)){
+                reservation.updateToExpiredState();
+                reservationRepository.save(reservation);
+            }
+            if(startingDate.isAfter(today) && finishingDate.isAfter(today)){
+                reservation.updateToUpcoming();
+                reservationRepository.save(reservation);
+            }
+        }
         return reservationRepository.findAll();
     }
 }

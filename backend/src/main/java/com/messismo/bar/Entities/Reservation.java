@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Objects;
+
 
 @Data
 @NoArgsConstructor
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Table(name = "reservations")
+
+
 public class Reservation {
 
     @Id
@@ -25,11 +29,8 @@ public class Reservation {
     @JoinColumn(name = "shift_id")
     private Shift shift;
 
-    @Column(name = "starting_date")
-    private LocalDateTime startingDate;
-
-    @Column(name = "finishing_date")
-    private LocalDateTime finishingDate;
+    @Column(name = "reservation_date")
+    private LocalDate reservationDate;
 
     @Column(name = "client_email")
     private String clientEmail;
@@ -43,45 +44,58 @@ public class Reservation {
     @Column(name = "comment")
     private String comment;
 
+    @Column(name = "state")
+    private String state;
 
-    public Reservation(Shift shift, LocalDateTime startingDate, LocalDateTime finishingDate, String clientEmail, Integer capacity, String comment) {
-        if (finishingDate.isAfter(startingDate)) {
-            this.shift = shift;
-            this.startingDate = startingDate;
-            this.finishingDate = finishingDate;
-            this.clientEmail = clientEmail;
-            this.capacity = capacity;
-            this.comment = comment;
-        } else {
-            throw new IllegalArgumentException("Starting date must be before finishing date");
+    @Column(name = "used")
+    private Boolean used;
+
+
+    public Reservation(Shift shift, LocalDate reservationDate, String clientEmail, Integer clientPhone, Integer capacity, String comment) {
+        if (capacity < 0) {
+            throw new IllegalArgumentException("Capacity must be greater than 0");
         }
+        if (clientPhone == null && clientEmail == null) {
+            throw new IllegalArgumentException("Missing phone and email");
+        }
+        if (clientPhone != null) {
+            if (clientPhone < 0) {
+                throw new IllegalArgumentException("Phone must be greater than 0");
+            } else {
+                this.clientPhone = clientPhone;
+            }
+        }
+        if (clientEmail != null) {
+            if (!clientEmail.isEmpty()) {
+                this.clientEmail = clientEmail;
+            }
+        }
+        this.shift = shift;
+        this.reservationDate = reservationDate;
+        this.capacity = capacity;
+        this.comment = comment;
+        this.state = "Upcoming";
+        this.used = false;
     }
 
-    public Reservation(Shift shift, LocalDateTime startingDate, LocalDateTime finishingDate, Integer clientPhone, Integer capacity, String comment) {
-        if (finishingDate.isAfter(startingDate)) {
-            this.shift = shift;
-            this.startingDate = startingDate;
-            this.finishingDate = finishingDate;
-            this.clientPhone = clientPhone;
-            this.capacity = capacity;
-            this.comment = comment;
-        } else {
-            throw new IllegalArgumentException("Starting date must be before finishing date");
-        }
+    public void setAsUsed(){
+        this.used = true;
     }
 
-    public Reservation(Shift shift, LocalDateTime startingDate, LocalDateTime finishingDate, String clientEmail, Integer clientPhone, Integer capacity, String comment) {
-        if (finishingDate.isAfter(startingDate)) {
-            this.shift = shift;
-            this.startingDate = startingDate;
-            this.finishingDate = finishingDate;
-            this.clientEmail = clientEmail;
-            this.clientPhone = clientPhone;
-            this.capacity = capacity;
-            this.comment = comment;
-        } else {
-            throw new IllegalArgumentException("Starting date must be before finishing date");
-        }
+    public void updateToInProcessState() {
+        this.state = "In Process";
+    }
+
+    public void updateToExpiredState() {
+        this.state = "Expired";
+    }
+
+    public void updateToUpcoming() {
+        this.state = "Upcoming";
+    }
+
+    public Boolean isExpired(){
+        return Objects.equals(this.state, "Expired");
     }
 
 }

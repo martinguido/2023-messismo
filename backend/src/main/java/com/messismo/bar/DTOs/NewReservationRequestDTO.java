@@ -18,9 +18,7 @@ public class NewReservationRequestDTO {
 
     private Shift shift;
 
-    private LocalDate startingDate;
-
-    private LocalDate finishingDate;
+    private LocalDate reservationDate;
 
     private String comment;
 

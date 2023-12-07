@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -447,7 +448,7 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testGetAllReservationsSuccessful() {
 
-        List<Reservation> mockReservations = List.of(new Reservation(1L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"), new Reservation(2L, new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 12, 1, 14, 0), LocalDateTime.of(2023, 12, 1, 15, 0), "martin@mail.com", 15000055, 5, "Birthdays"));
+        List<Reservation> mockReservations = List.of(new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 12, 1 ), "martin@mail.com", 15000055, 5, "Birthdays"), new Reservation( new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 12, 1), "martin@mail.com", 15000055, 5, "Birthdays"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         ResponseEntity<?> response = validatedEmployeeController.getAllReservations();
 

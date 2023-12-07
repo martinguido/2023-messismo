@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class ShiftServiceTests {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
         when(shiftRepository.findById(existingShift.getShiftId())).thenReturn(Optional.of(existingShift));
-        List<Reservation> mockReservations = List.of(new Reservation(existingShift, LocalDateTime.of(2023, 1, 1, 14, 0), LocalDateTime.of(2023, 1, 1, 15, 0), "martin@mail.com", 2, "Birthday"), new Reservation(existingShift, LocalDateTime.of(2023, 2, 1, 14, 0), LocalDateTime.of(2023, 2, 1, 15, 0), "martin2@mail.com", 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDateTime.of(2023, 1, 1, 15, 0), LocalDateTime.of(2023, 1, 1, 16, 0), "martin3@mail.com", 2, "Birthday3"));
+        List<Reservation> mockReservations = List.of(new Reservation(existingShift, LocalDate.of(2023, 1, 1), "martin@mail.com", null, 2, "Birthday"), new Reservation(existingShift, LocalDate.of(2023, 2, 1), "martin2@mail.com", null, 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         DeleteShiftRequestDTO requestDTO = new DeleteShiftRequestDTO(existingShift.getShiftId());
 
@@ -152,6 +153,7 @@ public class ShiftServiceTests {
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
 
     }
+
     @Test
     public void testAddShiftWithCannotCreateShiftWithEqualsStartingHourAndFinishingHourAfter() {
         List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
@@ -164,6 +166,7 @@ public class ShiftServiceTests {
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
 
     }
+
     @Test
     public void testAddShiftWithCannotCreateShiftWithEqualsStartingHourAndFinishingHourBefore() {
         List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
@@ -176,6 +179,7 @@ public class ShiftServiceTests {
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
 
     }
+
     @Test
     public void testAddShiftWithCannotCreateShiftWithStartingHourAfterAndEqualsFinishingHour() {
         List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
@@ -188,6 +192,7 @@ public class ShiftServiceTests {
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
 
     }
+
     @Test
     public void testAddShiftWithCannotCreateShiftWithStartingHourBeforeAndEqualsFinishingHour() {
         List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
@@ -202,7 +207,7 @@ public class ShiftServiceTests {
     }
 
 
-   @Test
+    @Test
     public void testAddShiftWithCannotCreateShiftContainingAShift() {
         List<Shift> existingShifts = Arrays.asList(new Shift(LocalTime.of(18, 10), LocalTime.of(18, 15)), new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0)));
         when(shiftRepository.findAll()).thenReturn(existingShifts);
@@ -214,7 +219,6 @@ public class ShiftServiceTests {
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
 
     }
-
 
 
     @Test

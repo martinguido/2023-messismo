@@ -10,6 +10,8 @@ import com.messismo.bar.Exceptions.ReservationNotFoundException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,8 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     private final BarRepository barRepository;
+
+    private final JavaMailSender javaMailSender;
 
     public String addReservation(NewReservationRequestDTO newReservationRequestDTO) throws Exception {
         try {
@@ -44,6 +48,14 @@ public class ReservationService {
             }
             Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(), clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
             reservationRepository.save(newReservation);
+            if (newReservationRequestDTO.getClientEmail() != null) {
+                SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+                simpleMailMessage.setTo(newReservationRequestDTO.getClientEmail());
+                simpleMailMessage.setFrom("automaticmoebar@hotmail.com");
+                simpleMailMessage.setSubject("Reservation created successfully for Moe's Bar" );
+                simpleMailMessage.setText("Your reservation:" + newReservationRequestDTO.getReservationDate() +" "+ newReservationRequestDTO.getShift().getStartingHour() +" "+ newReservationRequestDTO.getShift().getFinishingHour()+" . Hope to see you soon!");
+                javaMailSender.send(simpleMailMessage);
+            }
             return "Reservation added successfully";
         } catch (BarCapacityExceededException e) {
             throw e;
@@ -100,9 +112,9 @@ public class ReservationService {
                 reservationRepository.save(reservation);
                 return "Reservation mark as used successfully";
             }
-        } catch(ReservationNotFoundException | ReservationAlreadyUsedException e){
+        } catch (ReservationNotFoundException | ReservationAlreadyUsedException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new Exception("CANNOT use a reservation right now");
         }
 

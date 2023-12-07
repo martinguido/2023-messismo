@@ -471,6 +471,7 @@ const Register = () => {
                     <p style={{ marginBottom: "3.5%" }}>Please enter a date</p>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
+                        disablePast
                         variant="outlined"
                         error={errors.date ? true : false}
                         helperText={errors.date || ""}

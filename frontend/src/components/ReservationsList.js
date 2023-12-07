@@ -59,7 +59,7 @@ const ProductsList = () => {
         console.error("Error al mostrar las reservas", error);
         setIsLoading(false);
       });
-  }, [openDeleteReservationForm, openReservationForm, modified]);
+  }, [modified]);
   useEffect(() => {
     setIsLoading(true);
     shiftService
@@ -253,83 +253,91 @@ const ProductsList = () => {
         </Box>
       ) : (
         <>
-          {reservations.map((reservation, index) => (
-            <div className="entradas" key={index}>
-              <div className="product">
-                <div className="firstLine">
-                  <div className="names">
-                    <div className="name">
-                      <p
-                        className="text reservet"
-                        style={{ fontWeight: "bold" }}
-                      >
-                        {reservation.reservationId +
-                          " : " +
-                          reservation.startingDate.substring(0, 10)}
-                      </p>
-                    </div>
-                    <div className="category">
-                      <p className="text reservet">
-                        {reservation.startingDate.substring(11, 16) +
-                          " - " +
-                          reservation.finishingDate.substring(11, 16)}
-                      </p>
-                    </div>
-                    {reservation.clientEmail !== null ? (
-                      <div className="category">
-                        <p className="text reservet">
-                          {reservation.clientEmail}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="category">
-                        <p className="text reservet"> - </p>
-                      </div>
-                    )}
-
-                    {reservation.clientPhone !== null ? (
-                      <div className="category">
-                        <p className="text reservet">
-                          {reservation.clientPhone}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="category">
-                        <p className="text reservet"> - </p>
-                      </div>
-                    )}
-                    <div className="category">
-                      <p className="text reservet">{reservation.capacity}</p>
-                    </div>
-                    <div className="category">
-                      <p className="text reservet">{reservation.comment}</p>
-                    </div>
-                    {role === "ADMIN" || role === "MANAGER" ? (
-                      <div className="category">
-                        <Tooltip
-                          title="Delete Reservation"
-                          arrow
-                          style={{ fontSize: "2rem" }}
-                        >
-                          <IconButton
-                            aria-label="delete"
-                            size="large"
-                            style={{ color: "red", fontSize: "1.5 rem" }}
-                            onClick={() => handleDeleteClick(reservation)}
-                          >
-                            <DeleteIcon style={{ fontSize: "1.5rem" }} />
-                          </IconButton>
-                        </Tooltip>
-                      </div>
-                    ) : (
-                      <div></div>
-                    )}
-                  </div>
-                </div>
-                <div className="final-line"></div>
-              </div>
+          {reservations.length === 0 ? (
+            <div>
+              <h3 style={{ marginTop: "15%", color: "white" }}>
+                No data to display
+              </h3>
             </div>
-          ))}
+          ) : (
+            reservations.map((reservation, index) => (
+              <div className="entradas" key={index}>
+                <div className="product">
+                  <div className="firstLine">
+                    <div className="names">
+                      <div className="name">
+                        <p
+                          className="text reservet"
+                          style={{ fontWeight: "bold" }}
+                        >
+                          {reservation.reservationId +
+                            " : " +
+                            reservation.startingDate.substring(0, 10)}
+                        </p>
+                      </div>
+                      <div className="category">
+                        <p className="text reservet">
+                          {reservation.startingDate.substring(11, 16) +
+                            " - " +
+                            reservation.finishingDate.substring(11, 16)}
+                        </p>
+                      </div>
+                      {reservation.clientEmail !== null ? (
+                        <div className="category">
+                          <p className="text reservet">
+                            {reservation.clientEmail}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="category">
+                          <p className="text reservet"> - </p>
+                        </div>
+                      )}
+
+                      {reservation.clientPhone !== null ? (
+                        <div className="category">
+                          <p className="text reservet">
+                            {reservation.clientPhone}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="category">
+                          <p className="text reservet"> - </p>
+                        </div>
+                      )}
+                      <div className="category">
+                        <p className="text reservet">{reservation.capacity}</p>
+                      </div>
+                      <div className="category">
+                        <p className="text reservet">{reservation.comment}</p>
+                      </div>
+                      {role === "ADMIN" || role === "MANAGER" ? (
+                        <div className="category">
+                          <Tooltip
+                            title="Delete Reservation"
+                            arrow
+                            style={{ fontSize: "2rem" }}
+                          >
+                            <IconButton
+                              aria-label="delete"
+                              size="large"
+                              style={{ color: "red", fontSize: "1.5 rem" }}
+                              onClick={() => handleDeleteClick(reservation)}
+                            >
+                              <DeleteIcon style={{ fontSize: "1.5rem" }} />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      ) : (
+                        <div></div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="final-line"></div>
+                </div>
+              </div>
+            ))
+          )}
         </>
       )}
       <Dialog

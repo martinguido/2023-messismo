@@ -285,45 +285,53 @@ const BarConfigurationLists = () => {
         </Box>
       ) : (
         <>
-          {shifts.map((shift, index) => (
-            <div className="entradas" key={index}>
-              <div className="product">
-                <div className="firstLine">
-                  <div className="names">
-                    <div className="name">
-                      <p
-                        className="text"
-                        style={{ fontWeight: "bold", height: "40px" }}
-                      >
-                        Shift time:{" "}
-                        {shift.startingHour + " - " + shift.finishingHour}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="buttons-edit">
-                    {role === "ADMIN" ? (
-                      <Tooltip
-                        title="Delete Shift"
-                        arrow
-                        style={{ fontSize: "2rem" }}
-                      >
-                        <IconButton
-                          aria-label="delete"
-                          size="large"
-                          style={{ color: "red", fontSize: "1.5 rem" }}
-                          onClick={() => handleDeleteClick(shift)}
+          {shifts.length === 0 ? (
+            <div>
+              <h3 style={{ marginTop: "15%", color: "white" }}>
+                No data to display
+              </h3>
+            </div>
+          ) : (
+            shifts.map((shift, index) => (
+              <div className="entradas" key={index}>
+                <div className="product">
+                  <div className="firstLine">
+                    <div className="names">
+                      <div className="name">
+                        <p
+                          className="text"
+                          style={{ fontWeight: "bold", height: "40px" }}
                         >
-                          <DeleteIcon style={{ fontSize: "1.5rem" }} />
-                        </IconButton>
-                      </Tooltip>
-                    ) : (
-                      <div></div>
-                    )}
+                          Shift time:{" "}
+                          {shift.startingHour + " - " + shift.finishingHour}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="buttons-edit">
+                      {role === "ADMIN" ? (
+                        <Tooltip
+                          title="Delete Shift"
+                          arrow
+                          style={{ fontSize: "2rem" }}
+                        >
+                          <IconButton
+                            aria-label="delete"
+                            size="large"
+                            style={{ color: "red", fontSize: "1.5 rem" }}
+                            onClick={() => handleDeleteClick(shift)}
+                          >
+                            <DeleteIcon style={{ fontSize: "1.5rem" }} />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        <div></div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </>
       )}
 

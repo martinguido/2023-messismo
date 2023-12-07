@@ -66,8 +66,7 @@ public class ReservationService {
 
     public List<Reservation> getAllReservations() {
         List<Reservation> allReservations = reservationRepository.findAll();
-        List<Reservation> updateReservationsStates = updateReservationsStates(allReservations);
-        return updateReservationsStates;
+        return updateReservationsStates(allReservations);
     }
 
     private List<Reservation> updateReservationsStates(List<Reservation> allReservations) {

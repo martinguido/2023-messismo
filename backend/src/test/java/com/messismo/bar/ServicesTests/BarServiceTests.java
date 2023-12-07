@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -131,24 +130,14 @@ public class BarServiceTests {
     public void testModifyBarCapacityWithReservationException() {
 
         Bar bar = new Bar(1L, 50);
-        List<Reservation> mockReservations = List.of(
-                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDate.of(2023, 1, 1), "martin@mail.com",null, 2,
-                        "Birthday"),
-                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDate.of(2023, 2, 1), "martin2@mail.com",null, 2,
-                        "Birthday2"),
-                new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)),
-                        LocalDate.of(2023, 1, 1), "martin3@mail.com",null, 2,
-                        "Birthday3"));
+        List<Reservation> mockReservations = List.of(new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin@mail.com", null, 2, "Birthday"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 2, 1), "martin2@mail.com", null, 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         when(barRepository.findById(1L)).thenReturn(Optional.of(bar));
 
         ModifyBarCapacityRequestDTO requestDTO = new ModifyBarCapacityRequestDTO(1L, 1);
-        AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException exception = Assert
-                .assertThrows(AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException.class, () -> {
-                    barService.modifyBarCapacity(requestDTO);
-                });
+        AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException exception = Assert.assertThrows(AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException.class, () -> {
+            barService.modifyBarCapacity(requestDTO);
+        });
         Assertions.assertEquals("There is a shift with a higher capacity than the requested", exception.getMessage());
 
     }
@@ -157,32 +146,36 @@ public class BarServiceTests {
     public void testModifyBarCapacityWithReservationExceptionInDifferentShifts() throws Exception {
 
         Bar bar = new Bar(1L, 15);
-        Shift shit1= new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0));
-        Shift shit2= new Shift(LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> mockReservations = List.of(
-                new Reservation(shit1,
-                        LocalDate.of(2023, 1, 1),  "martin@mail.com", null,2,
-                        "Birthday"),
-                new Reservation(shit1,
-                        LocalDate.of(2024, 2, 1),  "martin2@mail.com", null, 3,
-                        "Birthday2"),
-                new Reservation(shit1,
-                        LocalDate.of(2025, 1, 1),  "martin3@mail.com", null, 4,
-                        "Birthday3"),
-                new Reservation(shit1,
-                        LocalDate.of(2025, 1, 1),  "martin3@mail.com", null, 4,
-                        "Birthday3"),
-                new Reservation(shit2,
-                        LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 6,
-                        "Birthday3"));
+        Shift shit1 = new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0));
+        Shift shit2 = new Shift(LocalTime.of(15, 0), LocalTime.of(16, 0));
+        List<Reservation> mockReservations = List.of(new Reservation(shit1, LocalDate.of(2023, 1, 1), "martin@mail.com", null, 2, "Birthday"), new Reservation(shit1, LocalDate.of(2024, 2, 1), "martin2@mail.com", null, 3, "Birthday2"), new Reservation(shit1, LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 4, "Birthday3"), new Reservation(shit1, LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 4, "Birthday3"), new Reservation(shit2, LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 6, "Birthday3"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         when(barRepository.findById(1L)).thenReturn(Optional.of(bar));
 
         ModifyBarCapacityRequestDTO requestDTO = new ModifyBarCapacityRequestDTO(1L, 7);
-        AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException exception = Assert
-                .assertThrows(AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException.class, () -> {
-                    barService.modifyBarCapacity(requestDTO);
-                });
+        AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException exception = Assert.assertThrows(AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException.class, () -> {
+            barService.modifyBarCapacity(requestDTO);
+        });
+        Assertions.assertEquals("There is a shift with a higher capacity than the requested", exception.getMessage());
+        Assertions.assertEquals("Bar capacity updated successfully", barService.modifyBarCapacity(ModifyBarCapacityRequestDTO.builder().barId(1L).newCapacity(8).build()));
+
+    }
+
+    @Test
+    public void testModifyBarCapacityWithReservationExceptionInDifferentShiftsAndExpiredReservations() throws Exception {
+
+        Bar bar = new Bar(1L, 15);
+        Shift shift1 = new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0));
+        Shift shift2 = new Shift(LocalTime.of(15, 0), LocalTime.of(16, 0));
+        Reservation reservation1 = Reservation.builder().shift(shift1).reservationDate(LocalDate.of(2023, 1, 1)).clientEmail("martin@mail.com").capacity(45).state("Expired").build();
+        List<Reservation> reservations = List.of(reservation1, new Reservation(shift1, LocalDate.of(2024, 2, 1), "martin2@mail.com", null, 3, "Birthday2"), new Reservation(shift1, LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 4, "Birthday3"), new Reservation(shift1, LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 4, "Birthday3"), new Reservation(shift2, LocalDate.of(2025, 1, 1), "martin3@mail.com", null, 6, "Birthday3"));
+        when(reservationService.getAllReservations()).thenReturn(reservations);
+        when(barRepository.findById(1L)).thenReturn(Optional.of(bar));
+
+        ModifyBarCapacityRequestDTO requestDTO = new ModifyBarCapacityRequestDTO(1L, 7);
+        AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException exception = Assert.assertThrows(AlreadyHaveAReservationWithACapacityHigherThanSpecifiedException.class, () -> {
+            barService.modifyBarCapacity(requestDTO);
+        });
         Assertions.assertEquals("There is a shift with a higher capacity than the requested", exception.getMessage());
         Assertions.assertEquals("Bar capacity updated successfully", barService.modifyBarCapacity(ModifyBarCapacityRequestDTO.builder().barId(1L).newCapacity(8).build()));
 
@@ -191,8 +184,7 @@ public class BarServiceTests {
     @Test
     public void testModifyBarCapacityWithGeneralException() {
 
-        when(barRepository.findById(anyLong()))
-                .thenThrow(new RuntimeException("CANNOT modify bar capacity at the moment"));
+        when(barRepository.findById(anyLong())).thenThrow(new RuntimeException("CANNOT modify bar capacity at the moment"));
 
         ModifyBarCapacityRequestDTO requestDTO = new ModifyBarCapacityRequestDTO(1L, 50);
         assertThrows(Exception.class, () -> barService.modifyBarCapacity(requestDTO));

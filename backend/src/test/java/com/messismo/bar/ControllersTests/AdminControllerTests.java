@@ -130,6 +130,28 @@ public class AdminControllerTests {
     }
 
     @Test
+    public void testModifyBarCapacityWithZeroNewCapacity() {
+
+        ModifyBarCapacityRequestDTO requestDTO = new ModifyBarCapacityRequestDTO(1L,0);
+        ResponseEntity<String> response = adminController.modifyBarCapacity(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Bar capacity must be higher than 0", response.getBody());
+
+    }
+
+    @Test
+    public void testModifyBarCapacityWithBelowZeroNewCapacity() {
+
+        ModifyBarCapacityRequestDTO requestDTO = new ModifyBarCapacityRequestDTO(1L,-5);
+        ResponseEntity<String> response = adminController.modifyBarCapacity(requestDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Bar capacity must be higher than 0", response.getBody());
+
+    }
+
+    @Test
     public void testModifyBarCapacityWithBarNotFoundException() throws Exception {
 
         when(barService.modifyBarCapacity(any())).thenThrow(new BarNotFoundException("Provided bar id DOES NOT match any bar id"));

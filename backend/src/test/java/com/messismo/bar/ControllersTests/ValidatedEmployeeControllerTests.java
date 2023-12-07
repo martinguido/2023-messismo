@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -249,6 +250,30 @@ public class ValidatedEmployeeControllerTests {
     }
 
     @Test
+    public void testAddNewOrder_ConflictEmptyProductList() {
+
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com", new Date(), new ArrayList<>());
+        ResponseEntity<?> response = validatedEmployeeController.addNewOrder(orderRequestDTO);
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        Assertions.assertEquals("Product list is empty", response.getBody());
+
+    }
+
+    @Test
+    public void testAddNewOrder_ConflictWrongEmailFormat(){
+
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employeeexample.com", new Date(),
+                List.of(new ProductOrderDTO(
+                        new Product(1L, "Product1", 10.0, 7.0, "Description1", 50, new Category(1L, "Category1")), 2)));
+        ResponseEntity<?> response = validatedEmployeeController.addNewOrder(orderRequestDTO);
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        Assertions.assertEquals("Wrong email format", response.getBody());
+
+    }
+
+    @Test
     public void testAddNewOrder_Conflict_UserNotFound() throws Exception {
 
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO("employee@example.com", new Date(),
@@ -316,6 +341,17 @@ public class ValidatedEmployeeControllerTests {
     }
 
     @Test
+    public void testCloseOrder_ConflictMissingData()  {
+
+        OrderIdDTO orderIdDTO = new OrderIdDTO();
+        ResponseEntity<?> response = validatedEmployeeController.closeOrder(orderIdDTO);
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        Assertions.assertEquals("Missing information to close order", response.getBody());
+
+    }
+
+    @Test
     public void testCloseOrder_InternalServerError() throws Exception {
 
         OrderIdDTO orderIdDTO = new OrderIdDTO(1L);
@@ -337,6 +373,17 @@ public class ValidatedEmployeeControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals("Order modified successfully", response.getBody());
+
+    }
+
+    @Test
+    public void testModifyOrder_ConflictWithEmptyProductList() {
+
+        ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO(1L, new ArrayList<>());
+        ResponseEntity<?> response = validatedEmployeeController.modifyOrder(modifyOrderDTO);
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        Assertions.assertEquals("New product list must not be empty", response.getBody());
 
     }
 

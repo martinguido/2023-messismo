@@ -193,6 +193,17 @@ public class ManagerControllerTests {
     }
 
     @Test
+    public void testModifyProductStock_ConflictWrongOperation() throws Exception {
+
+        ProductStockDTO validProductStockDTO = new ProductStockDTO(1L, "", 10);
+        ResponseEntity<String> response = managerController.modifyProductStock(validProductStockDTO);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Wrong type of operation", response.getBody());
+
+    }
+
+    @Test
     public void testModifyProductStock_MissingData() throws Exception {
 
         ProductStockDTO invalidProductStockDTO = new ProductStockDTO(null, "add", 10);
@@ -597,7 +608,6 @@ public class ManagerControllerTests {
         goalDTO.setEndingDate(endingDate);
         goalDTO.setObjectType("Category");
         goalDTO.setGoalObjective(500.0);
-        System.out.println("HOLA " + goalDTO);
         ResponseEntity<String> response = managerController.addGoal(goalDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());

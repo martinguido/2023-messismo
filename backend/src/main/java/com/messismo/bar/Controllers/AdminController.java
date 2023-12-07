@@ -46,6 +46,8 @@ public class AdminController {
     public ResponseEntity<String> modifyBarCapacity(@RequestBody ModifyBarCapacityRequestDTO modifyBarCapacityRequestDTO) {
         if (modifyBarCapacityRequestDTO.getBarId() == null || modifyBarCapacityRequestDTO.getNewCapacity() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to modify bar capacity");
+        } else if (modifyBarCapacityRequestDTO.getNewCapacity() <= 0) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Bar capacity must be higher than 0");
         } else {
             try {
                 return ResponseEntity.status(HttpStatus.OK).body(barService.modifyBarCapacity(modifyBarCapacityRequestDTO));
@@ -65,8 +67,6 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-
 
 
     @PostMapping("/addShift")

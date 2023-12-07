@@ -26,6 +26,9 @@ public class ValidatedEmployeeController {
     private final OrderService orderService;
 
     private final ReservationService reservationService;
+
+    private final String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
     @PostMapping("/product/addProduct")
     public ResponseEntity<?> addProduct(@RequestBody ProductDTO productDTO) {
         if (productDTO.getCategory() == null || productDTO.getName() == null || productDTO.getName().isEmpty() || productDTO.getUnitPrice() == null || productDTO.getDescription() == null || productDTO.getStock() == null || productDTO.getUnitCost() == null || productDTO.getNewCategory() == null) {
@@ -66,6 +69,12 @@ public class ValidatedEmployeeController {
 
     @PostMapping("/addNewOrder")
     public ResponseEntity<?> addNewOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
+        if(!orderRequestDTO.getRegisteredEmployeeEmail().matches(emailRegex)){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong email format");
+        }
+        if (orderRequestDTO.getProductOrders().isEmpty()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Product list is empty");
+        }
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(orderService.addNewOrder(orderRequestDTO));
         } catch (UserNotFoundException | ProductQuantityBelowAvailableStock e) {
@@ -77,6 +86,9 @@ public class ValidatedEmployeeController {
 
     @PostMapping("/closeOrder")
     public ResponseEntity<?> closeOrder(@RequestBody OrderIdDTO orderIdDTO) {
+        if(orderIdDTO.getOrderId()==null){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to close order");
+        }
         try {
             return ResponseEntity.status(HttpStatus.OK).body(orderService.closeOrder(orderIdDTO));
         } catch (OrderNotFoundException e) {
@@ -89,7 +101,11 @@ public class ValidatedEmployeeController {
     @PostMapping("/modifyOrder")
     public ResponseEntity<?> modifyOrder(@RequestBody ModifyOrderDTO modifyOrderDTO) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(orderService.modifyOrder(modifyOrderDTO));
+            if(modifyOrderDTO.getProductOrders().isEmpty()){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("New product list must not be empty");
+            }
+            else {
+            return ResponseEntity.status(HttpStatus.OK).body(orderService.modifyOrder(modifyOrderDTO));}
         } catch (ProductQuantityBelowAvailableStock | OrderNotFoundException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {

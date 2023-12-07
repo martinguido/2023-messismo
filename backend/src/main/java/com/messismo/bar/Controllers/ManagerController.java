@@ -70,6 +70,9 @@ public class ManagerController {
         if (productStockDTO.getModifyStock() == null || productStockDTO.getProductId() == null || productStockDTO.getOperation() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing data to add product stock");
         }
+        if (!(productStockDTO.getOperation().equals("add") || productStockDTO.getOperation().equals("substract"))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong type of operation");
+        }
         if (productStockDTO.getModifyStock() < 0) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Stock quantity cannot be less than 0");
         }
@@ -159,7 +162,8 @@ public class ManagerController {
         }
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(goalService.addGoal(goalDTO));
-        } catch (ProvidedDatesMustNotCollideWithOtherDatesException | ProductNotFoundException | CategoryNotFoundException | EndingDateMustBeAfterStartingDateException e) {
+        } catch (ProvidedDatesMustNotCollideWithOtherDatesException | ProductNotFoundException |
+                 CategoryNotFoundException | EndingDateMustBeAfterStartingDateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -207,7 +211,7 @@ public class ManagerController {
     }
 
     @DeleteMapping("/deleteReservation")
-    public ResponseEntity<String> deleteReservation(@RequestBody DeleteReservationRequestDTO deleteReservationRequestDTO){
+    public ResponseEntity<String> deleteReservation(@RequestBody DeleteReservationRequestDTO deleteReservationRequestDTO) {
         if (deleteReservationRequestDTO.getReservationId() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to delete a reservation");
         }
@@ -219,7 +223,6 @@ public class ManagerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
 
 
 }

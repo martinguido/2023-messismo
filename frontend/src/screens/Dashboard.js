@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import { Navigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+// import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -15,18 +15,18 @@ import productsService from "../services/products.service";
 import categoryService from "../services/category.service";
 import { makeStyles } from "@mui/styles";
 import dashboardService from "../services/dashboard.service";
-import moment from "moment";
-import dayjs from "dayjs";
+// import moment from "moment";
+// import dayjs from "dayjs";
 import BarChart from "../components/BarChart";
 import Doughnut from "../components/DoughnutChart";
-import InputLabel from "@mui/material/InputLabel";
+// import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useTheme } from "@mui/material/styles";
 import CircularProgress from "@mui/material/CircularProgress";
-import Chip from "@mui/material/Chip";
-import OutlinedInput from "@mui/material/OutlinedInput";
+// import Chip from "@mui/material/Chip";
+// import OutlinedInput from "@mui/material/OutlinedInput";
 import { useMediaQuery } from "@mui/material";
 
 const CustomizedDateTimePicker = styled(DatePicker)`
@@ -350,7 +350,8 @@ function Dashboard() {
   const clicked = useSelector((state) => state.navigation.clicked);
   const classes = useStyles();
   const theme = useTheme();
-  const [products, setProducts] = useState([]);
+  // const [products, setProducts] = useState([]);
+  // eslint-disable-next-line
   const [totalproducts, setTotalProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
@@ -376,6 +377,7 @@ function Dashboard() {
   const [chartType, setChartType] = useState("product");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  // eslint-disable-next-line
   const [dateToShow, setDateToShow] = useState("");
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
@@ -383,22 +385,19 @@ function Dashboard() {
     dashboardService
       .getDashboard({ dateRequested: "", categoryList: selectedCategories })
       .then((response) => {
-        console.log(response);
         setDashboardData(response);
         setIsLoading(false);
       })
       .catch((error) => {
         console.error(error);
         setIsLoading(false);
-      });
+      }); // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    console.log(selectedCategories);
     dashboardService
       .getDashboard({ dateRequested: "", categoryList: selectedCategories })
       .then((response) => {
-        console.log(response);
         setDashboardData(response);
         setIsLoading(false);
       })
@@ -420,7 +419,7 @@ function Dashboard() {
       })
       .catch((error) => {
         console.error("Error al mostrar los productos", error);
-      });
+      }); // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -435,11 +434,10 @@ function Dashboard() {
       .getAllCategories()
       .then((response) => {
         setCategories(response.data);
-        console.log(categories);
       })
       .catch((error) => {
         console.error("Error al obtener categorías:", error);
-      });
+      }); // eslint-disable-next-line
   }, []);
 
   if (!currentUser) {
@@ -492,7 +490,6 @@ function Dashboard() {
         categoryList: selectedCategories,
       })
       .then((response) => {
-        console.log(response);
         setDashboardData(response);
       })
       .catch((error) => {
@@ -538,7 +535,6 @@ function Dashboard() {
     dashboardService
       .getDashboard({ dateRequested: date, categoryList: selectedCategories })
       .then((response) => {
-        console.log(response);
         setDashboardData(response);
       })
       .catch((error) => {
@@ -777,7 +773,6 @@ function Dashboard() {
                       color: "white",
                       fontSize: "1.5rem",
                       margin: "2rem",
-                      color: "white",
                       ".MuiOutlinedInput-notchedOutline": {
                         borderColor: "rgba(228, 219, 233, 0.25)",
                       },
@@ -826,7 +821,6 @@ function Dashboard() {
                       fontSize: "1.5rem",
                       margin: "2rem",
                       marginTop: "0.5rem",
-                      color: "white",
                       ".MuiOutlinedInput-notchedOutline": {
                         borderColor: "rgba(228, 219, 233, 0.25)",
                       },

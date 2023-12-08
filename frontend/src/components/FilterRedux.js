@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
-import SendIcon from "@mui/icons-material/Send";
+// import SendIcon from "@mui/icons-material/Send";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
@@ -15,7 +15,7 @@ import "./Filter.css";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Fab from "@mui/material/Fab";
 import ClearIcon from "@mui/icons-material/Clear";
-import IconButton from "@mui/material/IconButton";
+// import IconButton from "@mui/material/IconButton";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import {
@@ -32,20 +32,20 @@ const FilterRedux = (props) => {
   const [openCategories, setOpenCategories] = React.useState(false);
   const [openMinPrice, setOpenMinPrice] = React.useState(false);
   const [openMaxPrice, setOpenMaxPrice] = React.useState(false);
-  const [openMinStock, setOpenMinStock] = React.useState(false);
-  const [openMaxStock, setOpenMaxStock] = React.useState(false);
+  // const [openMinStock, setOpenMinStock] = React.useState(false);
+  // const [openMaxStock, setOpenMaxStock] = React.useState(false);
   const [categories, setCategories] = useState([]);
   const [minValueTemp, setMinValueTemp] = useState("");
   const [maxValueTemp, setMaxValueTemp] = useState("");
   const [minStockTemp, setMinStockTemp] = useState("");
   const [maxStockTemp, setMaxStockTemp] = useState("");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // const [isFilterOpen, setIsFilterOpen] = useState(false);
   const selectedCategories = useSelector(
     (state) => state.filters.selectedCategories
   );
-  const selectedCategory = useSelector(
-    (state) => state.filters.selectedCategories
-  );
+  // const selectedCategory = useSelector(
+  //   (state) => state.filters.selectedCategories
+  // );
   const minValue = useSelector((state) => state.filters.minValue);
   const maxValue = useSelector((state) => state.filters.maxValue);
   const minStock = useSelector((state) => state.filters.minStock);
@@ -69,19 +69,17 @@ const FilterRedux = (props) => {
   const handleOpenMaxPrice = () => {
     setOpenMaxPrice(!openMaxPrice);
   };
-  const handleOpenMinStock = () => {
-    setOpenMinStock(!openMinStock);
-  };
-  const handleOpenMaxStock = () => {
-    setOpenMaxStock(!openMaxStock);
-  };
+  // const handleOpenMinStock = () => {
+  //   setOpenMinStock(!openMinStock);
+  // };
+  // const handleOpenMaxStock = () => {
+  //   setOpenMaxStock(!openMaxStock);
+  // };
 
   /*const handleSelectedCategory = (value) => {
     dispatch(setSelectedCategory(value));
 
   };*/
-
-
 
   const handlePriceRange = (value) => {
     const validationErrors = PriceValidation({
@@ -91,19 +89,18 @@ const FilterRedux = (props) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       setErrors({});
       dispatch(setMinValue(minValueTemp));
       dispatch(setMaxValue(maxValueTemp));
     }
   };
-
+  // eslint-disable-next-line
   const setPriceRange = async () => {
     setMinValue(minValueTemp);
     setMaxValue(maxValueTemp);
   };
-
+  // eslint-disable-next-line
   const old = (value) => {
     dispatch(setMinStock(minStockTemp));
     dispatch(setMaxStock(maxStockTemp));
@@ -117,7 +114,6 @@ const FilterRedux = (props) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       setAppliedFilters({ ...appliedFilters, minStock: true, maxStock: true });
 
@@ -137,8 +133,6 @@ const FilterRedux = (props) => {
       maxStock: maxStock === "" ? null : maxStock,
     };
 
-    console.log(product);
-
     props.onSave(product);
     props.onClose();
   };
@@ -154,30 +148,30 @@ const FilterRedux = (props) => {
       });
   }, []);
 
-  const selectedCategoryBadge = selectedCategories.map((category) => (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      backgroundColor="whitesmoke"
-      width={"100%"}
-      padding="5px"
-      borderRadius="5px"
-    >
-      <div
-        className="badge"
-        style={{ display: "flex", flexDirection: "row" }}
-      >{`${category}`}</div>
-      <IconButton
-        aria-label="edit"
-        size="large"
-        color="red"
-        onClick={() => handleRemoveCategory(category)}
-      >
-        <ClearIcon style={{ justifyContent: "flex-end" }} />
-      </IconButton>
-    </Box>
-  ));
+  // const selectedCategoryBadge = selectedCategories.map((category) => (
+  //   <Box
+  //     display="flex"
+  //     justifyContent="center"
+  //     alignItems="center"
+  //     backgroundColor="whitesmoke"
+  //     width={"100%"}
+  //     padding="5px"
+  //     borderRadius="5px"
+  //   >
+  //     <div
+  //       className="badge"
+  //       style={{ display: "flex", flexDirection: "row" }}
+  //     >{`${category}`}</div>
+  //     <IconButton
+  //       aria-label="edit"
+  //       size="large"
+  //       color="red"
+  //       onClick={() => handleRemoveCategory(category)}
+  //     >
+  //       <ClearIcon style={{ justifyContent: "flex-end" }} />
+  //     </IconButton>
+  //   </Box>
+  // ));
 
   const handleRemoveCategory = (category) => {
     const updatedCategories = selectedCategories.filter(
@@ -243,7 +237,7 @@ const FilterRedux = (props) => {
     maxValue !== "" ||
     minStock !== "" ||
     maxStock !== "";
-
+  // eslint-disable-next-line
   const resetCategoryValue = () => {
     dispatch(setSelectedCategories([]));
   };
@@ -258,7 +252,6 @@ const FilterRedux = (props) => {
       const updatedCategories = [...selectedCategories, value];
       dispatch(setSelectedCategories(updatedCategories));
     }
-    
   };
 
   return (
@@ -280,30 +273,37 @@ const FilterRedux = (props) => {
                 {category}
               </Fab>
             ))}
-          {(maxValue != "" || minValue != "") && (
-            <Fab
-              style={{ marginTop: "2%" }}
-              variant="extended"
-              size="medium"
-              color="white"
-              onClick={resetPriceValues}
-            >
-              <ClearIcon sx={{ mr: 1 }} />
-              {priceRangeBadge()}
-            </Fab>
-          )}
-          {(minStock != "" || maxStock != "") && (
-            <Fab
-              style={{ marginTop: "2%" }}
-              variant="extended"
-              size="medium"
-              color="white"
-              onClick={resetStockValues}
-            >
-              <ClearIcon sx={{ mr: 1 }} />
-              {stockRangeBadge()}
-            </Fab>
-          )}
+
+          {
+            // eslint-disable-next-line
+            (maxValue != "" || minValue != "") && (
+              <Fab
+                style={{ marginTop: "2%" }}
+                variant="extended"
+                size="medium"
+                color="white"
+                onClick={resetPriceValues}
+              >
+                <ClearIcon sx={{ mr: 1 }} />
+                {priceRangeBadge()}
+              </Fab>
+            )
+          }
+          {
+            // eslint-disable-next-line
+            (minStock != "" || maxStock != "") && (
+              <Fab
+                style={{ marginTop: "2%" }}
+                variant="extended"
+                size="medium"
+                color="white"
+                onClick={resetStockValues}
+              >
+                <ClearIcon sx={{ mr: 1 }} />
+                {stockRangeBadge()}
+              </Fab>
+            )
+          }
         </div>
         <div>
           {hasFiltersApplied && (

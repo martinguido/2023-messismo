@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { GrAddCircle } from "react-icons/gr";
-import { RiDeleteBinLine } from "react-icons/ri";
+// import { RiDeleteBinLine } from "react-icons/ri";
 import productsService from "../services/products.service";
 import ordersService from "../services/orders.service";
 import { useSelector } from "react-redux";
@@ -207,12 +207,12 @@ const OrderForm = ({ onCancel }) => {
     products: [],
     // paymentMethods: ['cash', 'credit card', 'debit card'],
   });
-  const [selectedProductNames, setSelectedProductNames] = useState([]);
+  const [selectedProductNames, setSelectedProductNames] = useState([]); // eslint-disable-next-line
   const [search, setSearch] = useState(""); // Estado para almacenar el término de búsqueda
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-  };
+  // const handleSearchChange = (event) => {
+  //   setSearch(event.target.value);
+  // };
 
   // Filtrar los productos según el término de búsqueda
   const filteredProducts = options.products.filter((product) => {
@@ -268,7 +268,6 @@ const OrderForm = ({ onCancel }) => {
           (product) => product.name === productName
         );
         const amount = parseInt(data[`amount-${index}`]) || 0;
-        console.log(products);
         if (
           product &&
           !isNaN(product.unitPrice) &&
@@ -290,76 +289,79 @@ const OrderForm = ({ onCancel }) => {
         }
       })
       .filter((product) => product !== null);
-
-
+    // eslint-disable-next-line
     const totalPrice = orderedProducts.reduce((total, product) => {
       return total + product.unitPrice * product.amount;
     }, 0);
-
+    // eslint-disable-next-line
     const orderSubmit = (data) => {
-        const orderedProducts = formField.map((form, index) => {
-            const productName = data[`product-${index}`];
-            const product = products.find(product => product.name === productName);
-            const amount = parseInt(data[`amount-${index}`]) || 0;
-            console.log(products);
-            if (product && !isNaN(product.unitPrice) && !isNaN(amount) && !isNaN(product.unitCost)) {
-                return {
-                    id: product.id,
-                    name: product.name,
-                    unitPrice: parseFloat(product.unitPrice),
-                    description: product.description,
-                    stock: product.stock,
-                    category: product.category,
-                    amount: amount,
-                    unitCost: parseFloat(product.unitCost)
-                };
-            } else {
-                return null;
-            }
-        }).filter(product => product !== null);
+      const orderedProducts = formField
+        .map((form, index) => {
+          const productName = data[`product-${index}`];
+          const product = products.find(
+            (product) => product.name === productName
+          );
+          const amount = parseInt(data[`amount-${index}`]) || 0;
+          if (
+            product &&
+            !isNaN(product.unitPrice) &&
+            !isNaN(amount) &&
+            !isNaN(product.unitCost)
+          ) {
+            return {
+              id: product.id,
+              name: product.name,
+              unitPrice: parseFloat(product.unitPrice),
+              description: product.description,
+              stock: product.stock,
+              category: product.category,
+              amount: amount,
+              unitCost: parseFloat(product.unitCost),
+            };
+          } else {
+            return null;
+          }
+        })
+        .filter((product) => product !== null);
 
-        const totalPrice = orderedProducts.reduce((total, product) => {
-            return total + product.unitPrice * product.amount;
-        }, 0);
+      const totalPrice = orderedProducts.reduce((total, product) => {
+        return total + product.unitPrice * product.amount;
+      }, 0);
 
-        const totalCost = orderedProducts.reduce((total, product) => {
-            console.log(product);
-            return total + product.unitCost * product.amount;
-        }, 0);
+      const totalCost = orderedProducts.reduce((total, product) => {
+        return total + product.unitCost * product.amount;
+      }, 0);
 
-        const orderData = {
-            registeredEmployeeEmail: currentUser.email,
-            dateCreated: new Date().toISOString(),
-            productOrders: orderedProducts.map(product => ({
-              product: {
-                productId: product.id,
-                name: product.name,
-                unitPrice: product.unitPrice,
-                description: product.description,
-                stock: product.stock,
-                category: product.category,
-                unitCost: product.unitCost,
-              },
-              quantity: product.amount
-            })),
-            totalPrice: totalPrice.toFixed(2),
-            totalCost: totalCost.toFixed(2),
-        };
+      const orderData = {
+        registeredEmployeeEmail: currentUser.email,
+        dateCreated: new Date().toISOString(),
+        productOrders: orderedProducts.map((product) => ({
+          product: {
+            productId: product.id,
+            name: product.name,
+            unitPrice: product.unitPrice,
+            description: product.description,
+            stock: product.stock,
+            category: product.category,
+            unitCost: product.unitCost,
+          },
+          quantity: product.amount,
+        })),
+        totalPrice: totalPrice.toFixed(2),
+        totalCost: totalCost.toFixed(2),
+      };
 
-        ordersService.addOrders(orderData)
-        .then(response => {
-          console.log("Orden enviada con éxito:", response.data);
+      ordersService
+        .addOrders(orderData)
+        .then((response) => {
           onCancel();
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error al enviar la orden:", error);
         });
-
-        console.log(orderData);
     };
-
+    // eslint-disable-next-line
     const totalCost = orderedProducts.reduce((total, product) => {
-      console.log(product);
       return total + product.unitCost * product.amount;
     }, 0);
 
@@ -385,14 +387,11 @@ const OrderForm = ({ onCancel }) => {
     ordersService
       .addOrders(orderData)
       .then((response) => {
-        console.log("Orden enviada con éxito:", response.data);
         onCancel();
       })
       .catch((error) => {
         console.error("Error al enviar la orden:", error);
       });
-
-    console.log(orderData);
   };
 
   const handleCancelClick = () => {
@@ -424,9 +423,14 @@ const OrderForm = ({ onCancel }) => {
                     <Select
                       {...field}
                       isSearchable
-                      options={filteredProducts
-                        .filter((product) => product.toLowerCase().startsWith(search.toLowerCase()))
-                        .sort((a, b) => a.localeCompare(b)) // Ordenar alfabéticamente
+                      options={
+                        filteredProducts
+                          .filter((product) =>
+                            product
+                              .toLowerCase()
+                              .startsWith(search.toLowerCase())
+                          )
+                          .sort((a, b) => a.localeCompare(b)) // Ordenar alfabéticamente
                       }
                       onChange={(e) => {
                         const selectedProduct = e.target.value;
@@ -444,16 +448,16 @@ const OrderForm = ({ onCancel }) => {
                     >
                       <option value="" disabled></option>
                       {filteredProducts
-                      .sort((a, b) => a.localeCompare(b))
-                      .map((product) => (
-                        <option
-                          key={product}
-                          value={product}
-                          disabled={selectedProductNames.includes(product)}
-                        >
-                          {product}
-                        </option>
-                      ))}
+                        .sort((a, b) => a.localeCompare(b))
+                        .map((product) => (
+                          <option
+                            key={product}
+                            value={product}
+                            disabled={selectedProductNames.includes(product)}
+                          >
+                            {product}
+                          </option>
+                        ))}
                     </Select>
                   )}
                 />

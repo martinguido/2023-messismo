@@ -2,55 +2,63 @@ import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import "./Form.css";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { useSlotProps } from "@mui/base";
+// import MenuItem from "@mui/material/MenuItem";
+// import FormControl from "@mui/material/FormControl";
+// import Select, { SelectChangeEvent } from "@mui/material/Select";
+// import { SelectChangeEvent } from "@mui/material/Select";
+// import { useSlotProps } from "@mui/base";
 import productsService from "../services/products.service";
-import { useSelector, useDispatch } from "react-redux";
-import FormValidation from "../FormValidation";
+import {
+  useSelector,
+  // useDispatch
+} from "react-redux";
+// import FormValidation from "../FormValidation";
 import EditFormValidation from "../EditFormValidation";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { convertQuickFilterV7ToLegacy } from "@mui/x-data-grid/internals";
-import Fab from "@mui/material/Fab";
+// import { convertQuickFilterV7ToLegacy } from "@mui/x-data-grid/internals";
+// import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import modifyProductStock from "../services/products.service";
+// import modifyProductStock from "../services/products.service";
 import { IconButton } from "@mui/material";
+
 const EditForm = (props) => {
+  // eslint-disable-next-line
   const [nombre, setNombre] = useState("");
+  // eslint-disable-next-line
   const [categoria, setCategoria] = useState("");
+  // eslint-disable-next-line
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
   const { user: currentUser } = useSelector((state) => state.auth);
-  const token = currentUser.access_token;
+  // const token = currentUser.access_token;
   const role = currentUser.role;
   const [errors, setErrors] = useState({});
   const [stock, setStock] = useState("");
   const [isOperationSuccessful, setIsOperationSuccessful] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertText, setAlertText] = useState("");
-  const [newStock, setNewStock] = useState(props.product.stock)
-  const handleNombreChange = (event) => {
-    setNombre(event.target.value);
-  };
+  const [newStock, setNewStock] = useState(props.product.stock);
+  // const handleNombreChange = (event) => {
+  //   setNombre(event.target.value);
+  // };
 
-  const handleCategoriaChange = (event: SelectChangeEvent) => {
-    setCategoria(event.target.value);
-  };
+  // const handleCategoriaChange = (event: SelectChangeEvent) => {
+  //   setCategoria(event.target.value);
+  // };
 
-  const handleDescripcionChange = (event) => {
-    setDescripcion(event.target.value);
-  };
+  // const handleDescripcionChange = (event) => {
+  //   setDescripcion(event.target.value);
+  // };
 
   const handlePrecioChange = (event) => {
     setPrecio(event.target.value);
   };
 
-  const handleStockChange = (event) => {
-    setStock(event.target.value);
-  };
+  // const handleStockChange = (event) => {
+  //   setStock(event.target.value);
+  // };
 
   const cancelarButton = (event) => {
     props.onClose();
@@ -64,15 +72,13 @@ const EditForm = (props) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       //productsService.updateProductStock(stockDTO)
       if (precio !== "") {
         try {
-          const response = await productsService
+          await productsService
             .updateProductPrice(props.product.productId, precio)
             .then((response) => {
-              console.log(response);
               setIsOperationSuccessful(true);
               setAlertText("Product updated successfully");
               setOpenSnackbar(true);
@@ -86,84 +92,64 @@ const EditForm = (props) => {
       }
 
       const stock = newProductStock();
-      if (stock !== 0)
-      {
-      try {
-        console.log(stock);
-        await productsService.modifyProductStock(
-          stock
-        );
-        setIsOperationSuccessful(true);
-        setAlertText("Product updated successfully");
-        setOpenSnackbar(true);
-      } catch (error) {
-        setIsOperationSuccessful(false);
-        setAlertText("Failed to modify stock");
-        setOpenSnackbar(true);
+      if (stock !== 0) {
+        try {
+          await productsService.modifyProductStock(stock);
+          setIsOperationSuccessful(true);
+          setAlertText("Product updated successfully");
+          setOpenSnackbar(true);
+        } catch (error) {
+          setIsOperationSuccessful(false);
+          setAlertText("Failed to modify stock");
+          setOpenSnackbar(true);
+        }
+
+        setNombre("");
+        setCategoria("");
+        setDescripcion("");
+        setPrecio("");
+        setStock("");
       }
-
-
-
-      setNombre("");
-      setCategoria("");
-      setDescripcion("");
-      setPrecio("");
-      setStock("");
     }
-  }
-
   };
 
   const addStock = () => {
     setNewStock(newStock + 1);
-  }
+  };
 
   const removeStock = () => {
-    if (newStock - 1 >= 0){
-    setNewStock(newStock - 1);
+    if (newStock - 1 >= 0) {
+      setNewStock(newStock - 1);
     }
-  }
+  };
 
   const handleModifyStock = () => {
+    // eslint-disable-next-line
     const productStock = newProductStock();
-    console.log(productStock)
-
-  }
+  };
 
   const newProductStock = () => {
-   if (newStock !== props.product.stock){
-    
-    console.log(newStock)
-    console.log(props.productStock)
-    if (newStock < props.product.stock)
-    {
+    if (newStock !== props.product.stock) {
+      if (newStock < props.product.stock) {
+        const modifyProductStock = {
+          productId: props.product.productId,
+          operation: "substract",
+          modifyStock: props.product.stock - newStock,
+        };
+        return modifyProductStock;
+      } else {
+        const modifyProductStock = {
+          productId: props.product.productId,
+          operation: "add",
+          modifyStock: newStock - props.product.stock,
+        };
 
-      const modifyProductStock = 
-    {
-      productId: props.product.productId,
-      operation: "substract",
-      modifyStock: props.product.stock - newStock,
-
-    }
-    return modifyProductStock
-    }
-    else {
-      const modifyProductStock = 
-      {
-        productId: props.product.productId,
-        operation: "add",
-        modifyStock: newStock - props.product.stock,
-  
+        return modifyProductStock;
       }
-
-      return modifyProductStock
-  }
-}
-else {
-  return 0;
-}
-}
-
+    } else {
+      return 0;
+    }
+  };
 
   return (
     <div>
@@ -253,8 +239,8 @@ else {
       )}
       <p>Modify Stock</p>
       {role === "ADMIN" || role === "MANAGER" ? (
-        <div style={{marginTop: "3%"}}>
-         { /*<TextField
+        <div style={{ marginTop: "3%" }}>
+          {/*<TextField
             required
             id="filled-number"
             type="number"
@@ -282,8 +268,19 @@ else {
             }}
           />*/}
           <div className="priceChange">
-            <IconButton size="medium" style={{backgroundColor: "#a4d4cc", color: "black", alignItems: "center", alignSelf: "center",alignContent: "center"}} aria-label="add" onClick={removeStock}>
-              <RemoveIcon style={{fontSize: "1.1rem"}}/>
+            <IconButton
+              size="medium"
+              style={{
+                backgroundColor: "#a4d4cc",
+                color: "black",
+                alignItems: "center",
+                alignSelf: "center",
+                alignContent: "center",
+              }}
+              aria-label="add"
+              onClick={removeStock}
+            >
+              <RemoveIcon style={{ fontSize: "1.1rem" }} />
             </IconButton>
             <TextField
               required
@@ -293,7 +290,12 @@ else {
               value={newStock}
               //error={errors.price ? true : false}
               //helperText={errors.price || ''}
-              style={{ width: "15%", marginRight: "1%", marginLeft: "1%", textAlign: "center",}}
+              style={{
+                width: "15%",
+                marginRight: "1%",
+                marginLeft: "1%",
+                textAlign: "center",
+              }}
               defaultValue={props.product.stock}
               size="small"
               InputProps={{
@@ -310,9 +312,13 @@ else {
                 },
               }}
             />
-           
-            <IconButton size="medium" style={{backgroundColor: "#a4d4cc", color: "black"}}  onClick={addStock}>
-              <AddIcon style={{fontSize: "1.1rem"}}/>
+
+            <IconButton
+              size="medium"
+              style={{ backgroundColor: "#a4d4cc", color: "black" }}
+              onClick={addStock}
+            >
+              <AddIcon style={{ fontSize: "1.1rem" }} />
             </IconButton>
           </div>
         </div>

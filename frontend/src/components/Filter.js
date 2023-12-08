@@ -1,18 +1,18 @@
 import * as React from "react";
-import ListSubheader from "@mui/material/ListSubheader";
+// import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
+// import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import SendIcon from "@mui/icons-material/Send";
+// import InboxIcon from "@mui/icons-material/MoveToInbox";
+// import DraftsIcon from "@mui/icons-material/Drafts";
+// import SendIcon from "@mui/icons-material/Send";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
+// import StarBorder from "@mui/icons-material/StarBorder";
 import Box from "@mui/material/Box";
-import Slider from "@mui/material/Slider";
+// import Slider from "@mui/material/Slider";
 import { useEffect, useState } from "react";
 import categoryService from "../services/category.service";
 import { Button } from "@mui/material";
@@ -27,14 +27,14 @@ const Filter = (props) => {
   const [openCategories, setOpenCategories] = React.useState(false);
   const [openMinPrice, setOpenMinPrice] = React.useState(false);
   const [openMaxPrice, setOpenMaxPrice] = React.useState(false);
-  const [openMinStock, setOpenMinStock] = React.useState(false);
-  const [openMaxStock, setOpenMaxStock] = React.useState(false);
+  // const [openMinStock, setOpenMinStock] = React.useState(false);
+  // const [openMaxStock, setOpenMaxStock] = React.useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedMinPrice, setSelectedMinPrice] = useState("");
-  const [selectedMaxPrice, setSelectedMaxPrice] = useState("");
-  const [selectedMinStock, setSelectedMinStock] = useState("");
-  const [selectedMaxStock, setSelectedMaxStock] = useState("");
+  // const [selectedMinPrice, setSelectedMinPrice] = useState("");
+  // const [selectedMaxPrice, setSelectedMaxPrice] = useState("");
+  // const [selectedMinStock, setSelectedMinStock] = useState("");
+  // const [selectedMaxStock, setSelectedMaxStock] = useState("");
   const [minValue, setMinValue] = useState("");
   const [maxValue, setMaxValue] = useState("");
   const [minValueTemp, setMinValueTemp] = useState("");
@@ -46,11 +46,11 @@ const Filter = (props) => {
   const [loadingCategory, setLoadingCategory] = useState(true);
   const [loadingPrice, setLoadingPrice] = useState(true);
   const [loadingStock, setLoadingStock] = useState(true);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState({});
+  // const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // const [appliedFilters, setAppliedFilters] = useState({});
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const handleChange = () => {};
+  // const handleChange = () => {};
 
   const handleOpenCategories = () => {
     setOpenCategories(!openCategories);
@@ -61,15 +61,15 @@ const Filter = (props) => {
   const handleOpenMaxPrice = () => {
     setOpenMaxPrice(!openMaxPrice);
   };
-  const handleOpenMinStock = () => {
-    setOpenMinStock(!openMinStock);
-  };
-  const handleOpenMaxStock = () => {
-    setOpenMaxStock(!openMaxStock);
-  };
+  // const handleOpenMinStock = () => {
+  //   setOpenMinStock(!openMinStock);
+  // };
+  // const handleOpenMaxStock = () => {
+  //   setOpenMaxStock(!openMaxStock);
+  // };
 
   const handleSelectedCategory = async (value) => {
-    setLoadingCategory(true);
+    setLoadingCategory(true); // eslint-disable-next-line
     const response = await setSelectedCategoryAsync(value);
     setLoadingCategory(false);
   };
@@ -78,31 +78,30 @@ const Filter = (props) => {
     setSelectedCategory(value);
   };
 
-  const handleSelectedMinPrice = (value) => {
-    setSelectedCategory(value);
-  };
+  // const handleSelectedMinPrice = (value) => {
+  //   setSelectedCategory(value);
+  // };
 
-  const handleSelectedMaxPrice = (value) => {
-    setSelectedCategory(value);
-    console.log(selectedCategory);
-  };
+  // const handleSelectedMaxPrice = (value) => {
+  //   setSelectedCategory(value);
+  // };
 
-  const handleSelectedMinStock = (value) => {
-    setSelectedCategory(value);
-  };
+  // const handleSelectedMinStock = (value) => {
+  //   setSelectedCategory(value);
+  // };
 
-  const handleSelectedMaxStock = (value) => {
-    setSelectedCategory(value);
-  };
+  // const handleSelectedMaxStock = (value) => {
+  //   setSelectedCategory(value);
+  // };
 
-  const valueLabelFormat = (value) => {
-    return value.toLocaleString();
-  };
+  // const valueLabelFormat = (value) => {
+  //   return value.toLocaleString();
+  // };
 
   const handlePriceRange = async () => {
-    setLoadingPrice(true);
+    setLoadingPrice(true); // eslint-disable-next-line
     if (minValueTemp != "" || maxValueTemp != "") {
-      const response = await setPriceRange();
+      await setPriceRange();
       setLoadingPrice(false);
     }
   };
@@ -112,10 +111,10 @@ const Filter = (props) => {
     setMaxValue(maxValueTemp);
   };
 
-  const handleStockRange =  async () => {
-    setLoadingStock(true);
+  const handleStockRange = async () => {
+    setLoadingStock(true); // eslint-disable-next-line
     if (minStockTemp != "" || maxStockTemp != "") {
-      const response = await setStockRange();
+      await setStockRange();
       setLoadingStock(false);
     }
   };
@@ -123,7 +122,7 @@ const Filter = (props) => {
   const setStockRange = async () => {
     setMinStock(minStockTemp);
     setMaxStock(maxStockTemp);
-  }
+  };
 
   const filterProduct = () => {
     const product = {
@@ -135,14 +134,11 @@ const Filter = (props) => {
       maxStock: maxStock === "" ? null : maxStock,
     };
 
-    console.log(product);
-
     props.onSave(product);
     props.onClose();
   };
 
-  useEffect( () => {
-    
+  useEffect(() => {
     categoryService
       .getAllCategories()
       .then((response) => {
@@ -155,25 +151,22 @@ const Filter = (props) => {
 
   useEffect(() => {
     if (props.appliedFilters) {
-      console.log("hola")
-      console.log(props.appliedFilters);
       handleSelectedCategory(props.appliedFilters.category);
       setMinValueTemp(props.appliedFilters.minUnitPrice);
       setMaxValueTemp(props.appliedFilters.maxUnitPrice);
       setMinStockTemp(props.appliedFilters.minStock);
       setMaxStockTemp(props.appliedFilters.maxStock);
       handlePriceRange();
-      handleStockRange();}
+      handleStockRange();
+    } // eslint-disable-next-line
   }, [props.appliedFilters]);
-
+  // eslint-disable-next-line
   const handleFilters = async () => {
-    const response = await applyFilters();
-  }
+    await applyFilters();
+  };
 
   const applyFilters = async () => {
     if (props.appliedFilters) {
-      console.log("hola")
-      console.log(props.appliedFilters);
       handleSelectedCategory(props.appliedFilters.category);
       setMinValueTemp(props.appliedFilters.minUnitPrice);
       setMaxValueTemp(props.appliedFilters.maxUnitPrice);
@@ -182,45 +175,45 @@ const Filter = (props) => {
       handlePriceRange();
       handleStockRange();
     }
-  }
+  };
 
   const handleRemoveSelectedCategory = (categoryName) => {
     // Clona el arreglo de categorías seleccionadas y filtra la categoría a eliminar
     const updatedSelectedCategories = selectedCategories.filter(
       (category) => category !== categoryName
     );
-  
+
     // Actualiza el estado con el nuevo arreglo de categorías seleccionadas
     setSelectedCategories(updatedSelectedCategories);
   };
-  
-  const selectedCategoryBadges = selectedCategories.map((categoryName, index) => (
-    <Box
-      key={index}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      backgroundColor="whitesmoke"
-      width={"20%"}
-      borderRadius="10px"
-      style={{ margin: "5px" }}
-    >
-      <div
-        className="badge"
-        style={{ display: "flex", flexDirection: "row" }}
-      >{`${categoryName}`}</div>
-      <IconButton
-        aria-label="clear"
-        size="large"
-        color="red"
-        onClick={() => handleRemoveSelectedCategory(categoryName)}
-      >
-        <ClearIcon style={{ justifyContent: "flex-end" }} />
-      </IconButton>
-    </Box>
-  ));
-  
 
+  const selectedCategoryBadges = selectedCategories.map(
+    (categoryName, index) => (
+      <Box
+        key={index}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="whitesmoke"
+        width={"20%"}
+        borderRadius="10px"
+        style={{ margin: "5px" }}
+      >
+        <div
+          className="badge"
+          style={{ display: "flex", flexDirection: "row" }}
+        >{`${categoryName}`}</div>
+        <IconButton
+          aria-label="clear"
+          size="large"
+          color="red"
+          onClick={() => handleRemoveSelectedCategory(categoryName)}
+        >
+          <ClearIcon style={{ justifyContent: "flex-end" }} />
+        </IconButton>
+      </Box>
+    )
+  );
 
   const priceRangeBadge = () => {
     if (minValue !== "" && maxValue !== "") {
@@ -250,7 +243,6 @@ const Filter = (props) => {
     setMaxValueTemp("");
     setMaxValue("");
     setLoadingPrice(true);
-    console.log(loadingPrice);
   };
 
   const handleClose = () => {
@@ -263,7 +255,6 @@ const Filter = (props) => {
     setMaxStockTemp("");
     setMaxStock("");
     setLoadingStock(true);
-    
   };
 
   useEffect(() => {
@@ -271,10 +262,8 @@ const Filter = (props) => {
   }, [selectedCategory]);
 
   const handleSelectedCategories = (categoryName) => {
-    
     const newSelectedCategories = [...selectedCategories];
 
-    
     const categoryIndex = newSelectedCategories.indexOf(categoryName);
 
     if (categoryIndex === -1) {
@@ -289,7 +278,9 @@ const Filter = (props) => {
     <div>
       <h1 style={{ marginBottom: "5%", fontSize: "2 rem" }}>Filter Products</h1>
       {!loadingCategory && (
-        <div className="badges" style={{ display: "flex", width: "100%" }}>{selectedCategoryBadges}</div>
+        <div className="badges" style={{ display: "flex", width: "100%" }}>
+          {selectedCategoryBadges}
+        </div>
       )}
       {!loadingPrice && (
         <Box
@@ -360,10 +351,9 @@ const Filter = (props) => {
                 key={index}
                 sx={{
                   pl: 4,
-                  backgroundColor:
-                  selectedCategories.includes(category.name)
-                      ? "lightgray"
-                      : "inherit",
+                  backgroundColor: selectedCategories.includes(category.name)
+                    ? "lightgray"
+                    : "inherit",
                 }}
                 onClick={() => handleSelectedCategories(category.name)}
               >

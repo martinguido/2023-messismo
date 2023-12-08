@@ -29,9 +29,7 @@ const addShift = (shift) => {
       method: "POST",
       "Content-Type": "application/json",
     })
-    .then((response) => {
-      console.log("Shift agregado con éxito:", response.data);
-    })
+    .then((response) => {})
     .catch((error) => {
       console.error("Error al agregar el shift:", error);
       throw error;

@@ -23,24 +23,24 @@ const deleteGoal = (id) => {
   const data = {
     goalId: id,
   };
-  console.log(data);
-  return axios.delete(delete_goal, {data: data, headers: authHeader() ,      
-  'Content-Type' : 'application/json'})
-  .then(response => {
-      console.log("Categoria eliminada con exito:", response.data);
-  })
-  .catch(error => {
+  return axios
+    .delete(delete_goal, {
+      data: data,
+      headers: authHeader(),
+      "Content-Type": "application/json",
+    })
+    .then((response) => {})
+    .catch((error) => {
       console.error("Error al eliminar la categoria:", error);
       throw error;
-  })
+    });
 };
 
-
 const goalsService = {
-    getAllGoals,
-    addGoal,
-    modifyGoal,
-    deleteGoal
+  getAllGoals,
+  addGoal,
+  modifyGoal,
+  deleteGoal,
 };
 
 export default goalsService;

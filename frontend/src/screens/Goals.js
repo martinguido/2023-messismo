@@ -1,16 +1,25 @@
 import "../App.css";
-import React, { useState, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  // useMemo
+} from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import GoalForm from "../components/GoalForm";
-import ordersService from "../services/orders.service";
+// import ordersService from "../services/orders.service";
 import goalsService from "../services/goals.service";
 import { useTheme } from "@mui/material/styles";
-import { Box, Typography, gridClasses, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Typography,
+  // gridClasses,
+  useMediaQuery,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { MdFastfood } from "react-icons/md";
+// import { MdFastfood } from "react-icons/md";
 import { AiFillDelete } from "react-icons/ai";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -30,47 +39,46 @@ import Doughnut from "../components/DoughnutChart";
 import GoalGauge from "../components/GoalGauge";
 import { Button } from "@mui/material";
 
-
 const Container = styled.div``;
 
 const Graphs = styled.div`
-      display: flex;
-      flex-direction: row;
-      width: "100%";
-      height: "auto";
-      justify-content: center;
-      margin: 3rem;
-    @media (max-width: 1000px) {
-        display: flex;
-        flex-direction: column;
-    }
+  display: flex;
+  flex-direction: row;
+  width: "100%";
+  height: "auto";
+  justify-content: center;
+  margin: 3rem;
+  @media (max-width: 1000px) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const DoughnutDiv = styled.div`
-    max-width: 50%;
-    display: flex;
-    margin-right: 5rem;
-    justify-content: center;
+  max-width: 50%;
+  display: flex;
+  margin-right: 5rem;
+  justify-content: center;
 
-    @media (max-width: 1000px) {
-        max-width: 100%;
-        margin-right: 0rem;
-        height: auto;
-        flex-direction: column;
-    }        
+  @media (max-width: 1000px) {
+    max-width: 100%;
+    margin-right: 0rem;
+    height: auto;
+    flex-direction: column;
+  }
 `;
 
 const GaugeDiv = styled.div`
-    max-width: 50%;
-    display: flex;
-    justify-content: center;
+  max-width: 50%;
+  display: flex;
+  justify-content: center;
 
-    @media (max-width: 1000px) {
-        max-width: 100%;
-        height: auto;
-        flex-direction: column;
-        margin-top: 2rem;
-    }
+  @media (max-width: 1000px) {
+    max-width: 100%;
+    height: auto;
+    flex-direction: column;
+    margin-top: 2rem;
+  }
 `;
 
 const AddGoalButton = styled.button`
@@ -142,88 +150,88 @@ const ModalContent = styled.div`
 
 const OrdersTable = styled.div``;
 
-const Details = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 9999;
-  padding: 1rem;
-`;
+// const Details = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background: rgba(0, 0, 0, 0.3);
+//   z-index: 9999;
+//   padding: 1rem;
+// `;
 
-const DetailsContent = styled.div`
-  padding: 2rem;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  max-height: 60vh;
-  overflow-y: auto;
-  width: 20%;
-  margin: auto;
-  background-color: black;
-  strong {
-    color: white;
-    font-family: "Roboto";
-    font-size: 2rem;
-  }
+// const DetailsContent = styled.div`
+//   padding: 2rem;
+//   border-radius: 8px;
+//   display: flex;
+//   flex-direction: column;
+//   max-height: 60vh;
+//   overflow-y: auto;
+//   width: 20%;
+//   margin: auto;
+//   background-color: black;
+//   strong {
+//     color: white;
+//     font-family: "Roboto";
+//     font-size: 2rem;
+//   }
 
-  @media (max-width: 1500px) {
-    width: 30%;
-  }
-  @media (max-width: 1000px) {
-    width: 40%;
-  }
-  @media (max-width: 800px) {
-    width: 50%;
-  }
-`;
+//   @media (max-width: 1500px) {
+//     width: 30%;
+//   }
+//   @media (max-width: 1000px) {
+//     width: 40%;
+//   }
+//   @media (max-width: 800px) {
+//     width: 50%;
+//   }
+// `;
 
-const DetailsButton = styled.button`
-  display: block;
-  width: 100%;
-  font-size: 1.5rem;
-  border-radius: 3px;
-  padding: 1rem 3.5rem;
-  border: 1px solid black;
-  background-color: #a4d4cc;
-  color: black;
-  text-transform: uppercase;
-  cursor: pointer;
-  letter-spacing: 1px;
-  box-shadow: 0 3px #999;
-  font-family: "Roboto", serif;
-  text-align: center;
+// const DetailsButton = styled.button`
+//   display: block;
+//   width: 100%;
+//   font-size: 1.5rem;
+//   border-radius: 3px;
+//   padding: 1rem 3.5rem;
+//   border: 1px solid black;
+//   background-color: #a4d4cc;
+//   color: black;
+//   text-transform: uppercase;
+//   cursor: pointer;
+//   letter-spacing: 1px;
+//   box-shadow: 0 3px #999;
+//   font-family: "Roboto", serif;
+//   text-align: center;
 
-  &:hover {
-    background-color: #a7d0cd;
-  }
-  &:active {
-    background-color: #a4d4cc;
-    box-shadow: 0 3px #666;
-    transform: translateY(4px);
-  }
-  &:focus {
-    outline: none;
-  }
-`;
+//   &:hover {
+//     background-color: #a7d0cd;
+//   }
+//   &:active {
+//     background-color: #a4d4cc;
+//     box-shadow: 0 3px #666;
+//     transform: translateY(4px);
+//   }
+//   &:focus {
+//     outline: none;
+//   }
+// `;
 
-const MoreDetails = styled(MdFastfood)`
-  cursor: pointer;
-  @media (max-width: 1000px) {
-    font-size: 1.5rem;
-  }
-  @media (max-width: 760px) {
-    font-size: 1rem;
-  }
-  @media (max-width: 500px) {
-    font-size: 0.8rem;
-  }
-`;
+// const MoreDetails = styled(MdFastfood)`
+//   cursor: pointer;
+//   @media (max-width: 1000px) {
+//     font-size: 1.5rem;
+//   }
+//   @media (max-width: 760px) {
+//     font-size: 1rem;
+//   }
+//   @media (max-width: 500px) {
+//     font-size: 0.8rem;
+//   }
+// `;
 
 const MOBILE_COLUMNS = {
   id: true,
@@ -238,7 +246,6 @@ const MOBILE_COLUMNS = {
   goalObject: false,
   status: true,
   achieved: true,
-
 };
 const ALL_COLUMNS = {
   id: false,
@@ -255,25 +262,24 @@ const ALL_COLUMNS = {
   achieved: true,
 };
 
-
 function Goals() {
   const { user: currentUser } = useSelector((state) => state.auth);
   const clicked = useSelector((state) => state.navigation.clicked);
   const [isGoalFormVisible, setGoalFormVisible] = useState(false);
   const [isEditGoalFormVisible, setEditGoalFormVisible] = useState(false);
-  const [isDetailsVisible, setDetailsVisible] = useState(false);
+  // const [isDetailsVisible, setDetailsVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [orders, setGoals] = useState([]);
-  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  // const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [pageSize, setPageSize] = useState(5);
-  const isAdminOrManager =
-    currentUser &&
-    (currentUser.role === "MANAGER" || currentUser.role === "ADMIN");
+  // const isAdminOrManager =
+  //   currentUser &&
+  //   (currentUser.role === "MANAGER" || currentUser.role === "ADMIN");
   const [openEditForm, setOpenEditForm] = useState(false);
-  const [isEditFormVisible, setEditFormVisible] = useState(false);
-  const [orderIdToEdit, setOrderIdToEdit] = useState(null);
-  const [selectedTotalPrice, setSelectedTotalPrice] = useState(null);
+  // const [isEditFormVisible, setEditFormVisible] = useState(false);
+  // const [orderIdToEdit, setOrderIdToEdit] = useState(null);
+  // const [selectedTotalPrice, setSelectedTotalPrice] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertText, setAlertText] = useState("");
   const [isOperationSuccessful, setIsOperationSuccessful] = useState(false);
@@ -282,8 +288,6 @@ function Goals() {
   const [selectedRow, setSelectedRow] = useState(initialRows);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [editGoalId, setEditGoalId] = useState(null);
-
-
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
@@ -296,25 +300,30 @@ function Goals() {
 
   useEffect(() => {
     const goalData = {
-      status: [], 
+      status: [],
       achieved: [],
     };
-  
+
     goalsService
       .getAllGoals(goalData)
       .then((response) => {
         const goalsData = response.data;
         setGoals(goalsData);
-        setInitialRows(goalsData.length > 0 ? [goalsData[goalsData.length-1]] : []);
+        setInitialRows(
+          goalsData.length > 0 ? [goalsData[goalsData.length - 1]] : []
+        );
         setIsLoading(false);
-        console.log("done");
       })
       .catch((error) => {
         console.error("Error al mostrar las metas", error);
         setIsLoading(false);
       });
-  }, [isGoalFormVisible, open, isEditFormVisible, openEditForm]);
-  
+  }, [
+    isGoalFormVisible,
+    open,
+    // isEditFormVisible,
+    openEditForm,
+  ]);
 
   if (!currentUser) {
     return <Navigate to="/" />;
@@ -343,15 +352,15 @@ function Goals() {
     setIsLoading(true);
   };
 
-  const handleViewDetails = (orderId) => {
-    const selectedOrder = orders.find((order) => order.id === orderId);
-    setSelectedOrderDetails(selectedOrder.productOrders);
-    setDetailsVisible(true);
-  };
+  // const handleViewDetails = (orderId) => {
+  //   const selectedOrder = orders.find((order) => order.id === orderId);
+  //   setSelectedOrderDetails(selectedOrder.productOrders);
+  //   setDetailsVisible(true);
+  // };
 
-  const handleCloseDetails = () => {
-    setDetailsVisible(false);
-  };
+  // const handleCloseDetails = () => {
+  //   setDetailsVisible(false);
+  // };
 
   const handleRowClick = (params) => {
     setSelectedRow(params.row);
@@ -359,7 +368,7 @@ function Goals() {
 
   const handleClose = () => {
     setConfirmOpen(false);
-  }
+  };
 
   const handleDeleteClick = (goalId) => {
     setSelectedCategory(goalId);
@@ -368,7 +377,7 @@ function Goals() {
 
   const handleDeleteCategory = async () => {
     const goalData = {
-      status: [], 
+      status: [],
       achieved: [],
     };
     if (selectedCategory) {
@@ -378,37 +387,31 @@ function Goals() {
         setIsOperationSuccessful(true);
         setAlertText("Goal deleted successfully");
         goalsService
-        .getAllGoals(goalData)
-        .then((response) => {
-          setGoals(response.data);
-          setIsLoading(false);
-          console.log("done");
-        })
-        .catch((error) => {
-          console.error("Error al mostrar las metas", error);
-          setIsLoading(false);
-        });
+          .getAllGoals(goalData)
+          .then((response) => {
+            setGoals(response.data);
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error al mostrar las metas", error);
+            setIsLoading(false);
+          });
         setOpenSnackbar(true);
         setSelectedRow(initialRows);
-        
       } catch (error) {
         if (error.response) {
-          console.log("Datos de respuesta del error:", error.response.data);
           setAlertText("Failed to delete goal: " + error.response.data);
         }
         setIsOperationSuccessful(false);
         setOpenSnackbar(true);
       }
       setConfirmOpen(false);
-
     }
   };
-  
+
   const deleteCategoryAsync = async (id) => {
     return goalsService.deleteGoal(id);
   };
-
-
 
   const rows = orders.map((order) => ({
     id: order.goalId,
@@ -419,7 +422,10 @@ function Goals() {
     currentGoal: order.currentGoal,
     goalObjective: order.goalObjective,
     goal: order.currentGoal + "/" + order.goalObjective,
-    tempGoal: order.currentGoal < order.goalObjective ? order.goalObjective - order.currentGoal : 0,
+    tempGoal:
+      order.currentGoal < order.goalObjective
+        ? order.goalObjective - order.currentGoal
+        : 0,
     goalObject: order.goalObject,
     status: order.status,
     achieved: order.achieved,
@@ -471,16 +477,16 @@ function Goals() {
         moment(params.row.startingDate).format("YYYY-MM-DD"),
     },
     {
-        field: "endingDate",
-        headerName: "End Date",
-        flex: 1,
-        align: "center",
-        headerAlign: "center",
-        sortable: true,
-        minWidth: 150,
-        renderCell: (params) =>
-          moment(params.row.endingDate).format("YYYY-MM-DD"),
-      },
+      field: "endingDate",
+      headerName: "End Date",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      sortable: true,
+      minWidth: 150,
+      renderCell: (params) =>
+        moment(params.row.endingDate).format("YYYY-MM-DD"),
+    },
     {
       field: "goal",
       headerName: "Goal",
@@ -501,8 +507,8 @@ function Goals() {
       renderCell: (params) => {
         const status = params.row.status;
         const statusColors = {
-            Upcoming: "#FDFEBC",
-            Expired: "#FEBCBC",
+          Upcoming: "#FDFEBC",
+          Expired: "#FEBCBC",
         };
 
         const fontColors = {
@@ -539,33 +545,37 @@ function Goals() {
       },
     },
     {
-        field: "achieved",
-        headerName: "Achieved",
-        flex: 1,
-        align: "center",
-        headerAlign: "center",
-        sortable: true,
-        maxWidth: 100,
-        renderCell: (params) => {
+      field: "achieved",
+      headerName: "Achieved",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      sortable: true,
+      maxWidth: 100,
+      renderCell: (params) => {
         const isAchieved = params.row.achieved === "Achieved";
         const isExpired = params.row.status === "Expired";
-    
+
         if (isAchieved && isExpired) {
-            return (
+          return (
             <div style={{ textAlign: "center" }}>
-                <AiFillCheckCircle style={{ color: 'rgba(159,193,108)',  fontSize: "2rem" }} />
+              <AiFillCheckCircle
+                style={{ color: "rgba(159,193,108)", fontSize: "2rem" }}
+              />
             </div>
-            );
+          );
         } else if (!isAchieved && isExpired) {
-            return (
+          return (
             <div style={{ textAlign: "center" }}>
-                <AiFillCloseCircle style={{ color: 'rgba(212,150,187)', fontSize: "2rem" }} />
+              <AiFillCloseCircle
+                style={{ color: "rgba(212,150,187)", fontSize: "2rem" }}
+              />
             </div>
-            );
+          );
         }
-    
+
         return null;
-        },
+      },
     },
     {
       field: "edit",
@@ -584,7 +594,7 @@ function Goals() {
             onClick={() => handleEditGoalClick(params.row.id)}
             disabled={isExpired}
           >
-            <EditIcon style={{ fontSize: "2rem" }}/>
+            <EditIcon style={{ fontSize: "2rem" }} />
           </button>
         );
       },
@@ -595,37 +605,40 @@ function Goals() {
     // Expired: delete
 
     {
-        field: "remove",
-        headerName: "",
-        flex: 1,
-        align: "center",
-        headerAlign: "center",
-        sortable: false,
-        maxWidth: 80,
-        renderCell: (params) => {
-          const status = params.row.status;
-          const isInProcess = status === "In Process";
-  
-          return (
-            <button
-              onClick={() => handleDeleteClick(params.row.id)}
-              disabled={isInProcess}
-            >
-              <AiFillDelete style={{ fontSize: "2rem" }}/>
-            </button>
-            
-          );
-        },
+      field: "remove",
+      headerName: "",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      maxWidth: 80,
+      renderCell: (params) => {
+        const status = params.row.status;
+        const isInProcess = status === "In Process";
+
+        return (
+          <button
+            onClick={() => handleDeleteClick(params.row.id)}
+            disabled={isInProcess}
+          >
+            <AiFillDelete style={{ fontSize: "2rem" }} />
+          </button>
+        );
       },
+    },
   ];
 
-  const filteredGoals = orders.filter(goal => goal.status === "Expired");
-  const achievedCount = filteredGoals.filter(goal => goal.achieved === "Achieved").length;
-  const notAchievedCount = filteredGoals.filter(goal => goal.achieved === "Not Achieved").length;
+  const filteredGoals = orders.filter((goal) => goal.status === "Expired");
+  const achievedCount = filteredGoals.filter(
+    (goal) => goal.achieved === "Achieved"
+  ).length;
+  const notAchievedCount = filteredGoals.filter(
+    (goal) => goal.achieved === "Not Achieved"
+  ).length;
 
   const goalsCount = {
-    "Achieved": achievedCount,
-    "Not Achieved": notAchievedCount
+    Achieved: achievedCount,
+    "Not Achieved": notAchievedCount,
   };
   const rowInfo = {
     Name: selectedRow.name,
@@ -633,43 +646,40 @@ function Goals() {
     Goal: selectedRow.goalObjective,
     tempGoal: selectedRow.tempGoal,
   };
- 
-
-  
 
   return (
     <Container>
       <Navbar />
-    
-      <MainContent visible={contentVisible}>
 
-        {(currentUser.role === "ADMIN" ||
-        currentUser.role === "MANAGER") &&
-        !isGoalFormVisible && !isEditGoalFormVisible ? (
+      <MainContent visible={contentVisible}>
+        {(currentUser.role === "ADMIN" || currentUser.role === "MANAGER") &&
+        !isGoalFormVisible &&
+        !isEditGoalFormVisible ? (
           <AddGoalButton variant="contained" onClick={handleAddOrderClick}>
             Add Goal
           </AddGoalButton>
         ) : null}
 
         <div visible={contentVisible}>
-            
           <Modal open={isGoalFormVisible}>
             <ModalContent>
-              {isGoalFormVisible && (
-                <GoalForm onCancel={handleCloseGoalForm} />
-              )}
+              {isGoalFormVisible && <GoalForm onCancel={handleCloseGoalForm} />}
             </ModalContent>
           </Modal>
 
           <Modal open={isEditGoalFormVisible}>
             <ModalContent>
               {isEditGoalFormVisible && (
-                <EditGoalForm onCancel={handleCloseEditGoalForm} goalId={editGoalId}/>
+                <EditGoalForm
+                  onCancel={handleCloseEditGoalForm}
+                  goalId={editGoalId}
+                />
               )}
             </ModalContent>
           </Modal>
 
-          {!isGoalFormVisible && !isEditGoalFormVisible && !isEditFormVisible && (
+          {!isGoalFormVisible && !isEditGoalFormVisible && (
+            // !isEditFormVisible &&
             <div>
               {isLoading ? (
                 <Box
@@ -680,7 +690,7 @@ function Goals() {
                     marginTop: "20%",
                   }}
                 >
-                  <CircularProgress style={{ color:"#a4d4cc"}}/>
+                  <CircularProgress style={{ color: "#a4d4cc" }} />
                 </Box>
               ) : (
                 <OrdersTable sx={{ width: "100%", backgroundColor: "blue" }}>
@@ -688,7 +698,12 @@ function Goals() {
                     <Typography
                       variant="h3"
                       component="h3"
-                      sx={{ textAlign: "center", mt: 3, mb: 3, color: "white" }}
+                      sx={{
+                        textAlign: "center",
+                        mt: 3,
+                        mb: 3,
+                        color: "white",
+                      }}
                     >
                       Goals
                     </Typography>
@@ -699,14 +714,11 @@ function Goals() {
                           sortModel: [{ field: "dateCreated", sort: "desc" }],
                         },
                       }}
-
                       autoHeight={true}
                       columns={columns}
                       columnVisibilityModel={columnVisible}
                       rows={rows}
-
                       onRowClick={handleRowClick}
-
                       pageSizeOptions={[5, 10, 25]}
                       //rowsPerPageOptions={[5, 10, 25]}
                       pagination
@@ -733,7 +745,6 @@ function Goals() {
                         },
                         color: "white",
                         fontFamily: "Roboto",
-                        fontSize: "1.1rem",
                         ".MuiTablePagination-displayedRows": {
                           color: "white",
                           fontSize: "1.2rem",
@@ -775,92 +786,85 @@ function Goals() {
                       }}
                     />
 
-                  <Graphs id="wrap">
-
+                    <Graphs id="wrap">
                       <DoughnutDiv>
-                          <Doughnut  
-                          data={Object(goalsCount)} 
-                          label={'Expired Goals'} />
+                        <Doughnut
+                          data={Object(goalsCount)}
+                          label={"Expired Goals"}
+                        />
                       </DoughnutDiv>
-                      
+
                       <GaugeDiv>
                         {selectedRow && (
                           <div>
-                            <GoalGauge  
-                              data={Object(rowInfo)}/>
+                            <GoalGauge data={Object(rowInfo)} />
                           </div>
                         )}
-
                       </GaugeDiv>
-
-                  </Graphs>
-
+                    </Graphs>
                   </Box>
                 </OrdersTable>
               )}
-
             </div>
           )}
-
         </div>
-
-
       </MainContent>
 
       <Dialog
-          open={confirmOpen}
-          onClose={handleClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          PaperProps={{
-            style: {
-              backgroundColor: "white",
-              boxShadow: "none",
-              zIndex: 1000,
-              fontSize: "24px",
-            },
-          }}
-        >
-          <DialogTitle id="alert-dialog-title" style={{ fontSize: "1.3rem" }}>
-            {selectedCategory &&
-              `Are you sure you want to delete this goal?`}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText
-              id="alert-dialog-description"
-              style={{ fontSize: "1rem" }}
-            >
-              The goal will be permanently deleted
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} style={{ fontSize: "1rem" }}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleDeleteCategory}
-              style={{ color: "red", fontSize: "1rem" }}
-              autoFocus
-            >
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+        open={confirmOpen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: "white",
+            boxShadow: "none",
+            zIndex: 1000,
+            fontSize: "24px",
+          },
+        }}
+      >
+        <DialogTitle id="alert-dialog-title" style={{ fontSize: "1.3rem" }}>
+          {selectedCategory && `Are you sure you want to delete this goal?`}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-description"
+            style={{ fontSize: "1rem" }}
+          >
+            The goal will be permanently deleted
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} style={{ fontSize: "1rem" }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteCategory}
+            style={{ color: "red", fontSize: "1rem" }}
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={10000} 
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={10000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert
           onClose={() => setOpenSnackbar(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          severity={isOperationSuccessful ? "success" : "error"}
+          variant="filled"
+          sx={{ fontSize: "80%" }}
         >
-          <Alert onClose={() => setOpenSnackbar(false)} severity={isOperationSuccessful ? "success" : "error"} variant="filled" sx={{fontSize: '80%'}}>
-            {alertText}
-          </Alert>
-        </Snackbar>
-      
+          {alertText}
+        </Alert>
+      </Snackbar>
     </Container>
-
-    
   );
 }
 

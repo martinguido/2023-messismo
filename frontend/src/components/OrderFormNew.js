@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import {
+  useForm,
+  // Controller
+} from "react-hook-form";
 import styled from "styled-components";
 import { GrAddCircle } from "react-icons/gr";
-import { RiDeleteBinLine } from "react-icons/ri";
+// import { RiDeleteBinLine } from "react-icons/ri";
 import productsService from "../services/products.service";
 import ordersService from "../services/orders.service";
 import { useSelector } from "react-redux";
@@ -192,7 +195,7 @@ const Buttons = styled.div`
 
 const OrderFormNew = ({ onCancel }) => {
   const {
-    control,
+    // control,
     register,
     handleSubmit,
     formState: { errors },
@@ -202,31 +205,28 @@ const OrderFormNew = ({ onCancel }) => {
   const [selectedProducts, setSelectedProducts] = useState({});
   const [productStocks, setProductStocks] = useState({});
   const [products, setProducts] = useState([]);
-  const [formField, setFormField] = useState([{ product: "", amount: "" }]);
+  const [formField, setFormField] = useState([{ product: "", amount: "" }]); // eslint-disable-next-line
   const [options, setOptions] = useState({
     products: [],
     // paymentMethods: ['cash', 'credit card', 'debit card'],
   });
-  const [selectedProductNames, setSelectedProductNames] = useState([]);
-  const [search, setSearch] = useState(""); // Estado para almacenar el término de búsqueda
+  // const [selectedProductNames, setSelectedProductNames] = useState([]);
+  // const [search, setSearch] = useState(""); // Estado para almacenar el término de búsqueda
+  // eslint-disable-next-line
   const [selectedProduct, setSelectedProduct] = useState(null);
-
+  // eslint-disable-next-line
   const [selectedUnits, setSelectedUnits] = useState(0);
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-  };
-
-
-
+  // const handleSearchChange = (event) => {
+  //   setSearch(event.target.value);
+  // };
 
   // Filtrar los productos según el término de búsqueda
-  const filteredProducts = options.products.filter((product) => {
-    return product.toLowerCase().includes(search.toLowerCase());
-  });
+  // const filteredProducts = options.products.filter((product) => {
+  //   return product.toLowerCase().includes(search.toLowerCase());
+  // });
 
   useEffect(() => {
-    console.log(selectedProducts);
     productsService
       .getAllProducts()
       .then((response) => {
@@ -248,9 +248,8 @@ const OrderFormNew = ({ onCancel }) => {
       })
       .catch((error) => {
         console.error("Error al mostrar los productos", error);
-      });
+      }); // eslint-disable-next-line
   }, []);
-
 
   useEffect(() => {
     const stockData = {};
@@ -269,8 +268,6 @@ const OrderFormNew = ({ onCancel }) => {
   };
 
   const orderSubmit = (data) => {
-    console.log("ORDERRRRRR");
-    console.log(data);
     const orderedProducts = formField
       .map((form, index) => {
         const productName = data[`product-${index}`];
@@ -278,7 +275,6 @@ const OrderFormNew = ({ onCancel }) => {
           (product) => product.name === productName
         );
         const amount = parseInt(data[`amount-${index}`]) || 0;
-        console.log(products);
         if (
           product &&
           !isNaN(product.unitPrice) &&
@@ -306,7 +302,6 @@ const OrderFormNew = ({ onCancel }) => {
     }, 0);
 
     const totalCost = orderedProducts.reduce((total, product) => {
-      console.log(product);
       return total + product.unitCost * product.amount;
     }, 0);*/
 
@@ -332,14 +327,11 @@ const OrderFormNew = ({ onCancel }) => {
     ordersService
       .addOrders(orderData)
       .then((response) => {
-        console.log("Orden enviada con éxito:", response.data);
         onCancel();
       })
       .catch((error) => {
         console.error("Error al enviar la orden:", error);
       });
-
-    console.log(orderData);
   };
 
   const handleCancelClick = () => {
@@ -347,7 +339,7 @@ const OrderFormNew = ({ onCancel }) => {
   };
 
   /*const calculateTotalPrice = () => {
-    console.log("holi");
+
     const totalPrice = formField.reduce((total, form, index) => {
       const productName = watch(`product-${index}`);
       const product = products.find((product) => product.name === productName);
@@ -373,21 +365,21 @@ const OrderFormNew = ({ onCancel }) => {
               <div className="form-product">
                 <Label>Product</Label>
 
-                <Select onChange={(selectedOption) => {
+                <Select
+                  onChange={(selectedOption) => {
                     setSelectedProduct(selectedOption);
                     setSelectedProducts({
                       ...selectedProducts,
-                      [`product-${index}`]: selectedOption.value
-                    })
+                      [`product-${index}`]: selectedOption.value,
+                    });
                     //field.onChange(selectedProduct);
                   }}
                   className="form-select"
                   options={products.map((product) => ({
                     label: product.name,
                     value: product.name,
-                  }))}>
-
-                </Select>
+                  }))}
+                ></Select>
                 {errors[`product-${index}`]?.type === "required" && (
                   <small className="fail">Field is empty</small>
                 )}

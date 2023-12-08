@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import "./Products.css";
 import { useState } from "react";
-import { IconButton } from "@mui/material";
+import { IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -46,7 +45,14 @@ const BarConfigurationLists = () => {
   const [startingTime, setStartingTime] = useState("");
   const [finishingTime, setFinishingTime] = useState("");
 
+  const handleInputChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setNewCapacity(inputValue);
+  };
   useEffect(() => {
+    setIsLoading(true);
     shiftService
       .getAllShifts()
       .then((response) => {
@@ -69,17 +75,20 @@ const BarConfigurationLists = () => {
 
   const deleteShift = async () => {
     if (selectedShift) {
+      setIsLoading(true);
       try {
-        const response = await shiftService.deleteShift(selectedShift.shiftId);
+        await shiftService.deleteShift(selectedShift.shiftId);
         setSelectedShift(null);
         setIsOperationSuccessful(true);
         setAlertText("Shift deleted successfully");
         setModified(modified + 1);
         setOpenSnackbar(true);
+        setIsLoading(false);
       } catch (error) {
         setIsOperationSuccessful(false);
         setAlertText(error.response.data);
         setOpenSnackbar(true);
+        setIsLoading(false);
       }
       setOpenDeleteForm(false);
     }
@@ -115,7 +124,7 @@ const BarConfigurationLists = () => {
           startingHour: newStartingHour + ":" + newStartingMinute,
           finishingHour: newFinishingHour + ":" + newFinishingMinute,
         };
-        const response = await shiftService.addShift(newShift);
+        await shiftService.addShift(newShift);
         setIsOperationSuccessful(true);
         setAlertText("Shift added successfully");
         setModified(modified + 1);
@@ -138,11 +147,6 @@ const BarConfigurationLists = () => {
   };
   const handleCloseDeleteForm = () => {
     setOpenDeleteForm(false);
-    setIsLoading(true);
-  };
-
-  const handleInputCapacityChange = (e) => {
-    setNewCapacity(e.target.value);
   };
 
   const handleDeleteClick = (shift) => {
@@ -156,7 +160,6 @@ const BarConfigurationLists = () => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       const modifyBarCapacityDTO = {
         barId: barCapacity.barId,
@@ -170,13 +173,16 @@ const BarConfigurationLists = () => {
           setOpenSnackbar(true);
           handleCloseBarCapacityModal();
           setModified(modified + 1);
+          setErrors({});
+          setNewCapacity("");
         })
         .catch((error) => {
           setAlertText(error.response.data);
           setIsOperationSuccessful(false);
           setOpenSnackbar(true);
+          setErrors({});
+          setNewCapacity("");
         });
-      setNewCapacity("");
     }
   };
 
@@ -185,6 +191,8 @@ const BarConfigurationLists = () => {
   };
 
   const handleCloseBarCapacityModal = () => {
+    setErrors({});
+    setNewCapacity("");
     setOpenBarCapacityForm(false);
   };
 
@@ -293,42 +301,57 @@ const BarConfigurationLists = () => {
             </div>
           ) : (
             shifts.map((shift, index) => (
-              <div className="entradas" key={index}>
-                <div className="product">
-                  <div className="firstLine">
-                    <div className="names">
-                      <div className="name">
-                        <p
-                          className="text"
-                          style={{ fontWeight: "bold", height: "40px" }}
-                        >
-                          Shift time:{" "}
-                          {shift.startingHour + " - " + shift.finishingHour}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="buttons-edit">
-                      {role === "ADMIN" ? (
-                        <Tooltip
-                          title="Delete Shift"
-                          arrow
-                          style={{ fontSize: "2rem" }}
-                        >
-                          <IconButton
-                            aria-label="delete"
-                            size="large"
-                            style={{ color: "red", fontSize: "1.5 rem" }}
-                            onClick={() => handleDeleteClick(shift)}
-                          >
-                            <DeleteIcon style={{ fontSize: "1.5rem" }} />
-                          </IconButton>
-                        </Tooltip>
-                      ) : (
-                        <div></div>
-                      )}
-                    </div>
-                  </div>
+              <div
+                key={index}
+                className="category-data"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "1rem",
+                  padding: "1rem",
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "5px",
+                  width: "20%",
+                }}
+              >
+                {/* <div
+                  className="product"
+                  style={{ width: "50%", height: "110%" }}
+                > */}
+                {/* <div className="firstLine"> */}
+                {/* <div className="names"> */}
+                {/* <div className="name"> */}
+                <p
+                  className="text"
+                  style={{ fontWeight: "bold", height: "40px" }}
+                >
+                  Shift time: {shift.startingHour + " - " + shift.finishingHour}
+                </p>
+                {/* </div> */}
+                {/* </div> */}
+                <div className="buttons-edit">
+                  {role === "ADMIN" ? (
+                    <Tooltip
+                      title="Delete Shift"
+                      arrow
+                      style={{ fontSize: "2rem" }}
+                    >
+                      <IconButton
+                        aria-label="delete"
+                        size="large"
+                        style={{ color: "red", fontSize: "1.5 rem" }}
+                        onClick={() => handleDeleteClick(shift)}
+                      >
+                        <DeleteIcon style={{ fontSize: "1.5rem" }} />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <div></div>
+                  )}
                 </div>
+                {/* </div> */}
+                {/* </div> */}
               </div>
             ))
           )}
@@ -339,8 +362,8 @@ const BarConfigurationLists = () => {
         <Dialog
           open={openBarCapacityForm}
           onClose={handleCloseBarCapacityModal}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
+          fullWidth={true}
+          maxWidth="xs"
           PaperProps={{
             style: {
               backgroundColor: "white",
@@ -352,16 +375,22 @@ const BarConfigurationLists = () => {
         >
           <DialogTitle id="alert-dialog-title" style={{ fontSize: "1.5rem" }}>
             <p style={{ fontSize: "1.3rem" }}>New bar capacity</p>
+
             <TextField
               required
               id="name"
               value={newCapacity}
-              onChange={handleInputCapacityChange}
+              onChange={handleInputChange}
               variant="outlined"
               error={errors.capacity ? true : false}
+              inputProps={{
+                pattern: "[0-9]*",
+                inputMode: "numeric",
+              }}
               helperText={errors.capacity || ""}
               style={{
-                width: "80%",
+                // width: "80%",
+                width: "100%",
                 marginTop: "3%",
                 marginBottom: "3%",
                 fontSize: "1.1rem",
@@ -373,7 +402,7 @@ const BarConfigurationLists = () => {
               }}
               FormHelperTextProps={{
                 style: {
-                  fontSize: "1.1rem",
+                  fontSize: "1.0rem",
                 },
               }}
             />
@@ -472,10 +501,6 @@ const BarConfigurationLists = () => {
             },
           }}
         >
-          {/* <DialogTitle
-            id="alert-dialog-title"
-            style={{ fontSize: "1.5rem" }}
-          ></DialogTitle> */}
           <DialogContent>
             <h1 style={{ marginBottom: "3%", fontSize: "1.6rem" }}>
               Add a shift

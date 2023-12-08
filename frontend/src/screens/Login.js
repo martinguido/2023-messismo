@@ -220,7 +220,6 @@ function Login() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       authService
         .forgotPassword(email)
@@ -251,7 +250,6 @@ function Login() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       const selectedShiftObj = shifts.find(
         (shi) => shi.shiftId === selectedShift
@@ -293,9 +291,9 @@ function Login() {
     }
   };
 
-  const handleOpenChangePasswordForm = () => {
-    setOpenChangePasswordForm(true);
-  };
+  // const handleOpenChangePasswordForm = () => {
+  //   setOpenChangePasswordForm(true);
+  // };
 
   const handleCloseChangePasswordForm = () => {
     setOpenChangePasswordForm(false);
@@ -329,7 +327,6 @@ function Login() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       authService
         .changePassword(form)

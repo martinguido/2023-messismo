@@ -10,7 +10,7 @@ const addReservation = (newReservationData) => {
       "Content-Type": "application/json",
     })
     .then((response) => {
-      console.log("Reservation added successfully:", response.data);
+      return response;
     })
     .catch((error) => {
       console.error("Error making a reservation:", error);
@@ -38,10 +38,27 @@ const deleteReservation = (reservationId) => {
   });
 };
 
+const markAsUsedReservaiton = (reservationId) => {
+  const data = {
+    reservationId: reservationId,
+  };
+
+  return axios.put(
+    apiUrl + "/api/v1/validatedEmployee/markAsUsedReservation",
+    data,
+    {
+      headers: authHeader(),
+      method: "PUT",
+      "Content-Type": "application/json",
+    }
+  );
+};
+
 const reservationsService = {
   addReservation,
   getAllReservations,
   deleteReservation,
+  markAsUsedReservaiton,
 };
 
 export default reservationsService;

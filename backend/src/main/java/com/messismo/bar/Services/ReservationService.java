@@ -35,6 +35,7 @@ public class ReservationService {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
             List<Reservation> allReservations = reservationRepository.findAllByShiftAndDate(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate());
+            System.out.println(allReservations);
             Integer currentCapacity = 0;
             for (Reservation reservation : allReservations) {
                 currentCapacity += reservation.getCapacity();
@@ -43,17 +44,24 @@ public class ReservationService {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
             Integer clientPhoneCorrected = null;
-            if (newReservationRequestDTO.getClientPhone() != null) {
+            if (newReservationRequestDTO.getClientPhone() != null && !newReservationRequestDTO.getClientPhone().isEmpty()) {
+                System.out.println("ENTRA ACA");
                 clientPhoneCorrected = Integer.parseInt(newReservationRequestDTO.getClientPhone());
+                System.out.println("SE ROMPE");
             }
+            System.out.println("LLEGA HASTA CREAR LA RESERVA");
             Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(), clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
+           System.out.println("LA CREA");
             reservationRepository.save(newReservation);
-            if (newReservationRequestDTO.getClientEmail() != null) {
+            System.out.println("LA GUARDO");
+            if (newReservationRequestDTO.getClientEmail() != null && !newReservationRequestDTO.getClientEmail().isEmpty()) {
+                System.out.println("ENTRA ACA Y EL MAIL ES: " + "-" + newReservationRequestDTO.getClientEmail() + "-");
                 SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
                 simpleMailMessage.setTo(newReservationRequestDTO.getClientEmail());
                 simpleMailMessage.setFrom("automaticmoebar@hotmail.com");
-                simpleMailMessage.setSubject("Reservation created successfully for Moe's Bar" );
-                simpleMailMessage.setText("Your reservation:" + newReservationRequestDTO.getReservationDate() +" "+ newReservationRequestDTO.getShift().getStartingHour() +" "+ newReservationRequestDTO.getShift().getFinishingHour()+" . Hope to see you soon!");
+                simpleMailMessage.setSubject("Reservation created successfully for Moe's Bar");
+                String text = "Your reservation:" + newReservationRequestDTO.getReservationDate() + " " + newReservationRequestDTO.getShift().getStartingHour() + " " + newReservationRequestDTO.getShift().getFinishingHour() + " . Hope to see you soon!";
+                simpleMailMessage.setText(text);
                 javaMailSender.send(simpleMailMessage);
             }
             return "Reservation added successfully";

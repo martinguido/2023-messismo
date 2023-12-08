@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +41,9 @@ public class ReservationServiceTests {
 
     @Mock
     private BarRepository barRepository;
+
+    @Mock
+    private JavaMailSender javaMailSender;
 
     @BeforeEach
     public void setUp() {

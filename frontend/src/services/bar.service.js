@@ -17,9 +17,7 @@ const modifyBarCapacity = (modifyBarCapacityDTO) => {
       method: "PUT",
       "Content-Type": "application/json",
     })
-    .then((response) => {
-      // console.log("Bar configuration:", response.data);
-    })
+    .then((response) => {})
     .catch((error) => {
       // console.error("Error getting bar configuration:", error);
       throw error;

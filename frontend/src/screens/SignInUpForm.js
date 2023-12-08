@@ -13,12 +13,12 @@ import { clearMessage } from "../redux/message";
 import { Dialog } from "@mui/material";
 import RecoverPasswordValidation from "../RecoverPasswordValidation";
 import ChangePasswordValidation from "../ChangePasswordValidation";
-import FormValidation from "../FormValidation";
-import SignInValidation from "../SignInValidation";
-import Filter from "../components/Filter";
+// import FormValidation from "../FormValidation";
+// import SignInValidation from "../SignInValidation";
+// import Filter from "../components/Filter";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import SendIcon from "@mui/icons-material/Send";
+// import SendIcon from "@mui/icons-material/Send";
 import authService from "../services/auth.service";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
@@ -276,7 +276,7 @@ function SignInUpForm() {
   const { message } = useSelector((state) => state.message);
   const { user: currentUser } = useSelector((state) => state.auth);
   const [openForm, setOpenForm] = useState(false);
-  const [emailRecover, setEmailRecover] = useState("");
+  // const [emailRecover, setEmailRecover] = useState("");
   const [openChangePasswordForm, setOpenChangePasswordForm] = useState(false);
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
@@ -428,7 +428,6 @@ function SignInUpForm() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       authService
         .forgotPassword(email)
@@ -448,9 +447,9 @@ function SignInUpForm() {
     }
   };
 
-  const handleOpenChangePasswordForm = () => {
-    setOpenChangePasswordForm(true);
-  };
+  // const handleOpenChangePasswordForm = () => {
+  //   setOpenChangePasswordForm(true);
+  // };
 
   const handleCloseChangePasswordForm = () => {
     setOpenChangePasswordForm(false);
@@ -479,7 +478,6 @@ function SignInUpForm() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
       authService
         .changePassword(form)
@@ -530,12 +528,19 @@ function SignInUpForm() {
               e.preventDefault(); // Evita que la página se actualice
               handleOpenForm();
             }}
-            
           >
-            
             Forgot your Password?
           </ForgotLink>
-          <button onClick={handleOpenForm} style={{marginTop: "2%", color: "white", backgroundColor: "rgba(167, 208, 205, 0.2)"}}>Forgot your Password?</button>
+          <button
+            onClick={handleOpenForm}
+            style={{
+              marginTop: "2%",
+              color: "white",
+              backgroundColor: "rgba(167, 208, 205, 0.2)",
+            }}
+          >
+            Forgot your Password?
+          </button>
           <Dialog
             open={openForm}
             dividers={true}

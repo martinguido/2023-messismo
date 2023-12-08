@@ -117,27 +117,38 @@ public class AuthenticationController {
     public ResponseEntity<String> addReservation(@RequestBody NewReservationRequestDTO newReservationRequestDTO) {
         LocalDate actualDate = LocalDate.now();
         if (newReservationRequestDTO.getCapacity() == null) {
+            System.out.println("CASO 1");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing capacity to create a reservation");
         } else if (newReservationRequestDTO.getCapacity() <= 0 || newReservationRequestDTO.getCapacity() > barService.getBarConfiguration().getCapacity()) {
+            System.out.println("CASO 2");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT have the capacity under 1 or higher than maximum capacity");
         } else if (Objects.equals(newReservationRequestDTO.getClientPhone(), "") && Objects.equals(newReservationRequestDTO.getClientEmail(), "")) {
+            System.out.println("CASO 3");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing phone or email to create a reservation");
         } else if (newReservationRequestDTO.getShift() == null || newReservationRequestDTO.getReservationDate() == null  || newReservationRequestDTO.getComment() == null || (newReservationRequestDTO.getClientPhone() == null && newReservationRequestDTO.getClientEmail() == null)) {
+            System.out.println("CASO 4");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing information to add a reservation");
         } else if (newReservationRequestDTO.getClientEmail() != null && (!newReservationRequestDTO.getClientEmail().isEmpty() && !newReservationRequestDTO.getClientEmail().matches(emailRegex))) {
+            System.out.println("CASO 5");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong email format");
         } else if (newReservationRequestDTO.getClientPhone() != null && (!(newReservationRequestDTO.getClientPhone().isEmpty()) && !newReservationRequestDTO.getClientPhone().matches(phoneRegex))) {
+            System.out.println("CASO 6");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong phone format");
         } else if (!newReservationRequestDTO.getComment().matches(commentRegex)) {
+            System.out.println("CASO 7");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong comment format");
         } else if (newReservationRequestDTO.getReservationDate().isBefore(actualDate)) {
+            System.out.println("CASO 8");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT use a date from the past");
         } else {
             try {
+                System.out.println("CASO 9");
                 return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(newReservationRequestDTO));
             } catch (BarCapacityExceededException e) {
+                System.out.println("CASO 10");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
             } catch (Exception e) {
+                System.out.println("CASO 11");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
             }
         }

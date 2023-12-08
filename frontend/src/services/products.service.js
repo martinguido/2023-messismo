@@ -17,11 +17,8 @@ const addProducts = (product) => {
       method: "POST",
       "Content-Type": "application/json",
     })
-    .then((response) => {
-      console.log("Producto agregado con éxito:", response.data);
-    })
+    .then((response) => {})
     .catch((error) => {
-      console.log(product);
       console.error("Error al agregar el producto:", error);
     });
 };
@@ -66,16 +63,13 @@ const updateProductStock = (productId, operation, updatedStock) => {
       method: "PUT",
       "Content-Type": "application/json",
     })
-    .then((response) => {
-      console.log("Stock modificado con éxito:", response.data);
-    })
+    .then((response) => {})
     .catch((error) => {
       console.error("Error al modificar el Stock del producto:", error);
     });
 };
 
 const modifyProductStock = (modifiedProductStock) => {
-  console.log(modifiedProductStock);
   return axios
     .put(
       apiUrl + "/api/v1/manager/product/modifyProductStock",
@@ -86,9 +80,7 @@ const modifyProductStock = (modifiedProductStock) => {
         "Content-Type": "application/json",
       }
     )
-    .then((response) => {
-      console.log("Stock modificado con éxito:", response.data);
-    })
+    .then((response) => {})
     .catch((error) => {
       console.error("Error al modificar el Stock del producto:", error);
     });
@@ -102,7 +94,6 @@ const filterByName = (product) => {
       "Content-Type": "application/json",
     })
     .then((response) => {
-      console.log("Productos encontrados:", response.data);
       return response.data;
     })
     .catch((error) => {
@@ -112,8 +103,6 @@ const filterByName = (product) => {
 };
 
 const filter = (product) => {
-  console.log(product);
-
   return axios
     .post(apiUrl + "/api/v1/validatedEmployee/filterProducts", product, {
       headers: authHeader(),
@@ -121,7 +110,6 @@ const filter = (product) => {
       "Content-Type": "application/json",
     })
     .then((response) => {
-      console.log("Productos encontrados:", response.data);
       return response.data;
     })
     .catch((error) => {

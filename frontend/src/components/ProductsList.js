@@ -66,7 +66,7 @@ const ProductsList = () => {
           console.error("Error al mostrar los productos", error);
           setIsLoading(false);
         });
-    }
+    } // eslint-disable-next-line
   }, [openFormModal, open]);
 
   const handleClose = () => {
@@ -94,12 +94,9 @@ const ProductsList = () => {
   const handleApplyFilter = async (product) => {
     try {
       setAppliedFilters(product);
-      const response = await productsService
-        .filter(product)
-        .then((response) => {
-          console.log(response);
-          setProducts(response);
-        });
+      await productsService.filter(product).then((response) => {
+        setProducts(response);
+      });
     } catch (error) {
       console.error("Error al buscar productos", error);
     }
@@ -108,19 +105,15 @@ const ProductsList = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleDeleteClick = (producto) => {
-    console.log(producto);
     setSelectedProduct(producto);
-    console.log(producto);
     setOpen(true);
   };
 
   const deleteProduct = async () => {
     if (selectedProduct) {
       try {
-        const response = await productsService.deleteProduct(
-          selectedProduct.productId
-        );
-        console.log(response);
+        await productsService.deleteProduct(selectedProduct.productId);
+
         setSelectedProduct(null);
         setIsOperationSuccessful(true);
         setAlertText("Product deleted successfully");
@@ -160,8 +153,8 @@ const ProductsList = () => {
 
   const handleSaveProduct = async (newProductData) => {
     try {
-      const response = await addProductAsync(newProductData);
-      console.log(response);
+      await addProductAsync(newProductData);
+
       setIsOperationSuccessful(true);
       setAlertText("Product added successfully!");
 
@@ -199,8 +192,6 @@ const ProductsList = () => {
   };
 
   const handleSearch = async () => {
-    console.log(searchValue);
-
     const allfilters = {
       productName: searchValue,
       categoryName: selectedCategory,
@@ -210,12 +201,9 @@ const ProductsList = () => {
       maxStock: maxStock === "" ? null : maxStock,
     };
     try {
-      const response = await productsService
-        .filter(allfilters)
-        .then((response) => {
-          console.log(response);
-          setProducts(response);
-        });
+      await productsService.filter(allfilters).then((response) => {
+        setProducts(response);
+      });
     } catch (error) {
       console.error("Error al buscar productos", error);
     }
@@ -293,7 +281,7 @@ const ProductsList = () => {
         });
         setProducts(sortedProducts);
       }
-    }
+    } // eslint-disable-next-line
   }, [sortField, sortOrder]);
 
   return (
@@ -340,7 +328,7 @@ const ProductsList = () => {
               Add Product
             </Button>
           ) : (
-            console.log("")
+            <></>
           )}
         </div>
         <div className="filterBy">
@@ -540,7 +528,7 @@ const ProductsList = () => {
                         </IconButton>
                       </Tooltip>
                     ) : (
-                      console.log("")
+                      <></>
                     )}
                     {role === "ADMIN" || role === "MANAGER" ? (
                       <Tooltip

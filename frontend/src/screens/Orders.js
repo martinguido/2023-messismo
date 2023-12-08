@@ -1,5 +1,5 @@
 import "../App.css";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
@@ -7,19 +7,17 @@ import Navbar from "../components/Navbar";
 import OrderForm from "../components/OrderForm";
 import ordersService from "../services/orders.service";
 import { useTheme } from "@mui/material/styles";
-import { Box, Typography, gridClasses, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { MdFastfood } from "react-icons/md";
+// import { MdFastfood } from "react-icons/md";
 import moment from "moment";
 import EditIcon from "@mui/icons-material/Edit";
-import EditOrderForm from "../components/EditOrderForm";
 import ModifyForm from "../components/modifyForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Fab from "@mui/material/Fab";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
-import OrderFormNew from "../components/OrderFormNew";
 
 const Container = styled.div``;
 
@@ -121,14 +119,14 @@ const DetailsContent = styled.div`
     font-family: "Roboto";
     font-size: 1.5rem;
   }
-  strong2{
+  strong2 {
     color: white;
-    font-family: 'Roboto';
+    font-family: "Roboto";
     font-size: 1.7rem;
     margin-top: 1rem;
     align-self: center;
     margin-bottom: 1rem;
-}
+  }
 
   @media (max-width: 1500px) {
     width: 30%;
@@ -138,11 +136,7 @@ const DetailsContent = styled.div`
   }
   @media (max-width: 800px) {
     width: 100%;
-    
   }
-
- 
- 
 `;
 
 const DetailsButton = styled.button`
@@ -174,18 +168,18 @@ const DetailsButton = styled.button`
   }
 `;
 
-const MoreDetails = styled(MdFastfood)`
-  cursor: pointer;
-  @media (max-width: 1000px) {
-    font-size: 1.5rem;
-  }
-  @media (max-width: 760px) {
-    font-size: 1rem;
-  }
-  @media (max-width: 500px) {
-    font-size: 0.8rem;
-  }
-`;
+// const MoreDetails = styled(MdFastfood)`
+//   cursor: pointer;
+//   @media (max-width: 1000px) {
+//     font-size: 1.5rem;
+//   }
+//   @media (max-width: 760px) {
+//     font-size: 1rem;
+//   }
+//   @media (max-width: 500px) {
+//     font-size: 0.8rem;
+//   }
+// `;
 
 const MOBILE_COLUMNS = {
   id: true,
@@ -212,15 +206,17 @@ function Orders() {
   const [orders, setOrders] = useState([]);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [pageSize, setPageSize] = useState(5);
-  const isAdminOrManager =
-    currentUser &&
-    (currentUser.role === "MANAGER" || currentUser.role === "ADMIN");
+  // const isAdminOrManager =
+  //   currentUser &&
+  //   (currentUser.role === "MANAGER" || currentUser.role === "ADMIN");
   const [openEditForm, setOpenEditForm] = useState(false);
   const [isEditFormVisible, setEditFormVisible] = useState(false);
   const [orderIdToEdit, setOrderIdToEdit] = useState(null);
   const [selectedTotalPrice, setSelectedTotalPrice] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  // eslint-disable-next-line
   const [alertText, setAlertText] = useState("");
+  // eslint-disable-next-line
   const [isOperationSuccessful, setIsOperationSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -234,16 +230,11 @@ function Orders() {
   }, [matches]);
 
   useEffect(() => {
-    console.log("holis",selectedOrderDetails);
-  }, [selectedOrderDetails])
-
-  useEffect(() => {
     ordersService
       .getAllOrders()
       .then((response) => {
         setOrders(response.data);
         setIsLoading(false);
-        console.log("done");
       })
       .catch((error) => {
         console.error("Error al mostrar las ordenes", error);
@@ -257,14 +248,12 @@ function Orders() {
       .then((response) => {
         setOrders(response.data);
         setIsLoading(false);
-        console.log("done");
       })
       .catch((error) => {
         console.error("Error al mostrar las ordenes", error);
         setIsLoading(false);
       });
   }, [isEditFormVisible]);
-
 
   if (!currentUser) {
     return <Navigate to="/" />;
@@ -286,7 +275,7 @@ function Orders() {
   const handleCloseEditOrderForm = () => {
     setEditFormVisible(false);
     setOpenEditForm(false);
-    setOrderFormVisible(false); 
+    setOrderFormVisible(false);
     setOpen(false);
     setIsLoading(true);
   };
@@ -449,15 +438,17 @@ function Orders() {
   return (
     <Container>
       <Navbar />
-    
+
       <MainContent visible={contentVisible}>
-      {!isOrderFormVisible && !isEditFormVisible && (currentUser.role === "ADMIN" ||
-        currentUser.role === "MANAGER" ||
-        currentUser.role === "VALIDATEDEMPLOYEE") && (
-          <Button variant="contained" onClick={handleAddOrderClick}>
-            Add Order
-          </Button>
-        )}
+        {!isOrderFormVisible &&
+          !isEditFormVisible &&
+          (currentUser.role === "ADMIN" ||
+            currentUser.role === "MANAGER" ||
+            currentUser.role === "VALIDATEDEMPLOYEE") && (
+            <Button variant="contained" onClick={handleAddOrderClick}>
+              Add Order
+            </Button>
+          )}
 
         <div visible={contentVisible}>
           <Modal open={isOrderFormVisible}>
@@ -492,7 +483,7 @@ function Orders() {
                     marginTop: "20%",
                   }}
                 >
-                  <CircularProgress style={{ color:"#a4d4cc"}}/>
+                  <CircularProgress style={{ color: "#a4d4cc" }} />
                 </Box>
               ) : (
                 <OrdersTable sx={{ width: "100%", backgroundColor: "blue" }}>
@@ -511,7 +502,6 @@ function Orders() {
                           sortModel: [{ field: "dateCreated", sort: "desc" }],
                         },
                       }}
-                      sx={{ fontSize: "1rem" }}
                       autoHeight={true}
                       columns={columns}
                       columnVisibilityModel={columnVisible}
@@ -531,6 +521,10 @@ function Orders() {
                       sx={{
                         border: 2,
                         borderColor: "#a4d4cc",
+                        color: "white",
+                        fontFamily: "Roboto",
+                        fontSize: "1.1rem",
+
                         "& .MuiButtonBase-root": {
                           color: "white",
                         },
@@ -540,9 +534,6 @@ function Orders() {
                         ".MuiDataGrid-columnSeparator": {
                           display: "none",
                         },
-                        color: "white",
-                        fontFamily: "Roboto",
-                        fontSize: "1.1rem",
                         ".MuiTablePagination-displayedRows": {
                           color: "white",
                           fontSize: "1.2rem",
@@ -602,7 +593,9 @@ function Orders() {
                         <br />
                       </div>
                     ))}
-                    <strong2 style={{ color: "white" }}>Total price: ${selectedTotalPrice}</strong2>
+                    <strong2 style={{ color: "white" }}>
+                      Total price: ${selectedTotalPrice}
+                    </strong2>
 
                     <DetailsButton onClick={() => handleCloseDetails()}>
                       Close

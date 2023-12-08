@@ -3,7 +3,11 @@ import "./Login.css";
 import "../App.css";
 import image from "../images/signup2.png";
 import logo from "../images/logo.png";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  // useNavigate
+} from "react-router-dom";
 import { FaUserShield } from "react-icons/fa";
 import { BsFillShieldLockFill } from "react-icons/bs";
 import { MdEmail } from "react-icons/md";
@@ -70,7 +74,7 @@ const Register = () => {
   //   const { message } = useSelector((state) => state.message);
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
     shiftService
@@ -111,6 +115,11 @@ const Register = () => {
       .then(() => {
         setIsRegistered(false);
         setSignUpPopUp(true);
+        setSignUpValues({
+          username: "",
+          email: "",
+          password: "",
+        });
       })
       .catch(() => {
         setIsRegistered(true);
@@ -190,19 +199,14 @@ const Register = () => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log(validationErrors);
     } else {
-      console.log(selectedShift);
       const selectedShiftObj = shifts.find(
         (shi) => shi.shiftId === selectedShift
       );
-      console.log(selectedShiftObj);
       const fechaDate = new Date(selectedDate);
       const fechaISO = fechaDate.toISOString();
       const indiceT = fechaISO.indexOf("T");
       const fechaSinHora = fechaISO.substring(0, indiceT);
-      console.log(fechaSinHora);
-
       const newReservationData = {
         capacity: capacity,
         shift: selectedShiftObj,
@@ -212,7 +216,6 @@ const Register = () => {
         clientEmail: emailR,
         clientPhone: phone,
       };
-      console.log(newReservationData);
       reservationService
         .addReservation(newReservationData)
         .then((response) => {

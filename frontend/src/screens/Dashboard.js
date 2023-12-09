@@ -506,6 +506,7 @@ function Dashboard() {
   };
 
   const handleButtonClick = () => {
+    setIsLoading(true);
     const dateObject = new Date(selectedDate);
     let date = "";
 
@@ -539,6 +540,9 @@ function Dashboard() {
       })
       .catch((error) => {
         console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 

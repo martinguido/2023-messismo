@@ -31,6 +31,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import shiftService from "../services/shift.service";
 import reservationService from "../services/reservation.service";
 import Select from "@mui/material/Select";
+import { CircularProgress } from "@mui/material";
+import Box from "@mui/material/Box";
 
 const ForgotPassword = styled.a`
   text-decoration: none;
@@ -85,6 +87,9 @@ function Login() {
   const [comment, setComment] = useState("");
   const [capacity, setCapacity] = useState("");
   const [openReservationForm, setOpenReservationForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMail, setIsLoadingMail] = useState(false);
+  const [isLoadingPin, setIsLoadingPin] = useState(false);
 
   useEffect(() => {
     shiftService
@@ -108,6 +113,7 @@ function Login() {
   }, [dispatch]);
 
   const handleLogin = (userData) => {
+    setIsLoading(true);
     const email = userData.email;
     const password = userData.password;
 
@@ -130,6 +136,9 @@ function Login() {
       .catch(() => {
         setIsRegistered(false);
         setSignInPopUp(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -221,6 +230,7 @@ function Login() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
+      setIsLoadingMail(true);
       authService
         .forgotPassword(email)
         .then((response) => {
@@ -234,6 +244,9 @@ function Login() {
           setAlertText("Error sending password recovery email");
           setIsOperationSuccessful(false);
           setOpenSnackbar(true);
+        })
+        .finally(() => {
+          setIsLoadingMail(false);
         });
       setEmail("");
     }
@@ -328,6 +341,7 @@ function Login() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
+      setIsLoadingPin(true);
       authService
         .changePassword(form)
         .then((response) => {
@@ -340,6 +354,9 @@ function Login() {
           setAlertText("Error changing password");
           setIsOperationSuccessful(false);
           setOpenSnackbar(true);
+        })
+        .finally(() => {
+          setIsLoadingPin(false);
         });
       setEmail("");
       setPassword("");
@@ -402,7 +419,18 @@ function Login() {
                   <ErrorMessage>{signinerrors.password}</ErrorMessage>
                 )}
               </div>
-
+              {isLoading && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: "10%",
+                  }}
+                >
+                  <CircularProgress style={{ color: "#a4d4cc" }} />
+                </Box>
+              )}
               <Link
                 className="btn flx"
                 onClick={() => {
@@ -671,69 +699,84 @@ function Login() {
                         width: "100%",
                       }}
                     />
-                    <p>
-                      Please enter you email to receive a link to reset your
-                      password
-                    </p>
-                    <TextField
-                      required
-                      id="name"
-                      value={email}
-                      onChange={handleInputChange}
-                      variant="outlined"
-                      error={errors.email ? true : false}
-                      helperText={errors.email || ""}
-                      style={{
-                        width: "80%",
-                        marginTop: "3%",
-                        marginBottom: "3%",
-                        fontSize: "1.1rem",
-                      }}
-                      InputProps={{
-                        style: {
-                          fontSize: "1rem",
-                        },
-                      }}
-                      FormHelperTextProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                    />
+                    {isLoadingMail ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
+                        }}
+                      >
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    ) : (
+                      <>
+                        <p>
+                          Please enter your email to receive a link to reset
+                          your password
+                        </p>
+                        <TextField
+                          required
+                          id="name"
+                          value={email}
+                          onChange={handleInputChange}
+                          variant="outlined"
+                          error={errors.email ? true : false}
+                          helperText={errors.email || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                          InputProps={{
+                            style: {
+                              fontSize: "1rem",
+                            },
+                          }}
+                          FormHelperTextProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                        />
 
-                    <div
-                      className="buttons"
-                      style={{
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <Button
-                        variant="outlined"
-                        style={{
-                          color: "grey",
-                          borderColor: "grey",
-                          fontSize: "1rem",
-                        }}
-                        onClick={handleCloseForm}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="contained"
-                        style={{
-                          marginLeft: "3%",
-                          fontSize: "1rem",
-                          backgroundColor: "#a4d4cc",
-                          color: "black",
-                        }}
-                        onClick={handleSendEmail}
-                      >
-                        Send
-                      </Button>
-                    </div>
+                        <div
+                          className="buttons"
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Button
+                            variant="outlined"
+                            style={{
+                              color: "grey",
+                              borderColor: "grey",
+                              fontSize: "1rem",
+                            }}
+                            onClick={handleCloseForm}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="contained"
+                            style={{
+                              marginLeft: "3%",
+                              fontSize: "1rem",
+                              backgroundColor: "#a4d4cc",
+                              color: "black",
+                            }}
+                            onClick={handleSendEmail}
+                          >
+                            Send
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </DialogContent>
               </Dialog>
@@ -758,154 +801,171 @@ function Login() {
                         width: "100%",
                       }}
                     />
-                    <p style={{ color: errors.email ? "red" : "black" }}>
-                      Email *
-                    </p>
-                    <TextField
-                      required
-                      id="name"
-                      value={email}
-                      onChange={handleInputChange}
-                      variant="outlined"
-                      error={errors.email ? true : false}
-                      helperText={errors.email || ""}
-                      style={{
-                        width: "80%",
-                        marginTop: "3%",
-                        marginBottom: "3%",
-                        fontSize: "1.1rem",
-                      }}
-                      InputProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                      FormHelperTextProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                    />
-                    <p style={{ color: errors.pin ? "red" : "black" }}>Pin *</p>
-                    <TextField
-                      required
-                      id="name"
-                      value={pin}
-                      onChange={handlePinChange}
-                      variant="outlined"
-                      error={errors.pin ? true : false}
-                      helperText={errors.pin || ""}
-                      style={{
-                        width: "80%",
-                        marginTop: "3%",
-                        marginBottom: "3%",
-                        fontSize: "1.1rem",
-                      }}
-                      InputProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                      FormHelperTextProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                    />
-                    <p style={{ color: errors.password ? "red" : "black" }}>
-                      New Password *
-                    </p>
-                    <TextField
-                      required
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                      variant="outlined"
-                      error={errors.password ? true : false}
-                      helperText={errors.password || ""}
-                      style={{
-                        width: "80%",
-                        marginTop: "3%",
-                        marginBottom: "3%",
-                        fontSize: "1.1rem",
-                      }}
-                      InputProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                      FormHelperTextProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                    />
-                    <p style={{ color: errors.password ? "red" : "black" }}>
-                      Repeat Password *
-                    </p>
-                    <TextField
-                      required
-                      id="password"
-                      type="password"
-                      value={repeatPassword}
-                      onChange={handleRepeatPasswordChange}
-                      onCut={handleChange}
-                      onCopy={handleChange}
-                      onPaste={handleChange}
-                      variant="outlined"
-                      error={errors.repeatPassword ? true : false}
-                      helperText={errors.repeatPassword || ""}
-                      style={{
-                        width: "80%",
-                        marginTop: "3%",
-                        marginBottom: "3%",
-                        fontSize: "1.1rem",
-                      }}
-                      InputProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                      FormHelperTextProps={{
-                        style: {
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                    />
-                    <div
-                      className="buttons"
-                      style={{
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <Button
-                        variant="outlined"
-                        style={{
-                          color: "grey",
-                          borderColor: "grey",
-                          fontSize: "1rem",
+                    {isLoadingPin ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
                         }}
-                        onClick={handleCloseChangePasswordForm}
                       >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="contained"
-                        style={{
-                          marginLeft: "3%",
-                          fontSize: "1rem",
-                          backgroundColor: "#a4d4cc",
-                          color: "black",
-                        }}
-                        onClick={handleChangePassword}
-                      >
-                        Change Password
-                      </Button>
-                    </div>
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    ) : (
+                      <>
+                        <p style={{ color: errors.email ? "red" : "black" }}>
+                          Email *
+                        </p>
+                        <TextField
+                          required
+                          id="name"
+                          value={email}
+                          onChange={handleInputChange}
+                          variant="outlined"
+                          error={errors.email ? true : false}
+                          helperText={errors.email || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                          InputProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                          FormHelperTextProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                        />
+                        <p style={{ color: errors.pin ? "red" : "black" }}>
+                          Pin *
+                        </p>
+                        <TextField
+                          required
+                          id="name"
+                          value={pin}
+                          onChange={handlePinChange}
+                          variant="outlined"
+                          error={errors.pin ? true : false}
+                          helperText={errors.pin || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                          InputProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                          FormHelperTextProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                        />
+                        <p style={{ color: errors.password ? "red" : "black" }}>
+                          New Password *
+                        </p>
+                        <TextField
+                          required
+                          id="password"
+                          type="password"
+                          value={password}
+                          onChange={handlePasswordChange}
+                          variant="outlined"
+                          error={errors.password ? true : false}
+                          helperText={errors.password || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                          InputProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                          FormHelperTextProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                        />
+                        <p style={{ color: errors.password ? "red" : "black" }}>
+                          Repeat Password *
+                        </p>
+                        <TextField
+                          required
+                          id="password"
+                          type="password"
+                          value={repeatPassword}
+                          onChange={handleRepeatPasswordChange}
+                          onCut={handleChange}
+                          onCopy={handleChange}
+                          onPaste={handleChange}
+                          variant="outlined"
+                          error={errors.repeatPassword ? true : false}
+                          helperText={errors.repeatPassword || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                          InputProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                          FormHelperTextProps={{
+                            style: {
+                              fontSize: "1.1rem",
+                            },
+                          }}
+                        />
+                        <div
+                          className="buttons"
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Button
+                            variant="outlined"
+                            style={{
+                              color: "grey",
+                              borderColor: "grey",
+                              fontSize: "1rem",
+                            }}
+                            onClick={handleCloseChangePasswordForm}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="contained"
+                            style={{
+                              marginLeft: "3%",
+                              fontSize: "1rem",
+                              backgroundColor: "#a4d4cc",
+                              color: "black",
+                            }}
+                            onClick={handleChangePassword}
+                          >
+                            Change Password
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </DialogContent>
               </Dialog>

@@ -32,6 +32,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import shiftService from "../services/shift.service";
 import reservationService from "../services/reservation.service";
 import Select from "@mui/material/Select";
+import { CircularProgress } from "@mui/material";
+import Box from "@mui/material/Box";
 
 const ErrorMessage = styled.h4`
   color: red;
@@ -69,6 +71,7 @@ const Register = () => {
   const [alertText, setAlertText] = useState("");
   const [isOperationSuccessful, setIsOperationSuccessful] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isLoggedIn } = useSelector((state) => state.auth);
   //   const { message } = useSelector((state) => state.message);
@@ -106,6 +109,7 @@ const Register = () => {
   }
 
   const handleRegister = (userData) => {
+    setIsLoading(true);
     const username = userData.username;
     const email = userData.email;
     const password = userData.password;
@@ -124,6 +128,9 @@ const Register = () => {
       .catch(() => {
         setIsRegistered(true);
         setSignUpPopUp(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -310,7 +317,18 @@ const Register = () => {
                   <ErrorMessage>{signuperrors.password}</ErrorMessage>
                 )}
               </div>
-
+              {isLoading && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: "10%",
+                  }}
+                >
+                  <CircularProgress style={{ color: "#a4d4cc" }} />
+                </Box>
+              )}
               <Link
                 type="submit"
                 className="btn flx"

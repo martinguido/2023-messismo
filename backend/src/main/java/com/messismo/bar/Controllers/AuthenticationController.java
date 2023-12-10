@@ -48,7 +48,7 @@ public class AuthenticationController {
             } else if (!request.getPassword().matches(passwordRegex)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Password has to be at least 8 characters long, with an uppercase,lowercase and a number");
             } else {
-                Thread.sleep(3000);
+//                Thread.sleep(3000);
                 return ResponseEntity.status(HttpStatus.CREATED).body(authenticationService.register(request));
             }
         } catch (UserAlreadyExistsException e) {
@@ -68,7 +68,7 @@ public class AuthenticationController {
             } else if (!request.getPassword().matches(passwordRegex)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Password has to be at least 8 characters long, with an uppercase,lowercase and a number");
             } else {
-                Thread.sleep(3000);
+//                Thread.sleep(3000);
                 return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticate(request));
             }
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class AuthenticationController {
             } else if (!email.matches(emailRegex)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Wrong email format");
             } else {
-                Thread.sleep(3000);
+//                Thread.sleep(3000);
                 return ResponseEntity.status(HttpStatus.OK).body(passwordRecoveryService.forgotPassword(email));
             }
         } catch (UserNotFoundException e) {
@@ -97,7 +97,7 @@ public class AuthenticationController {
     @PostMapping("/changeForgottenPassword")
     public ResponseEntity<String> changeForgottenPassword(@RequestBody PasswordRecoveryDTO passwordRecoveryDTO) {
         try {
-            Thread.sleep(3000);
+//            Thread.sleep(3000);
             if (passwordRecoveryDTO.getEmail() == null || passwordRecoveryDTO.getNewPassword() == null || passwordRecoveryDTO.getPin() == null || passwordRecoveryDTO.getPin().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Missing data for changing password");
             } else if (!passwordRecoveryDTO.getEmail().matches(emailRegex)) {
@@ -145,7 +145,7 @@ System.out.println(newReservationRequestDTO);
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT use a date from the past nor today");
         } else {
             try {
-                Thread.sleep(3000);
+//                Thread.sleep(3000);
                 System.out.println("CASO 9");
                 return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(newReservationRequestDTO));
             } catch (BarCapacityExceededException e) {
@@ -167,7 +167,7 @@ System.out.println(newReservationRequestDTO);
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CANNOT use a date from the past nor today");
         }
         try {
-            Thread.sleep(3000);
+//            Thread.sleep(3000);
             return ResponseEntity.status(HttpStatus.OK).body(reservationService.getShiftsForADate(localDateDTO.getLocalDate()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

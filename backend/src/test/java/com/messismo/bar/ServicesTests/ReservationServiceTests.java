@@ -9,6 +9,7 @@ import com.messismo.bar.Exceptions.ReservationAlreadyUsedException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
+import com.messismo.bar.Repositories.ShiftRepository;
 import com.messismo.bar.Services.ReservationService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -45,6 +46,9 @@ public class ReservationServiceTests {
     @Mock
     private JavaMailSender javaMailSender;
 
+    @Mock
+    private ShiftRepository shiftRepository;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -54,7 +58,7 @@ public class ReservationServiceTests {
     public void testGetAllReservations() {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> expectedReservations = List.of(new Reservation(existingShift, LocalDate.of(2023, 1, 1), "martin@mail.com", 156683434, 2, "Birthday"), new Reservation(existingShift, LocalDate.of(2023, 2, 1), "martin2@mail.com", 1554209090, 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
+        List<Reservation> expectedReservations = List.of(new Reservation(existingShift, LocalDate.of(2023, 1, 1), "guidomartin7@gmail.com", 156683434, 2, "Birthday"), new Reservation(existingShift, LocalDate.of(2023, 2, 1), "martin2@mail.com", 1554209090, 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
         when(reservationRepository.findAll()).thenReturn(expectedReservations);
 
         List<Reservation> result = reservationService.getAllReservations();
@@ -109,7 +113,7 @@ public class ReservationServiceTests {
         Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
         when(reservationRepository.findAllByShiftAndDate(aShift, LocalDate.of(2024, 12, 1))).thenReturn(List.of());
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("test@example.com").build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("guidomartin7@gmail.com").build();
         String result = reservationService.addReservation(requestDTO);
         assertEquals("Reservation added successfully", result);
         // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
@@ -124,7 +128,7 @@ public class ReservationServiceTests {
         Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         when(barRepository.findAll()).thenReturn(List.of(mockBar));
         when(reservationRepository.findAllByShiftAndDate(aShift, LocalDate.of(2024, 12, 1))).thenReturn(List.of());
-        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("test@example.com").build();
+        NewReservationRequestDTO requestDTO = NewReservationRequestDTO.builder().capacity(5).shift(aShift).reservationDate(LocalDate.of(2024, 12, 1)).clientEmail("guidomartin7@gmail.com").build();
         String result = reservationService.addReservation(requestDTO);
         assertEquals("Reservation added successfully", result);
         // ADDED TO CHECK IF RESERVATION HAS SELECTED SHIFT
@@ -281,6 +285,44 @@ public class ReservationServiceTests {
         assertEquals("CANNOT use a reservation right now", exception.getMessage());
         verify(reservationRepository, times(1)).findById(1L);
         verify(reservationRepository, never()).save(any(Reservation.class));
+
+    }
+
+    @Test
+    public void testGetShiftsForADate_Success() throws Exception {
+        LocalDate localDate = LocalDate.now();
+        Bar bar = new Bar(1L,50);
+        when(barRepository.findAll()).thenReturn(List.of(bar));
+        Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Shift shift3 = new Shift(LocalTime.of(17, 0), LocalTime.of(19, 0));
+        List<Shift> allShifts = List.of(shift1, shift2,shift3);
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+        Reservation reservation1 = new Reservation(shift1, localDate, null, 1566785465,25, "Birthday");
+        Reservation reservation3 = new Reservation(shift1, localDate, null, 1566785465,20, "Birthday");
+        Reservation reservation4 = new Reservation(shift1, localDate, null, 1566785465,5, "Birthday");
+        Reservation reservation2 = new Reservation(shift2, LocalDate.of(2023, 12, 1), null, 1566785465,2, "Birthday");
+        Reservation reservation5 = new Reservation(shift2, LocalDate.of(2023, 12, 1), null, 1566785465,20, "Birthday");
+        Reservation reservation6 = new Reservation(shift2, LocalDate.of(2023, 12, 2), null, 1566785465,49, "Birthday");
+        List<Reservation> allReservations = List.of(reservation1, reservation2,reservation3,reservation4,reservation5,reservation6);
+        when(reservationRepository.findAll()).thenReturn(allReservations);
+
+        List<Shift> result = reservationService.getShiftsForADate(localDate);
+        assertEquals(2, result.size());
+    }
+
+
+    @Test
+    public void testGetShiftsForADate_InternalServerError() {
+
+        LocalDate localDate = LocalDate.now();
+        when(reservationRepository.findAll()).thenThrow(new RuntimeException("Some unexpected exception"));
+        Exception exception = assertThrows(Exception.class, () -> {
+            reservationService.getShiftsForADate(localDate);
+        });
+
+        assertEquals("CANNOT get shifts for a date at the moment", exception.getMessage());
+        verify(reservationRepository, times(1)).findAll();
 
     }
 

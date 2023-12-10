@@ -536,7 +536,7 @@ public class AuthenticationControllerTests {
         ResponseEntity<String> response = authenticationController.addReservation(requestDTO);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("CANNOT use a date from the past", response.getBody());
+        assertEquals("CANNOT use a date from the past nor today", response.getBody());
 
     }
 
@@ -630,4 +630,44 @@ public class AuthenticationControllerTests {
         assertEquals("ErrorMessage", response.getBody());
 
     }
+
+    @Test
+    public void testGetShiftsForADate_Success() throws Exception {
+
+        LocalDateDTO localDateDTO = new LocalDateDTO(LocalDate.now().plusDays(1));
+        Shift aShift = new Shift(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        Shift aShift1 = new Shift(LocalTime.of(11, 0), LocalTime.of(12, 0));
+        List<Shift> filteredShifts = List.of(aShift,aShift1);
+        when(reservationService.getShiftsForADate(any(LocalDate.class)))
+                .thenReturn(filteredShifts);
+        ResponseEntity<?> responseEntity = authenticationController.getShiftsForADate(localDateDTO);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(filteredShifts,responseEntity.getBody());
+
+    }
+
+    @Test
+    public void testGetShiftsForADate_Conflict() {
+
+        LocalDateDTO localDateDTO = new LocalDateDTO(LocalDate.now());
+        ResponseEntity<?> responseEntity = authenticationController.getShiftsForADate(localDateDTO);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        assertEquals("CANNOT use a date from the past nor today",responseEntity.getBody());
+    }
+
+    @Test
+    public void testGetShiftsForADate_InternalServerError() throws Exception {
+
+        LocalDateDTO localDateDTO = new LocalDateDTO(LocalDate.now().plusDays(1));
+        when(reservationService.getShiftsForADate(any())).thenThrow(new Exception("CANNOT get shifts for a date at the moment"));
+        ResponseEntity<?> responseEntity = authenticationController.getShiftsForADate(localDateDTO);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals("CANNOT get shifts for a date at the moment",responseEntity.getBody());
+
+    }
+
+
 }

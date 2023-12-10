@@ -136,25 +136,29 @@ public class ReservationService {
 
     }
 
-    public Object getShiftsForADate(LocalDate localDate) {
-        List<Reservation> allReservations= getAllReservations();
-        List<Shift> allShifts = shiftRepository.findAll();
-        Integer barCapacity = barRepository.findAll().get(0).getCapacity();
-        HashMap<Shift, Integer> countPerShiftPerDay = new HashMap<>();
-        for(Shift shift : allShifts){
-            countPerShiftPerDay.put(shift,0);
-        }
-        for(Reservation reservation: allReservations){
-            if(reservation.getReservationDate().equals(localDate)){
-                countPerShiftPerDay.put(reservation.getShift(), countPerShiftPerDay.get(reservation.getShift())+reservation.getCapacity());
+    public List<Shift> getShiftsForADate(LocalDate localDate) throws Exception{
+        try {
+            List<Reservation> allReservations = getAllReservations();
+            List<Shift> allShifts = shiftRepository.findAll();
+            Integer barCapacity = barRepository.findAll().get(0).getCapacity();
+            HashMap<Shift, Integer> countPerShiftPerDay = new HashMap<>();
+            for (Shift shift : allShifts) {
+                countPerShiftPerDay.put(shift, 0);
             }
-        }
-        List<Shift> responseShifts= new ArrayList<>();
-        for(Map.Entry<Shift, Integer> entry : countPerShiftPerDay.entrySet()){
-            if(!(entry.getValue()>=barCapacity)){
-                responseShifts.add(entry.getKey());
+            for (Reservation reservation : allReservations) {
+                if (reservation.getReservationDate().equals(localDate)) {
+                    countPerShiftPerDay.put(reservation.getShift(), countPerShiftPerDay.get(reservation.getShift()) + reservation.getCapacity());
+                }
             }
+            List<Shift> responseShifts = new ArrayList<>();
+            for (Map.Entry<Shift, Integer> entry : countPerShiftPerDay.entrySet()) {
+                if (!(entry.getValue() >= barCapacity)) {
+                    responseShifts.add(entry.getKey());
+                }
+            }
+            return responseShifts;
+        }catch (Exception e){
+            throw new Exception("CANNOT get shifts for a date at the moment");
         }
-        return responseShifts;
     }
 }

@@ -477,10 +477,13 @@ const ProductsList = () => {
             )}
           </IconButton>
         </div>
-
-        <div className="title">
-          <p style={{ color: "white", fontWeight: "bold" }}>Actions</p>
-        </div>
+        {role === "ADMIN" || role === "MANAGER" ? (
+          <div className="title">
+            <p style={{ color: "white", fontWeight: "bold" }}>Actions</p>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
       {isLoading ? (
         <Box

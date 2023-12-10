@@ -65,10 +65,11 @@ public class InitialConfiguration {
         Shift firstShift = allShifts.get(0);
         Shift secondShift = allShifts.get(1);
         Shift thirdShift = allShifts.get(2);
-        System.out.println(reservationService.addReservation(NewReservationRequestDTO.builder().capacity(3).clientEmail("guidomartin7@gmail.com").clientPhone("1568837531").comment("My birthday").shift(firstShift).reservationDate(LocalDate.of(2023, 12, 1)).build()));
+//        System.out.println(reservationService.addReservation(NewReservationRequestDTO.builder().capacity(3).clientEmail("guidomartin7@gmail.com").clientPhone("1568837531").comment("My birthday").shift(firstShift).reservationDate(LocalDate.of(2023, 12, 1)).build()));
 //        System.out.println(reservationService.addReservation(NewReservationRequestDTO.builder().capacity(10).clientEmail("guidomartin7alt@gmail.com").comment("Social event").shift(secondShift).reservationDate(LocalDate.of(2023, 12, 1)).build()));
 //        System.out.println(reservationService.addReservation(NewReservationRequestDTO.builder().capacity(15).clientEmail("carlybaccari@hotmail.com").clientPhone("1532837531").comment("Holidays").shift(firstShift).reservationDate(LocalDate.of(2024, 1, 1)).build()));
 //        System.out.println(reservationService.addReservation(NewReservationRequestDTO.builder().capacity(12).clientPhone("1567637531").comment("Ramen").shift(thirdShift).reservationDate(LocalDate.of(2023, 12, 1)).build()));
+        System.out.println(reservationService.addReservation(NewReservationRequestDTO.builder().capacity(15).clientPhone("1567637531").comment("Ramen").shift(thirdShift).reservationDate(LocalDate.of(2023, 12, 11)).build()));
     }
 
 

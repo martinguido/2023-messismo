@@ -38,6 +38,7 @@ import { AiFillDelete } from "react-icons/ai";
 // import { AiFillCheckCircle } from "react-icons/ai";
 // import { AiFillCloseCircle } from "react-icons/ai";
 import Fab from "@mui/material/Fab";
+import dayjs from "dayjs";
 // import EditIcon from "@mui/icons-material/Edit";
 
 // const ALL_COLUMNS = {
@@ -51,6 +52,7 @@ import Fab from "@mui/material/Fab";
 //   state: true,
 //   used: true,
 // };
+const tomorrow = dayjs().add(1, "day");
 const ProductsList = () => {
   const [reservations, setReservations] = useState([]);
 
@@ -76,6 +78,8 @@ const ProductsList = () => {
   const [initialRows, setInitialRows] = useState([]);
   // eslint-disable-next-line
   const [selectedRow, setSelectedRow] = useState(initialRows);
+  const [isLoadingReservation, setIsLoadingReservation] = useState(false);
+  const [isLoadingShift, setIsLoadingShift] = useState(false);
   const [openDeleteReservationForm, setOpenDeleteReservationForm] =
     useState(false);
   const [openMarkAsUsedReservationForm, setOpenMarkAsUsedReservationForm] =
@@ -97,19 +101,21 @@ const ProductsList = () => {
         setIsLoading(false);
       });
   }, [modified]);
-  useEffect(() => {
-    setIsLoading(true);
-    shiftService
-      .getAllShifts()
-      .then((response) => {
-        setShifts(response.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error al obtener turnos:", error);
-        setIsLoading(false);
-      });
-  }, [openReservationForm]);
+
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   shiftService
+  //     .getAllShifts()
+  //     .then((response) => {
+  //       setShifts(response.data);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error al obtener turnos:", error);
+  //       setIsLoading(false);
+  //     });
+  // }, [openReservationForm]);
+
   const handleDeleteClick = (aReservation) => {
     setSelectedReservation(aReservation);
     setOpenDeleteReservationForm(true);
@@ -178,6 +184,35 @@ const ProductsList = () => {
     }
   };
 
+  useEffect(() => {
+    if (selectedDate !== "") {
+      setIsLoadingShift(true);
+      const fechaDate = new Date(selectedDate);
+      const pruebaDate = new Date(
+        fechaDate.getFullYear(),
+        fechaDate.getMonth(),
+        fechaDate.getDate()
+      );
+      const fechaISO = pruebaDate.toISOString();
+      const indiceT = fechaISO.indexOf("T");
+      const fechaSinHora = fechaISO.substring(0, indiceT);
+      const localDate = { localDate: fechaSinHora };
+      shiftService
+        .getShiftsForADate(localDate)
+        .then((response) => {
+          console.log(response.data);
+          setShifts(response.data);
+          setIsLoadingShift(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener turnos:", error);
+        })
+        .finally(() => {
+          setIsLoadingShift(false);
+        });
+    }
+  }, [selectedDate]);
+
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
@@ -186,17 +221,32 @@ const ProductsList = () => {
   };
 
   const handleMakeAReservationCloseForm = () => {
+    setCapacity("");
+    setSelectedShift("");
+    setShifts([]);
+    setErrors({});
+    setSelectedDate("");
+    setComment("");
+    setEmailR("");
+    setPhone("");
     setOpenReservationForm(false);
   };
   const handleInputEmailRChange = (e) => {
     setEmailR(e.target.value);
   };
-  const handleInputPhoneChange = (e) => {
-    setPhone(e.target.value);
+  const handleInputPhoneChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setPhone(inputValue);
   };
-  const handleInputCapacityChange = (e) => {
-    setCapacity(e.target.value);
+  const handleInputCapacityChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setCapacity(inputValue);
   };
+
   const handleInputCommentChange = (e) => {
     setComment(e.target.value);
   };
@@ -218,6 +268,7 @@ const ProductsList = () => {
       setErrors(validationErrors);
       console.log(validationErrors);
     } else {
+      setIsLoadingReservation(true);
       const selectedShiftObj = shifts.find(
         (shi) => shi.shiftId === selectedShift
       );
@@ -233,12 +284,9 @@ const ProductsList = () => {
         clientEmail: emailR,
         clientPhone: phone,
       };
-      console.log(newReservationData);
       reservationService
         .addReservation(newReservationData)
         .then((response) => {
-          console.log("RESPONDE: ");
-          console.log(response);
           setAlertText("Reservation made succesfully!");
           setIsOperationSuccessful(true);
           setOpenSnackbar(true);
@@ -251,13 +299,18 @@ const ProductsList = () => {
           setIsOperationSuccessful(false);
           setOpenSnackbar(true);
           setModified(modified + 1);
+        })
+        .finally(() => {
+          setCapacity("");
+          setSelectedShift("");
+          setShifts([]);
+          setErrors({});
+          setSelectedDate("");
+          setComment("");
+          setEmailR("");
+          setPhone("");
+          setIsLoadingReservation(false);
         });
-      setCapacity("");
-      setSelectedShift("");
-      setSelectedDate("");
-      setComment("");
-      setEmailR("");
-      setPhone("");
     }
   };
 
@@ -710,6 +763,10 @@ const ProductsList = () => {
               variant="outlined"
               error={errors.phone ? true : false}
               helperText={errors.phone || ""}
+              inputProps={{
+                pattern: "[0-9]*",
+                inputMode: "numeric",
+              }}
               style={{
                 width: "80%",
                 marginTop: "3%",
@@ -736,11 +793,38 @@ const ProductsList = () => {
               onChange={handleInputCapacityChange}
               variant="outlined"
               error={errors.capacity ? true : false}
+              inputProps={{
+                pattern: "[0-9]*",
+                inputMode: "numeric",
+              }}
               helperText={errors.capacity || ""}
               style={{
                 width: "80%",
                 marginTop: "3%",
-                marginBottom: "3%",
+                fontSize: "1.1rem",
+              }}
+              InputProps={{
+                style: {
+                  fontSize: "1rem",
+                },
+              }}
+              FormHelperTextProps={{
+                style: {
+                  fontSize: "1.0rem",
+                },
+              }}
+            />
+            {/* <TextField
+              required
+              id="name"
+              value={capacity}
+              onChange={handleInputCapacityChange}
+              variant="outlined"
+              error={errors.capacity ? true : false}
+              helperText={errors.capacity || ""}
+              style={{
+                width: "80%",
+                marginTop: "3%",
                 fontSize: "1.1rem",
               }}
               InputProps={{
@@ -753,45 +837,18 @@ const ProductsList = () => {
                   fontSize: "1.1rem",
                 },
               }}
-            />
-            <p>Please enter a shift *</p>
+            /> */}
 
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={selectedShift}
-              onChange={handleShiftChange}
-              error={errors.shift ? true : false}
-              helperText={errors.shift || ""}
-              style={{
-                width: "80%",
-                marginTop: "3%",
-                marginBottom: "3%",
-                fontSize: "1.1rem",
-              }}
-            >
-              {shifts.map((shift) => (
-                <MenuItem
-                  style={{
-                    color: "black",
-                  }}
-                  key={shift.shiftId}
-                  value={shift.shiftId}
-                >
-                  {shift.startingHour.substring(0, 5) +
-                    " - " +
-                    shift.finishingHour.substring(0, 5)}
-                </MenuItem>
-              ))}
-            </Select>
-
-            <p style={{ marginBottom: "3.5%" }}>Please enter a date</p>
+            <p style={{ marginTop: "3.5%", marginBottom: "3.5%" }}>
+              Please enter a date
+            </p>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                disablePast
+                minDate={tomorrow}
+                // disablePast
                 variant="outlined"
                 error={errors.date ? true : false}
-                helperText={errors.date || ""}
+                // helperText={errors.date || ""}
                 label={"YYYY-MM-DD"}
                 views={["year", "month", "day"]}
                 format="YYYY-MM-DD"
@@ -799,7 +856,65 @@ const ProductsList = () => {
                 onChange={handleDateChange}
               />
             </LocalizationProvider>
-            <p>Please enter a comment *</p>
+            {isLoadingShift ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: "10%",
+                }}
+              >
+                <CircularProgress style={{ color: "#a4d4cc" }} />
+              </Box>
+            ) : (
+              <>
+                <p style={{ marginTop: "3.5%" }}>Please enter a shift *</p>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={selectedShift}
+                  onChange={handleShiftChange}
+                  error={errors.shift ? true : false}
+                  // helperText={errors.shift || ""}
+                  style={{
+                    width: "80%",
+                    marginTop: "3%",
+                    marginBottom: "3%",
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  {shifts.length === 0 ? (
+                    <MenuItem
+                      style={{
+                        color: "black",
+                      }}
+                      key="no-data"
+                      value="no-data"
+                      disabled
+                    >
+                      No hay turnos disponibles para esa fecha
+                    </MenuItem>
+                  ) : (
+                    shifts.map((shift) => (
+                      <MenuItem
+                        style={{
+                          color: "black",
+                        }}
+                        key={shift.shiftId}
+                        value={shift.shiftId}
+                      >
+                        {shift.startingHour.substring(0, 5) +
+                          " - " +
+                          shift.finishingHour.substring(0, 5)}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </>
+            )}
+
+            <p style={{ marginBottom: "3.5%" }}>Please enter a comment *</p>
             <TextField
               required
               id="name"
@@ -825,7 +940,18 @@ const ProductsList = () => {
                 },
               }}
             />
-
+            {isLoadingReservation && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: "10%",
+                }}
+              >
+                <CircularProgress style={{ color: "#a4d4cc" }} />
+              </Box>
+            )}
             <div
               className="buttons"
               style={{

@@ -34,7 +34,7 @@ import reservationService from "../services/reservation.service";
 import Select from "@mui/material/Select";
 import { CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
-
+import dayjs from "dayjs";
 const ErrorMessage = styled.h4`
   color: red;
   font-family: "Roboto";
@@ -45,7 +45,7 @@ const ErrorMessage = styled.h4`
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-
+const tomorrow = dayjs().add(1, "day");
 const Register = () => {
   const [open, setOpen] = useState(false);
 
@@ -72,13 +72,43 @@ const Register = () => {
   const [isOperationSuccessful, setIsOperationSuccessful] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoadingReservation, setIsLoadingReservation] = useState(false);
+  const [isLoadingShift, setIsLoadingShift] = useState(false);
   const { isLoggedIn } = useSelector((state) => state.auth);
   //   const { message } = useSelector((state) => state.message);
   const { user: currentUser } = useSelector((state) => state.auth);
 
   // let navigate = useNavigate();
   const dispatch = useDispatch();
+  useEffect(() => {
+    if (selectedDate !== "") {
+      setIsLoadingShift(true);
+      const fechaDate = new Date(selectedDate);
+      const pruebaDate = new Date(
+        fechaDate.getFullYear(),
+        fechaDate.getMonth(),
+        fechaDate.getDate()
+      );
+      const fechaISO = pruebaDate.toISOString();
+      const indiceT = fechaISO.indexOf("T");
+      const fechaSinHora = fechaISO.substring(0, indiceT);
+      const localDate = { localDate: fechaSinHora };
+      shiftService
+        .getShiftsForADate(localDate)
+        .then((response) => {
+          console.log(response.data);
+          setShifts(response.data);
+          setIsLoadingShift(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener turnos:", error);
+        })
+        .finally(() => {
+          setIsLoadingShift(false);
+        });
+    }
+  }, [selectedDate]);
+
   useEffect(() => {
     shiftService
       .getAllShifts()
@@ -119,17 +149,18 @@ const Register = () => {
       .then(() => {
         setIsRegistered(false);
         setSignUpPopUp(true);
-        setSignUpValues({
-          username: "",
-          email: "",
-          password: "",
-        });
       })
       .catch(() => {
         setIsRegistered(true);
         setSignUpPopUp(true);
       })
       .finally(() => {
+        setSignUpValues({
+          username: "",
+          email: "",
+          password: "",
+        });
+        console.log(signupvalues);
         setIsLoading(false);
       });
   };
@@ -176,17 +207,32 @@ const Register = () => {
   };
 
   const handleMakeAReservationCloseForm = () => {
+    setCapacity("");
+    setSelectedShift("");
+    setShifts([]);
+    setErrors({});
+    setSelectedDate("");
+    setComment("");
+    setEmailR("");
+    setPhone("");
     setOpenReservationForm(false);
   };
   const handleInputEmailRChange = (e) => {
     setEmailR(e.target.value);
   };
-  const handleInputPhoneChange = (e) => {
-    setPhone(e.target.value);
+  const handleInputPhoneChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setPhone(inputValue);
   };
-  const handleInputCapacityChange = (e) => {
-    setCapacity(e.target.value);
+  const handleInputCapacityChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setCapacity(inputValue);
   };
+
   const handleInputCommentChange = (e) => {
     setComment(e.target.value);
   };
@@ -206,7 +252,9 @@ const Register = () => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      console.log(validationErrors);
     } else {
+      setIsLoadingReservation(true);
       const selectedShiftObj = shifts.find(
         (shi) => shi.shiftId === selectedShift
       );
@@ -217,8 +265,7 @@ const Register = () => {
       const newReservationData = {
         capacity: capacity,
         shift: selectedShiftObj,
-        startingDate: fechaSinHora,
-        finishingDate: fechaSinHora,
+        reservationDate: fechaSinHora,
         comment: comment,
         clientEmail: emailR,
         clientPhone: phone,
@@ -230,18 +277,24 @@ const Register = () => {
           setIsOperationSuccessful(true);
           setOpenSnackbar(true);
           handleMakeAReservationCloseForm();
+          setErrors({});
         })
         .catch((error) => {
           setAlertText(error.response.data);
           setIsOperationSuccessful(false);
           setOpenSnackbar(true);
+        })
+        .finally(() => {
+          setCapacity("");
+          setSelectedShift("");
+          setShifts([]);
+          setErrors({});
+          setSelectedDate("");
+          setComment("");
+          setEmailR("");
+          setPhone("");
+          setIsLoadingReservation(false);
         });
-      setCapacity("");
-      setSelectedShift("");
-      setSelectedDate("");
-      setComment("");
-      setEmailR("");
-      setPhone("");
     }
   };
 
@@ -265,6 +318,7 @@ const Register = () => {
                     type="text"
                     name="username"
                     id="usernameId"
+                    value={signupvalues.username}
                     placeholder="Enter your username"
                     className="inpt"
                     onChange={handleSignUpInput}
@@ -286,6 +340,7 @@ const Register = () => {
                     type="email"
                     name="email"
                     id="emailSuId"
+                    value={signupvalues.email}
                     placeholder="Enter your email"
                     className="inpt"
                     onChange={handleSignUpInput}
@@ -307,6 +362,7 @@ const Register = () => {
                     type="password"
                     name="password"
                     id="passwordSuId"
+                    value={signupvalues.password}
                     placeholder="Enter your password"
                     className="inpt"
                     onChange={handleSignUpInput}
@@ -414,6 +470,10 @@ const Register = () => {
                       variant="outlined"
                       error={errors.phone ? true : false}
                       helperText={errors.phone || ""}
+                      inputProps={{
+                        pattern: "[0-9]*",
+                        inputMode: "numeric",
+                      }}
                       style={{
                         width: "80%",
                         marginTop: "3%",
@@ -440,11 +500,14 @@ const Register = () => {
                       onChange={handleInputCapacityChange}
                       variant="outlined"
                       error={errors.capacity ? true : false}
+                      inputProps={{
+                        pattern: "[0-9]*",
+                        inputMode: "numeric",
+                      }}
                       helperText={errors.capacity || ""}
                       style={{
                         width: "80%",
                         marginTop: "3%",
-                        marginBottom: "3%",
                         fontSize: "1.1rem",
                       }}
                       InputProps={{
@@ -454,48 +517,45 @@ const Register = () => {
                       }}
                       FormHelperTextProps={{
                         style: {
-                          fontSize: "1.1rem",
+                          fontSize: "1.0rem",
                         },
                       }}
                     />
-                    <p>Please enter a shift *</p>
+                    {/* <TextField
+              required
+              id="name"
+              value={capacity}
+              onChange={handleInputCapacityChange}
+              variant="outlined"
+              error={errors.capacity ? true : false}
+              helperText={errors.capacity || ""}
+              style={{
+                width: "80%",
+                marginTop: "3%",
+                fontSize: "1.1rem",
+              }}
+              InputProps={{
+                style: {
+                  fontSize: "1rem",
+                },
+              }}
+              FormHelperTextProps={{
+                style: {
+                  fontSize: "1.1rem",
+                },
+              }}
+            /> */}
 
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={selectedShift}
-                      onChange={handleShiftChange}
-                      error={errors.shift ? true : false}
-                      helperText={errors.shift || ""}
-                      style={{
-                        width: "80%",
-                        marginTop: "3%",
-                        marginBottom: "3%",
-                        fontSize: "1.1rem",
-                      }}
-                    >
-                      {shifts.map((shift) => (
-                        <MenuItem
-                          style={{
-                            color: "black",
-                          }}
-                          key={shift.shiftId}
-                          value={shift.shiftId}
-                        >
-                          {shift.startingHour.substring(0, 5) +
-                            " - " +
-                            shift.finishingHour.substring(0, 5)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-
-                    <p style={{ marginBottom: "3.5%" }}>Please enter a date</p>
+                    <p style={{ marginTop: "3.5%", marginBottom: "3.5%" }}>
+                      Please enter a date
+                    </p>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
-                        disablePast
+                        minDate={tomorrow}
+                        // disablePast
                         variant="outlined"
                         error={errors.date ? true : false}
-                        helperText={errors.date || ""}
+                        // helperText={errors.date || ""}
                         label={"YYYY-MM-DD"}
                         views={["year", "month", "day"]}
                         format="YYYY-MM-DD"
@@ -503,7 +563,69 @@ const Register = () => {
                         onChange={handleDateChange}
                       />
                     </LocalizationProvider>
-                    <p>Please enter a comment *</p>
+                    {isLoadingShift ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
+                        }}
+                      >
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    ) : (
+                      <>
+                        <p style={{ marginTop: "3.5%" }}>
+                          Please enter a shift *
+                        </p>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={selectedShift}
+                          onChange={handleShiftChange}
+                          error={errors.shift ? true : false}
+                          // helperText={errors.shift || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                        >
+                          {shifts.length === 0 ? (
+                            <MenuItem
+                              style={{
+                                color: "black",
+                              }}
+                              key="no-data"
+                              value="no-data"
+                              disabled
+                            >
+                              No hay turnos disponibles para esa fecha
+                            </MenuItem>
+                          ) : (
+                            shifts.map((shift) => (
+                              <MenuItem
+                                style={{
+                                  color: "black",
+                                }}
+                                key={shift.shiftId}
+                                value={shift.shiftId}
+                              >
+                                {shift.startingHour.substring(0, 5) +
+                                  " - " +
+                                  shift.finishingHour.substring(0, 5)}
+                              </MenuItem>
+                            ))
+                          )}
+                        </Select>
+                      </>
+                    )}
+
+                    <p style={{ marginBottom: "3.5%" }}>
+                      Please enter a comment *
+                    </p>
                     <TextField
                       required
                       id="name"
@@ -529,7 +651,18 @@ const Register = () => {
                         },
                       }}
                     />
-
+                    {isLoadingReservation && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
+                        }}
+                      >
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    )}
                     <div
                       className="buttons"
                       style={{

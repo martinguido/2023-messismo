@@ -35,10 +35,29 @@ const addShift = (shift) => {
       throw error;
     });
 };
+
+const getShiftsForADate = (localDate) => {
+  return axios
+    .post(apiUrl + "/api/v1/auth/getShiftsForADate", localDate, {
+      headers: authHeader(),
+      method: "POST",
+      "Content-Type": "application/json",
+    })
+    .then((response) => {
+      console.log(response);
+      return response;
+    })
+    .catch((error) => {
+      console.error("Error al traer los shifts:", error);
+      throw error;
+    });
+};
+
 const shiftService = {
   getAllShifts,
   deleteShift,
   addShift,
+  getShiftsForADate,
 };
 
 export default shiftService;

@@ -4,19 +4,21 @@ import com.messismo.bar.DTOs.DeleteReservationRequestDTO;
 import com.messismo.bar.DTOs.NewReservationRequestDTO;
 import com.messismo.bar.DTOs.UseReservationDTO;
 import com.messismo.bar.Entities.Reservation;
+import com.messismo.bar.Entities.Shift;
 import com.messismo.bar.Exceptions.BarCapacityExceededException;
 import com.messismo.bar.Exceptions.ReservationAlreadyUsedException;
 import com.messismo.bar.Exceptions.ReservationNotFoundException;
 import com.messismo.bar.Repositories.BarRepository;
 import com.messismo.bar.Repositories.ReservationRepository;
+import com.messismo.bar.Repositories.ShiftRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,26 +30,32 @@ public class ReservationService {
 
     private final JavaMailSender javaMailSender;
 
+    private final ShiftRepository shiftRepository;
+
     public String addReservation(NewReservationRequestDTO newReservationRequestDTO) throws Exception {
         try {
             Integer maxCapacity = barRepository.findAll().get(0).getCapacity();
             if (maxCapacity < newReservationRequestDTO.getCapacity()) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
+            System.out.println("CHECK1");
             List<Reservation> allReservations = reservationRepository.findAllByShiftAndDate(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate());
             System.out.println(allReservations);
+            System.out.println("CHECK2");
             Integer currentCapacity = 0;
             for (Reservation reservation : allReservations) {
                 currentCapacity += reservation.getCapacity();
             }
+            System.out.println("CHECK2");
             if (currentCapacity + newReservationRequestDTO.getCapacity() > maxCapacity) {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
+            System.out.println("CHECK2");
             Integer clientPhoneCorrected = null;
             if (newReservationRequestDTO.getClientPhone() != null && !newReservationRequestDTO.getClientPhone().isEmpty()) {
                 System.out.println("ENTRA ACA");
                 clientPhoneCorrected = Integer.parseInt(newReservationRequestDTO.getClientPhone());
-                System.out.println("SE ROMPE");
+                System.out.println("NO SE ROMPE");
             }
             System.out.println("LLEGA HASTA CREAR LA RESERVA");
             Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(), clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
@@ -126,5 +134,27 @@ public class ReservationService {
             throw new Exception("CANNOT use a reservation right now");
         }
 
+    }
+
+    public Object getShiftsForADate(LocalDate localDate) {
+        List<Reservation> allReservations= getAllReservations();
+        List<Shift> allShifts = shiftRepository.findAll();
+        Integer barCapacity = barRepository.findAll().get(0).getCapacity();
+        HashMap<Shift, Integer> countPerShiftPerDay = new HashMap<>();
+        for(Shift shift : allShifts){
+            countPerShiftPerDay.put(shift,0);
+        }
+        for(Reservation reservation: allReservations){
+            if(reservation.getReservationDate().equals(localDate)){
+                countPerShiftPerDay.put(reservation.getShift(), countPerShiftPerDay.get(reservation.getShift())+reservation.getCapacity());
+            }
+        }
+        List<Shift> responseShifts= new ArrayList<>();
+        for(Map.Entry<Shift, Integer> entry : countPerShiftPerDay.entrySet()){
+            if(!(entry.getValue()>=barCapacity)){
+                responseShifts.add(entry.getKey());
+            }
+        }
+        return responseShifts;
     }
 }

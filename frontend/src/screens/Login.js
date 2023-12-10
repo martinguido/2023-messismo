@@ -33,7 +33,7 @@ import reservationService from "../services/reservation.service";
 import Select from "@mui/material/Select";
 import { CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
-
+import dayjs from "dayjs";
 const ForgotPassword = styled.a`
   text-decoration: none;
   color: #a7d0cd;
@@ -50,6 +50,7 @@ const Alert2 = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+const tomorrow = dayjs().add(1, "day");
 function Login() {
   const [open, setOpen] = useState(false);
 
@@ -88,19 +89,137 @@ function Login() {
   const [capacity, setCapacity] = useState("");
   const [openReservationForm, setOpenReservationForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingReservation, setIsLoadingReservation] = useState(false);
   const [isLoadingMail, setIsLoadingMail] = useState(false);
   const [isLoadingPin, setIsLoadingPin] = useState(false);
-
+  const [isLoadingShift, setIsLoadingShift] = useState(false);
   useEffect(() => {
-    shiftService
-      .getAllShifts()
-      .then((response) => {
-        setShifts(response.data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener turnos:", error);
-      });
-  }, [openReservationForm]);
+    if (selectedDate !== "") {
+      setIsLoadingShift(true);
+      const fechaDate = new Date(selectedDate);
+      const pruebaDate = new Date(
+        fechaDate.getFullYear(),
+        fechaDate.getMonth(),
+        fechaDate.getDate()
+      );
+      const fechaISO = pruebaDate.toISOString();
+      const indiceT = fechaISO.indexOf("T");
+      const fechaSinHora = fechaISO.substring(0, indiceT);
+      const localDate = { localDate: fechaSinHora };
+      shiftService
+        .getShiftsForADate(localDate)
+        .then((response) => {
+          console.log(response.data);
+          setShifts(response.data);
+          setIsLoadingShift(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener turnos:", error);
+        })
+        .finally(() => {
+          setIsLoadingShift(false);
+        });
+    }
+  }, [selectedDate]);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+  const handleMakeAReservationOpenForm = () => {
+    setOpenReservationForm(true);
+  };
+
+  const handleMakeAReservationCloseForm = () => {
+    setCapacity("");
+    setSelectedShift("");
+    setShifts([]);
+    setErrors({});
+    setSelectedDate("");
+    setComment("");
+    setEmailR("");
+    setPhone("");
+    setOpenReservationForm(false);
+  };
+  const handleInputEmailRChange = (e) => {
+    setEmailR(e.target.value);
+  };
+  const handleInputPhoneChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setPhone(inputValue);
+  };
+  const handleInputCapacityChange = (event) => {
+    let inputValue = event.target.value;
+    inputValue = inputValue.replace(/[^0-9]/g, "");
+    event.target.value = inputValue;
+    setCapacity(inputValue);
+  };
+
+  const handleInputCommentChange = (e) => {
+    setComment(e.target.value);
+  };
+
+  const handleShiftChange = (event) => {
+    setSelectedShift(event.target.value);
+  };
+
+  const handleMakeAReservation = () => {
+    const validationErrors = MakeAReservationValidation({
+      phone: phone,
+      email: emailR,
+      comment: comment,
+      capacity: capacity,
+      shift: selectedShift,
+    });
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      console.log(validationErrors);
+    } else {
+      setIsLoadingReservation(true);
+      const selectedShiftObj = shifts.find(
+        (shi) => shi.shiftId === selectedShift
+      );
+      const fechaDate = new Date(selectedDate);
+      const fechaISO = fechaDate.toISOString();
+      const indiceT = fechaISO.indexOf("T");
+      const fechaSinHora = fechaISO.substring(0, indiceT);
+      const newReservationData = {
+        capacity: capacity,
+        shift: selectedShiftObj,
+        reservationDate: fechaSinHora,
+        comment: comment,
+        clientEmail: emailR,
+        clientPhone: phone,
+      };
+      reservationService
+        .addReservation(newReservationData)
+        .then((response) => {
+          setAlertText("Reservation made succesfully!");
+          setIsOperationSuccessful(true);
+          setOpenSnackbar(true);
+          handleMakeAReservationCloseForm();
+          setErrors({});
+        })
+        .catch((error) => {
+          setAlertText(error.response.data);
+          setIsOperationSuccessful(false);
+          setOpenSnackbar(true);
+        })
+        .finally(() => {
+          setCapacity("");
+          setSelectedShift("");
+          setShifts([]);
+          setErrors({});
+          setSelectedDate("");
+          setComment("");
+          setEmailR("");
+          setPhone("");
+          setIsLoadingReservation(false);
+        });
+    }
+  };
 
   useEffect(() => {
     const validationErrors = signinvalidation(signinvalues);
@@ -195,32 +314,6 @@ function Login() {
   const handleInputChange = (e) => {
     setEmail(e.target.value);
   };
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-  const handleMakeAReservationOpenForm = () => {
-    setOpenReservationForm(true);
-  };
-
-  const handleMakeAReservationCloseForm = () => {
-    setOpenReservationForm(false);
-  };
-  const handleInputEmailRChange = (e) => {
-    setEmailR(e.target.value);
-  };
-  const handleInputPhoneChange = (e) => {
-    setPhone(e.target.value);
-  };
-  const handleInputCapacityChange = (e) => {
-    setCapacity(e.target.value);
-  };
-  const handleInputCommentChange = (e) => {
-    setComment(e.target.value);
-  };
-
-  const handleShiftChange = (event) => {
-    setSelectedShift(event.target.value);
-  };
 
   const handleSendEmail = () => {
     const validationErrors = RecoverPasswordValidation({
@@ -246,67 +339,11 @@ function Login() {
           setOpenSnackbar(true);
         })
         .finally(() => {
+          setEmail("");
           setIsLoadingMail(false);
         });
-      setEmail("");
     }
   };
-
-  const handleMakeAReservation = () => {
-    const validationErrors = MakeAReservationValidation({
-      phone: phone,
-      email: emailR,
-      comment: comment,
-      capacity: capacity,
-      shift: selectedShift,
-    });
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      const selectedShiftObj = shifts.find(
-        (shi) => shi.shiftId === selectedShift
-      );
-      const fechaDate = new Date(selectedDate);
-      const fechaISO = fechaDate.toISOString();
-      const indiceT = fechaISO.indexOf("T");
-      const fechaSinHora = fechaISO.substring(0, indiceT);
-
-      const newReservationData = {
-        capacity: capacity,
-        shift: selectedShiftObj,
-        startingDate: fechaSinHora,
-        finishingDate: fechaSinHora,
-        comment: comment,
-        clientEmail: emailR,
-        clientPhone: phone,
-      };
-
-      reservationService
-        .addReservation(newReservationData)
-        .then((response) => {
-          setAlertText("Reservation made succesfully!");
-          setIsOperationSuccessful(true);
-          setOpenSnackbar(true);
-          handleMakeAReservationCloseForm();
-        })
-        .catch((error) => {
-          setAlertText(error.response.data);
-          setIsOperationSuccessful(false);
-          setOpenSnackbar(true);
-        });
-      setCapacity("");
-      setSelectedShift("");
-      setSelectedDate("");
-      setComment("");
-      setEmailR("");
-      setPhone("");
-    }
-  };
-
-  // const handleOpenChangePasswordForm = () => {
-  //   setOpenChangePasswordForm(true);
-  // };
 
   const handleCloseChangePasswordForm = () => {
     setOpenChangePasswordForm(false);
@@ -356,11 +393,12 @@ function Login() {
           setOpenSnackbar(true);
         })
         .finally(() => {
+          setEmail("");
+          setPassword("");
+          setPin("");
+          setRepeatPassword("");
           setIsLoadingPin(false);
         });
-      setEmail("");
-      setPassword("");
-      setPin("");
     }
   };
 
@@ -419,6 +457,7 @@ function Login() {
                   <ErrorMessage>{signinerrors.password}</ErrorMessage>
                 )}
               </div>
+
               {isLoading && (
                 <Box
                   sx={{
@@ -431,6 +470,7 @@ function Login() {
                   <CircularProgress style={{ color: "#a4d4cc" }} />
                 </Box>
               )}
+
               <Link
                 className="btn flx"
                 onClick={() => {
@@ -470,6 +510,291 @@ function Login() {
                 <span>Make a Reservation</span>
               </Link>
               <Dialog
+                open={openReservationForm}
+                // dividers={true}
+                onClose={handleMakeAReservationCloseForm}
+                aria-labelledby="form-dialog-title"
+                className="custom-dialog"
+                maxWidth="sm"
+                fullWidth
+              >
+                <DialogContent>
+                  <div>
+                    <h1 style={{ marginBottom: "3%", fontSize: "1.6rem" }}>
+                      Make a Reservation
+                    </h1>
+                    <hr
+                      style={{
+                        borderTop: "1px solid grey",
+                        marginBottom: "3%",
+                        width: "100%",
+                      }}
+                    />
+                    <p>Please enter you email</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={emailR}
+                      onChange={handleInputEmailRChange}
+                      variant="outlined"
+                      error={errors.emailR ? true : false}
+                      helperText={errors.emailR || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+                    <p>Please enter you phone number</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={phone}
+                      onChange={handleInputPhoneChange}
+                      variant="outlined"
+                      error={errors.phone ? true : false}
+                      helperText={errors.phone || ""}
+                      inputProps={{
+                        pattern: "[0-9]*",
+                        inputMode: "numeric",
+                      }}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+
+                    <p>Please enter a capacity *</p>
+                    <TextField
+                      required
+                      id="name"
+                      value={capacity}
+                      onChange={handleInputCapacityChange}
+                      variant="outlined"
+                      error={errors.capacity ? true : false}
+                      inputProps={{
+                        pattern: "[0-9]*",
+                        inputMode: "numeric",
+                      }}
+                      helperText={errors.capacity || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.0rem",
+                        },
+                      }}
+                    />
+                    {/* <TextField
+              required
+              id="name"
+              value={capacity}
+              onChange={handleInputCapacityChange}
+              variant="outlined"
+              error={errors.capacity ? true : false}
+              helperText={errors.capacity || ""}
+              style={{
+                width: "80%",
+                marginTop: "3%",
+                fontSize: "1.1rem",
+              }}
+              InputProps={{
+                style: {
+                  fontSize: "1rem",
+                },
+              }}
+              FormHelperTextProps={{
+                style: {
+                  fontSize: "1.1rem",
+                },
+              }}
+            /> */}
+
+                    <p style={{ marginTop: "3.5%", marginBottom: "3.5%" }}>
+                      Please enter a date
+                    </p>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        minDate={tomorrow}
+                        // disablePast
+                        variant="outlined"
+                        error={errors.date ? true : false}
+                        // helperText={errors.date || ""}
+                        label={"YYYY-MM-DD"}
+                        views={["year", "month", "day"]}
+                        format="YYYY-MM-DD"
+                        value={selectedDate}
+                        onChange={handleDateChange}
+                      />
+                    </LocalizationProvider>
+                    {isLoadingShift ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
+                        }}
+                      >
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    ) : (
+                      <>
+                        <p style={{ marginTop: "3.5%" }}>
+                          Please enter a shift *
+                        </p>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={selectedShift}
+                          onChange={handleShiftChange}
+                          error={errors.shift ? true : false}
+                          // helperText={errors.shift || ""}
+                          style={{
+                            width: "80%",
+                            marginTop: "3%",
+                            marginBottom: "3%",
+                            fontSize: "1.1rem",
+                          }}
+                        >
+                          {shifts.length === 0 ? (
+                            <MenuItem
+                              style={{
+                                color: "black",
+                              }}
+                              key="no-data"
+                              value="no-data"
+                              disabled
+                            >
+                              No hay turnos disponibles para esa fecha
+                            </MenuItem>
+                          ) : (
+                            shifts.map((shift) => (
+                              <MenuItem
+                                style={{
+                                  color: "black",
+                                }}
+                                key={shift.shiftId}
+                                value={shift.shiftId}
+                              >
+                                {shift.startingHour.substring(0, 5) +
+                                  " - " +
+                                  shift.finishingHour.substring(0, 5)}
+                              </MenuItem>
+                            ))
+                          )}
+                        </Select>
+                      </>
+                    )}
+
+                    <p style={{ marginBottom: "3.5%" }}>
+                      Please enter a comment *
+                    </p>
+                    <TextField
+                      required
+                      id="name"
+                      value={comment}
+                      onChange={handleInputCommentChange}
+                      variant="outlined"
+                      error={errors.comment ? true : false}
+                      helperText={errors.comment || ""}
+                      style={{
+                        width: "80%",
+                        marginTop: "3%",
+                        marginBottom: "3%",
+                        fontSize: "1.1rem",
+                      }}
+                      InputProps={{
+                        style: {
+                          fontSize: "1rem",
+                        },
+                      }}
+                      FormHelperTextProps={{
+                        style: {
+                          fontSize: "1.1rem",
+                        },
+                      }}
+                    />
+                    {isLoadingReservation && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
+                        }}
+                      >
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    )}
+                    <div
+                      className="buttons"
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <Button
+                        variant="outlined"
+                        style={{
+                          color: "grey",
+                          borderColor: "grey",
+                          fontSize: "1rem",
+                        }}
+                        onClick={handleMakeAReservationCloseForm}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
+                        style={{
+                          marginLeft: "3%",
+                          fontSize: "1rem",
+                          backgroundColor: "#a4d4cc",
+                          color: "black",
+                        }}
+                        onClick={handleMakeAReservation}
+                      >
+                        Reserve
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              {/* <Dialog
                 open={openReservationForm}
                 // dividers={true}
                 onClose={handleMakeAReservationCloseForm}
@@ -614,7 +939,9 @@ function Login() {
                         onChange={handleDateChange}
                       />
                     </LocalizationProvider>
-                    <p>Please enter a comment *</p>
+                    <p style={{ marginTop: "3.5%" }}>
+                      Please enter a comment *
+                    </p>
                     <TextField
                       required
                       id="name"
@@ -640,7 +967,18 @@ function Login() {
                         },
                       }}
                     />
-
+                    {isLoadingReservation && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: "10%",
+                        }}
+                      >
+                        <CircularProgress style={{ color: "#a4d4cc" }} />
+                      </Box>
+                    )}
                     <div
                       className="buttons"
                       style={{
@@ -676,7 +1014,7 @@ function Login() {
                     </div>
                   </div>
                 </DialogContent>
-              </Dialog>
+              </Dialog> */}
 
               <Dialog
                 open={openForm}

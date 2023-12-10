@@ -25,6 +25,8 @@ import "./Products.css";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimeField } from "@mui/x-date-pickers/TimeField";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const BarConfigurationLists = () => {
   const [shifts, setShifts] = useState([]);
@@ -44,6 +46,8 @@ const BarConfigurationLists = () => {
   const [openCreateShiftModal, setOpenCreateShiftModal] = useState(false);
   const [startingTime, setStartingTime] = useState("");
   const [finishingTime, setFinishingTime] = useState("");
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const handleInputChange = (event) => {
     let inputValue = event.target.value;
@@ -204,6 +208,37 @@ const BarConfigurationLists = () => {
     setOpenCreateShiftModal(false);
   };
 
+  const handleSort = (field) => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+
+    const sortedProducts = [...shifts].sort((a, b) => {
+      if (sortOrder === "asc") {
+        if (a[sortField] < b[sortField]) {
+          return -1;
+        }
+        if (a[sortField] > b[sortField]) {
+          return 1;
+        }
+        return 0;
+      } else {
+        if (a[sortField] > b[sortField]) {
+          return -1;
+        }
+        if (a[sortField] < b[sortField]) {
+          return 1;
+        }
+        return 0;
+      }
+    });
+
+    setShifts(sortedProducts);
+  };
+
   return (
     <div className="container">
       <div className="firstRow">
@@ -278,6 +313,17 @@ const BarConfigurationLists = () => {
       <div className="titles">
         <div className="title">
           <p style={{ color: "white", fontWeight: "bold" }}>Shift details</p>
+          <IconButton size="small" onClick={() => handleSort("startingHour")}>
+            {sortField === "startingHour" ? (
+              sortOrder === "asc" ? (
+                <ExpandLessIcon style={{ color: "white" }} />
+              ) : (
+                <ExpandMoreIcon style={{ color: "white" }} />
+              )
+            ) : (
+              <ExpandMoreIcon style={{ color: "white" }} />
+            )}
+          </IconButton>
         </div>
       </div>
       {isLoading ? (

@@ -11,7 +11,7 @@ import com.messismo.bar.Repositories.ShiftRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,4 +60,43 @@ public class ShiftService {
     public List<Shift> getAllShifts() {
         return shiftRepository.findAll();
     }
+
+    public LinkedHashMap<Shift, Integer> getMostSelectedShifts() throws Exception {
+        try {
+            List<Shift> allShifts = shiftRepository.findAll();
+            HashMap<Shift, Integer> response = new HashMap<>();
+            for (Shift shift : allShifts) {
+                response.put(shift, reservationService.getReservationsForAShift(shift));
+            }
+            return sortShiftsByValues(response);
+
+        } catch (Exception e) {
+            throw new Exception("CANNOT get shifts information at the moment");
+        }
+    }
+
+    public LinkedHashMap<Shift, Integer> getBusiestShifts() throws Exception {
+        try {
+            List<Shift> allShifts = shiftRepository.findAll();
+            HashMap<Shift, Integer> response = new HashMap<>();
+            for (Shift shift : allShifts) {
+                response.put(shift, reservationService.getQuantityForAShift(shift));
+            }
+            return sortShiftsByValues(response);
+
+        } catch (Exception e) {
+            throw new Exception("CANNOT get shifts information at the moment");
+        }
+    }
+
+    public LinkedHashMap<Shift, Integer> sortShiftsByValues(HashMap<Shift, Integer> shifts) {
+        List<Map.Entry<Shift, Integer>> entryList = new ArrayList<>(shifts.entrySet());
+        entryList.sort(Map.Entry.comparingByValue());
+        LinkedHashMap<Shift, Integer> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Shift, Integer> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
+
 }

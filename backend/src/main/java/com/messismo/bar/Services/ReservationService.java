@@ -59,7 +59,7 @@ public class ReservationService {
             }
             System.out.println("LLEGA HASTA CREAR LA RESERVA");
             Reservation newReservation = new Reservation(newReservationRequestDTO.getShift(), newReservationRequestDTO.getReservationDate(), newReservationRequestDTO.getClientEmail(), clientPhoneCorrected, newReservationRequestDTO.getCapacity(), newReservationRequestDTO.getComment());
-           System.out.println("LA CREA");
+            System.out.println("LA CREA");
             reservationRepository.save(newReservation);
             System.out.println("LA GUARDO");
             if (newReservationRequestDTO.getClientEmail() != null && !newReservationRequestDTO.getClientEmail().isEmpty()) {
@@ -136,7 +136,7 @@ public class ReservationService {
 
     }
 
-    public List<Shift> getShiftsForADate(LocalDate localDate) throws Exception{
+    public List<Shift> getShiftsForADate(LocalDate localDate) throws Exception {
         try {
             List<Reservation> allReservations = getAllReservations();
             List<Shift> allShifts = shiftRepository.findAll();
@@ -157,8 +157,56 @@ public class ReservationService {
                 }
             }
             return responseShifts;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("CANNOT get shifts for a date at the moment");
         }
     }
+
+
+    public Integer getReservationsForAShift(Shift shift) {
+        return reservationRepository.findAllByShift(shift).size();
+    }
+
+    public Integer getQuantityForAShift(Shift shift) {
+        List<Reservation> reservations = reservationRepository.findAllByShift(shift);
+        Integer count = 0;
+        for (Reservation reservation : reservations) {
+            count = count + reservation.getCapacity();
+        }
+        return count;
+    }
+
+    public HashMap<String, Object> getReservationsMetric() throws Exception {
+        try{
+            List<Reservation> inProcessReservations = reservationRepository.findAllByState("In Process");
+            Integer inProcessCount = inProcessReservations.size();
+            List<Reservation> expiredReservations = reservationRepository.findAllByState("Expired");
+            Integer expiredCount = expiredReservations.size();
+            List<Reservation> upcomingReservations = reservationRepository.findAllByState("Upcoming");
+            Integer upcomingCount = upcomingReservations.size();
+            Integer totalCount = inProcessCount + expiredCount;
+            List<Reservation> mergedReservations = new ArrayList<>(inProcessReservations);
+            mergedReservations.addAll(expiredReservations);
+            Integer usedCount =0;
+            for (Reservation reservation : mergedReservations){
+                if( reservation.getUsed()==Boolean.TRUE){
+                    usedCount = usedCount +1;
+                }
+            }
+            Double percentage = 0.00;
+            if(usedCount!=0 && totalCount!=0){
+                percentage = ((double)usedCount/totalCount)*100;
+            }
+            HashMap<String,Object> response = new HashMap<>();
+            response.put("Used reservations percentage",percentage);
+            response.put("Expired reservations", expiredCount);
+            response.put("In Process reservations", inProcessCount);
+            response.put("Upcoming reservations", upcomingCount);
+            response.put("Total reservations", upcomingCount+inProcessCount+expiredCount);
+            return response;
+        }catch (Exception e){
+            throw new Exception("CANNOT get reservations metric at the moment");
+        }
+    }
+
 }

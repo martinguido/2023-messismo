@@ -21,11 +21,10 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -78,7 +77,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findById(nonExistentShiftId)).thenReturn(Optional.empty());
         DeleteShiftRequestDTO requestDTO = new DeleteShiftRequestDTO(nonExistentShiftId);
 
-        ShiftNotFoundException exception = Assert.assertThrows(ShiftNotFoundException.class, () -> {
+        ShiftNotFoundException exception = assertThrows(ShiftNotFoundException.class, () -> {
             shiftService.deleteShift(requestDTO);
         });
         Assertions.assertEquals("Provided shift id DOES NOT match any shift id", exception.getMessage());
@@ -94,7 +93,7 @@ public class ShiftServiceTests {
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         DeleteShiftRequestDTO requestDTO = new DeleteShiftRequestDTO(existingShift.getShiftId());
 
-        CannotDeleteAShiftWithReservationsException exception = Assert.assertThrows(CannotDeleteAShiftWithReservationsException.class, () -> {
+        CannotDeleteAShiftWithReservationsException exception = assertThrows(CannotDeleteAShiftWithReservationsException.class, () -> {
             shiftService.deleteShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT delete a shift with reservations using it", exception.getMessage());
@@ -109,7 +108,7 @@ public class ShiftServiceTests {
         when(reservationService.getAllReservations()).thenThrow(new RuntimeException("CANNOT delete a shift at the moment"));
         DeleteShiftRequestDTO requestDTO = new DeleteShiftRequestDTO(existingShift.getShiftId());
 
-        Exception exception = Assert.assertThrows(Exception.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             shiftService.deleteShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT delete a shift at the moment", exception.getMessage());
@@ -134,7 +133,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(9, 30)).finishingHour(LocalTime.of(10, 30)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -147,7 +146,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 10)).finishingHour(LocalTime.of(18, 15)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -160,7 +159,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 10)).finishingHour(LocalTime.of(18, 16)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -173,7 +172,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 10)).finishingHour(LocalTime.of(18, 14)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -186,7 +185,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 11)).finishingHour(LocalTime.of(18, 15)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -199,7 +198,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 9)).finishingHour(LocalTime.of(18, 15)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -213,7 +212,7 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenReturn(existingShifts);
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(18, 9)).finishingHour(LocalTime.of(18, 16)).build();
 
-        CannotCreateShiftInBetweenOtherShiftException exception = Assert.assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
+        CannotCreateShiftInBetweenOtherShiftException exception = assertThrows(CannotCreateShiftInBetweenOtherShiftException.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift with an starting hour or finishing hour in between another shift", exception.getMessage());
@@ -227,11 +226,141 @@ public class ShiftServiceTests {
         when(shiftRepository.findAll()).thenThrow(new RuntimeException("CANNOT create a shift at the moment"));
         NewShiftRequestDTO requestDTO = NewShiftRequestDTO.builder().startingHour(LocalTime.of(10, 0)).finishingHour(LocalTime.of(11, 0)).build();
 
-        Exception exception = Assert.assertThrows(Exception.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             shiftService.addShift(requestDTO);
         });
         Assertions.assertEquals("CANNOT create a shift at the moment", exception.getMessage());
 
     }
+
+    @Test
+    public void testGetMostSelectedShifts() throws Exception {
+
+        Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Shift shift3 = new Shift(LocalTime.of(14, 0), LocalTime.of(16, 0));
+        List<Shift> allShifts = Arrays.asList(shift1, shift2,shift3);
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+        when(reservationService.getReservationsForAShift(shift1)).thenReturn(3);
+        when(reservationService.getReservationsForAShift(shift2)).thenReturn(10);
+        when(reservationService.getReservationsForAShift(shift3)).thenReturn(5);
+
+        LinkedHashMap<Shift,Integer> response = new LinkedHashMap<>();
+        response.put(shift2,10);
+        response.put(shift3,5);
+        response.put(shift1,3);
+
+        LinkedHashMap<Shift, Integer> result = shiftService.getMostSelectedShifts();
+        assertEquals(3, result.size());
+        assertEquals(response, result);
+    }
+
+    @Test
+    public void testGetMostSelectedShiftsWithNoShifts() throws Exception {
+
+        List<Shift> allShifts = new ArrayList<>();
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+
+        LinkedHashMap<Shift,Integer> response = new LinkedHashMap<>();
+
+        LinkedHashMap<Shift, Integer> result = shiftService.getMostSelectedShifts();
+        assertEquals(0, result.size());
+        assertEquals(response, result);
+    }
+
+    @Test
+    public void testGetMostSelectedShiftsException() {
+
+        Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
+
+        List<Shift> allShifts = Arrays.asList(shift1, shift2);
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+        when(reservationService.getReservationsForAShift(any())).thenThrow(new RuntimeException("Simulated exception"));
+        Exception exception = assertThrows(Exception.class, () -> {
+            shiftService.getMostSelectedShifts();
+        });
+
+        assertEquals("CANNOT get shifts information at the moment", exception.getMessage());
+    }
+
+    @Test
+    public void testGetBusiestShifts() throws Exception {
+
+        Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Shift shift3 = new Shift(LocalTime.of(14, 0), LocalTime.of(16, 0));
+        List<Shift> allShifts = Arrays.asList(shift1, shift2,shift3);
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+        when(reservationService.getQuantityForAShift(shift1)).thenReturn(3);
+        when(reservationService.getQuantityForAShift(shift2)).thenReturn(10);
+        when(reservationService.getQuantityForAShift(shift3)).thenReturn(5);
+
+        LinkedHashMap<Shift,Integer> response = new LinkedHashMap<>();
+        response.put(shift2,10);
+        response.put(shift3,5);
+        response.put(shift1,3);
+
+        LinkedHashMap<Shift, Integer> result = shiftService.getBusiestShifts();
+        assertEquals(3, result.size());
+        assertEquals(response, result);
+    }
+
+    @Test
+    public void testGetBusiestShiftsWithNoShifts() throws Exception {
+
+        List<Shift> allShifts = new ArrayList<>();
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+
+        LinkedHashMap<Shift,Integer> response = new LinkedHashMap<>();
+
+        LinkedHashMap<Shift, Integer> result = shiftService.getBusiestShifts();
+        assertEquals(0, result.size());
+        assertEquals(response, result);
+    }
+
+    @Test
+    public void testGetBusiestShiftsException() {
+
+        Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
+
+        List<Shift> allShifts = Arrays.asList(shift1, shift2);
+        when(shiftRepository.findAll()).thenReturn(allShifts);
+        when(reservationService.getQuantityForAShift(any())).thenThrow(new RuntimeException("Simulated exception"));
+        Exception exception = assertThrows(Exception.class, () -> {
+            shiftService.getBusiestShifts();
+        });
+
+        assertEquals("CANNOT get shifts information at the moment", exception.getMessage());
+    }
+
+    @Test
+    public void testSortShiftsByValues() {
+
+        Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Shift shift3 = new Shift(LocalTime.of(14, 0), LocalTime.of(16, 0));
+
+        HashMap<Shift, Integer> unsortedMap = new HashMap<>();
+        unsortedMap.put(shift1, 5);
+        unsortedMap.put(shift2, 2);
+        unsortedMap.put(shift3, 8);
+        LinkedHashMap<Shift, Integer> sortedMap = shiftService.sortShiftsByValues(unsortedMap);
+        assertEquals(3, sortedMap.size());
+        assertTrue(isMapSortedByValues(sortedMap));
+    }
+
+    private boolean isMapSortedByValues(LinkedHashMap<Shift, Integer> map) {
+        Integer previousValue = null;
+        for (Map.Entry<Shift, Integer> entry : map.entrySet()) {
+            if (previousValue != null && entry.getValue() < previousValue) {
+                return false;
+            }
+            previousValue = entry.getValue();
+        }
+        return true;
+    }
+
 
 }

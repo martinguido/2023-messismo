@@ -198,11 +198,11 @@ public class ReservationService {
                 percentage = ((double)usedCount/totalCount)*100;
             }
             HashMap<String,Object> response = new HashMap<>();
-            response.put("Used reservations percentage",percentage);
-            response.put("Expired reservations", expiredCount);
-            response.put("In Process reservations", inProcessCount);
-            response.put("Upcoming reservations", upcomingCount);
-            response.put("Total reservations", upcomingCount+inProcessCount+expiredCount);
+            response.put("usedReservationsPercentage",percentage);
+            response.put("expiredReservations", expiredCount);
+            response.put("inProcessReservations", inProcessCount);
+            response.put("upcomingReservations", upcomingCount);
+            response.put("totalReservations", upcomingCount+inProcessCount+expiredCount);
             return response;
         }catch (Exception e){
             throw new Exception("CANNOT get reservations metric at the moment");

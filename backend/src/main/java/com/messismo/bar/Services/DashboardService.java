@@ -4,6 +4,7 @@ import com.messismo.bar.DTOs.DashboardRequestDTO;
 import com.messismo.bar.Entities.Category;
 import com.messismo.bar.Entities.Order;
 import com.messismo.bar.Entities.ProductOrder;
+import com.messismo.bar.Entities.Shift;
 import com.messismo.bar.Exceptions.InvalidDashboardRequestedDate;
 import com.messismo.bar.Repositories.CategoryRepository;
 import com.messismo.bar.Repositories.OrderRepository;
@@ -23,20 +24,21 @@ public class DashboardService {
 
     private final CategoryRepository categoryRepository;
 
+    private final ReservationService reservationService;
+
+    private final ShiftService shiftService;
+
     public HashMap<String, Object> getDashboardInformation(DashboardRequestDTO dashboardRequestDTO) throws Exception {
         try {
             HashMap<String, Object> response = new HashMap<>();
             if (dashboardRequestDTO.getDateRequested() == null || dashboardRequestDTO.getDateRequested().isEmpty()) {
                 response = getYearlyInformation(dashboardRequestDTO.getCategoryList());
             } else if (dashboardRequestDTO.getDateRequested().matches("\\d{4}")) {
-                response = getMonthlyInformation(dashboardRequestDTO.getDateRequested(),
-                        dashboardRequestDTO.getCategoryList());
+                response = getMonthlyInformation(dashboardRequestDTO.getDateRequested(), dashboardRequestDTO.getCategoryList());
             } else if (dashboardRequestDTO.getDateRequested().matches("\\d{4}-\\d{2}-\\d{2}")) {
-                response = getWeeklyInformation(dashboardRequestDTO.getDateRequested(),
-                        dashboardRequestDTO.getCategoryList());
+                response = getWeeklyInformation(dashboardRequestDTO.getDateRequested(), dashboardRequestDTO.getCategoryList());
             } else if (dashboardRequestDTO.getDateRequested().matches("\\d{4}-\\d{2}")) {
-                response = getDailyInformation(dashboardRequestDTO.getDateRequested(),
-                        dashboardRequestDTO.getCategoryList());
+                response = getDailyInformation(dashboardRequestDTO.getDateRequested(), dashboardRequestDTO.getCategoryList());
             } else {
                 throw new InvalidDashboardRequestedDate("Incorrect date format");
             }
@@ -54,8 +56,7 @@ public class DashboardService {
         } else {
             List<Order> filteredOrders = new ArrayList<>();
             for (Order order : allOrders) {
-                Order newOrder = Order.builder().status(order.getStatus()).dateCreated(order.getDateCreated())
-                        .id(order.getId()).user(order.getUser()).build();
+                Order newOrder = Order.builder().status(order.getStatus()).dateCreated(order.getDateCreated()).id(order.getId()).user(order.getUser()).build();
                 List<ProductOrder> productOrderList = new ArrayList<>();
                 double orderPrice = 0.00;
                 double orderCost = 0.00;
@@ -87,15 +88,11 @@ public class DashboardService {
     }
 
     private HashMap<String, Object> getYearlyInformation(List<Category> categoryList) { // DESDE AÑO INICIAL HASTA AÑO
-                                                                                        // ACTUAL
+        // ACTUAL
         List<Order> allOrderList = orderRepository.findAll();
         List<Order> filteredOrdersByCategories = filterByCategory2(allOrderList, categoryList);
-        LocalDate minDate = filteredOrdersByCategories.stream()
-                .map(order -> order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .min(Comparator.naturalOrder()).orElse(LocalDate.now());
-        LocalDate maxDate = filteredOrdersByCategories.stream()
-                .map(order -> order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .max(Comparator.naturalOrder()).orElse(LocalDate.now());
+        LocalDate minDate = filteredOrdersByCategories.stream().map(order -> order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).min(Comparator.naturalOrder()).orElse(LocalDate.now());
+        LocalDate maxDate = filteredOrdersByCategories.stream().map(order -> order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).max(Comparator.naturalOrder()).orElse(LocalDate.now());
         List<Integer> years = new ArrayList<>();
         LocalDate currentDate = minDate;
         while (!currentDate.isAfter(maxDate)) {
@@ -136,10 +133,10 @@ public class DashboardService {
     }
 
     public HashMap<String, Object> getDailyInformation(String dateRequested, List<Category> categoryList) { // ESE MES
-                                                                                                            // DESDE DIA
-                                                                                                            // 1 HASTA
-                                                                                                            // UN MES
-                                                                                                            // MAS
+        // DESDE DIA
+        // 1 HASTA
+        // UN MES
+        // MAS
         List<Order> allOrderList = orderRepository.findAll();
         List<Order> filteredOrdersByCategories = filterByCategory2(allOrderList, categoryList);
         List<Order> filteredOrders = new ArrayList<>();
@@ -163,8 +160,7 @@ public class DashboardService {
                 filteredOrders.add(order);
                 String formattedDate = orderDate.format(DateTimeFormatter.ofPattern("dd"));
                 orderByDayQuantity.put(formattedDate, orderByDayQuantity.get(formattedDate) + 1);
-                double currentEarnings = orderByDayEarnings.get(formattedDate)
-                        + (order.getTotalPrice() - order.getTotalCost());
+                double currentEarnings = orderByDayEarnings.get(formattedDate) + (order.getTotalPrice() - order.getTotalCost());
                 orderByDayEarnings.put(formattedDate, currentEarnings);
             }
         }
@@ -188,10 +184,10 @@ public class DashboardService {
     }
 
     public HashMap<String, Object> getWeeklyInformation(String dateRequested, List<Category> categoryList) { // ESE DIA
-                                                                                                             // HASTA
-                                                                                                             // UNA
-                                                                                                             // SEMANA
-                                                                                                             // MAS
+        // HASTA
+        // UNA
+        // SEMANA
+        // MAS
         List<Order> filteredOrders = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate requestedDate = LocalDate.parse(dateRequested, formatter);
@@ -214,8 +210,7 @@ public class DashboardService {
                 filteredOrders.add(order);
                 String formattedDate = orderDate.format(DateTimeFormatter.ofPattern("dd/MM"));
                 orderByDateQuantity.put(formattedDate, orderByDateQuantity.get(formattedDate) + 1);
-                double currentEarnings = orderByDateEarnings.get(formattedDate)
-                        + (order.getTotalPrice() - order.getTotalCost());
+                double currentEarnings = orderByDateEarnings.get(formattedDate) + (order.getTotalPrice() - order.getTotalCost());
                 orderByDateEarnings.put(formattedDate, currentEarnings);
             }
         }
@@ -239,9 +234,9 @@ public class DashboardService {
     }
 
     public HashMap<String, Object> getMonthlyInformation(String yearRequested, List<Category> categoryList) { // ESE AÑO
-                                                                                                              // HASTA
-                                                                                                              // UN AÑO
-                                                                                                              // MAS
+        // HASTA
+        // UN AÑO
+        // MAS
         List<Order> filteredOrders = new ArrayList<>();
         List<Order> allOrderList = orderRepository.findAll();
         List<Order> filteredOrdersByCategories = filterByCategory2(allOrderList, categoryList);
@@ -262,8 +257,7 @@ public class DashboardService {
                 filteredOrders.add(order);
                 String month = String.format("%02d", orderDate.getMonthValue());
                 ordersByMonthQuantity.put(month, ordersByMonthQuantity.get(month) + 1);
-                ordersByMonthEarnings.put(month,
-                        ordersByMonthEarnings.get(month) + (order.getTotalPrice() - order.getTotalCost()));
+                ordersByMonthEarnings.put(month, ordersByMonthEarnings.get(month) + (order.getTotalPrice() - order.getTotalCost()));
             }
         }
         for (String month : labels) {
@@ -294,8 +288,7 @@ public class DashboardService {
             for (Order order : orders) {
                 for (ProductOrder productOrder : order.getProductOrders()) {
                     if (productOrder.getCategory().equals(category)) {
-                        categoryEarnings += productOrder.getQuantity()
-                                * (productOrder.getProductUnitPrice() - productOrder.getProductUnitCost());
+                        categoryEarnings += productOrder.getQuantity() * (productOrder.getProductUnitPrice() - productOrder.getProductUnitCost());
                     }
                 }
             }
@@ -309,8 +302,7 @@ public class DashboardService {
         for (Order order : orders) {
             for (ProductOrder productOrder : order.getProductOrders()) {
                 Category category = productOrder.getCategory();
-                categorySalesMap.put(category.getName(),
-                        categorySalesMap.getOrDefault(category.getName(), 0) + productOrder.getQuantity());
+                categorySalesMap.put(category.getName(), categorySalesMap.getOrDefault(category.getName(), 0) + productOrder.getQuantity());
             }
         }
         return new HashMap<>(categorySalesMap);
@@ -320,10 +312,8 @@ public class DashboardService {
         HashMap<String, Double> productProfitsMap = new HashMap<>();
         for (Order order : orders) {
             for (ProductOrder productOrder : order.getProductOrders()) {
-                double productProfit = (productOrder.getProductUnitPrice() - productOrder.getProductUnitCost())
-                        * productOrder.getQuantity();
-                productProfitsMap.put(productOrder.getProductName(),
-                        productProfitsMap.getOrDefault(productOrder.getProductName(), 0.0) + productProfit);
+                double productProfit = (productOrder.getProductUnitPrice() - productOrder.getProductUnitCost()) * productOrder.getQuantity();
+                productProfitsMap.put(productOrder.getProductName(), productProfitsMap.getOrDefault(productOrder.getProductName(), 0.0) + productProfit);
             }
         }
         return productProfitsMap;
@@ -333,10 +323,24 @@ public class DashboardService {
         HashMap<String, Integer> productSalesMap = new HashMap<>();
         for (Order order : orders) {
             for (ProductOrder productOrder : order.getProductOrders()) {
-                productSalesMap.put(productOrder.getProductName(),
-                        productSalesMap.getOrDefault(productOrder.getProductName(), 0) + productOrder.getQuantity());
+                productSalesMap.put(productOrder.getProductName(), productSalesMap.getOrDefault(productOrder.getProductName(), 0) + productOrder.getQuantity());
             }
         }
         return productSalesMap;
+    }
+
+    public LinkedHashMap<String, LinkedHashMap<?, ?>> getReservationsAndShiftsMetrics() throws Exception {
+        try {
+            LinkedHashMap<Shift, Integer> busiestShifts = shiftService.getBusiestShifts();
+            LinkedHashMap<Shift, Integer> mostSelectedShifts = shiftService.getMostSelectedShifts();
+            LinkedHashMap<String, Object> reservationsMetrics = new LinkedHashMap<>(reservationService.getReservationsMetric());
+            LinkedHashMap<String, LinkedHashMap<?, ?>> response = new LinkedHashMap<>();
+            response.put("busiestShifts", busiestShifts);
+            response.put("mostSelectedShifts", mostSelectedShifts);
+            response.put("reservationsMetrics", reservationsMetrics);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 }

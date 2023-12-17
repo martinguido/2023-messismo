@@ -28,6 +28,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 // import Chip from "@mui/material/Chip";
 // import OutlinedInput from "@mui/material/OutlinedInput";
 import { useMediaQuery } from "@mui/material";
+// import "./Dashboard.css";
 
 const CustomizedDateTimePicker = styled(DatePicker)`
   .MuiInputBase-input {
@@ -249,7 +250,7 @@ const Stat = styled.div`
 const OutOfStock = styled.div`
   //background:orange;
   width: 25%;
-  height: 70vh;
+  height: 50vh;
   float: right;
 
   display: flex;
@@ -274,7 +275,7 @@ const StockList = styled.div`
 const RevenueBarChartDiv = styled.div`
   //background:red;
   width: 39%;
-  height: 70vh;
+  height: 50vh;
   float: left;
 
   @media (max-width: 1000px) {
@@ -302,7 +303,7 @@ const BarChartDiv = styled.div`
 const RevenueDoughnutDiv = styled.div`
   //background:purple;
   width: 36%;
-  height: 70vh;
+  height: 50vh;
   float: right;
 
   @media (max-width: 1000px) {
@@ -380,6 +381,10 @@ function Dashboard() {
   // eslint-disable-next-line
   const [dateToShow, setDateToShow] = useState("");
   const isSmallScreen = useMediaQuery("(max-width:600px)");
+  // const [resAndShiftsMetrics, setResAndShiftsMetrics] = useState({});
+  const [busiestShifts, setBusiestShifts] = useState({});
+  const [mostSelectedShifts, setMostSelectedShifts] = useState({});
+  const [reservationsMetrics, setReservationsMetrics] = useState({});
 
   useEffect(() => {
     dashboardService
@@ -419,6 +424,19 @@ function Dashboard() {
       })
       .catch((error) => {
         console.error("Error al mostrar los productos", error);
+      });
+    dashboardService
+      .getReservationsAndShiftsMetrics()
+      .then((response) => {
+        console.log(response.data);
+        setBusiestShifts(response.data.busiestShifts);
+        setMostSelectedShifts(response.data.mostSelectedShifts);
+        setReservationsMetrics(response.data.reservationsMetrics);
+        // setResAndShiftsMetrics(response.data);
+        console.log(mostSelectedShifts);
+      })
+      .catch((error) => {
+        console.error("Error al traer informacion", error);
       }); // eslint-disable-next-line
   }, []);
 
@@ -911,6 +929,151 @@ function Dashboard() {
                 )}
               </DoughnutDiv>
             </RevenueDoughnutDiv>
+            <h1
+              style={{
+                display: "flex",
+                width: "100%",
+                color: "white",
+                justifyContent: "center",
+              }}
+            >
+              Reservations Metrics
+            </h1>
+            <TotalStats
+              className="totalReservations"
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+              }}
+            >
+              <Stat className="total-revenue">
+                <p className="statnumber">
+                  {reservationsMetrics.totalReservations}
+                </p>
+                <p className="stattext">Reservations</p>
+              </Stat>
+              <Stat className="total-orders">
+                <p className="statnumber">
+                  {reservationsMetrics.usedReservationsPercentage}
+                </p>
+                <p className="stattext">% used reservations</p>
+              </Stat>
+              <Stat className="total-revenue">
+                <p className="statnumber">
+                  {reservationsMetrics.upcomingReservations}
+                </p>
+                <p className="stattext">Upcoming reservations</p>
+              </Stat>
+              <Stat className="total-orders">
+                <p className="statnumber">
+                  {reservationsMetrics.expiredReservations}
+                </p>
+                <p className="stattext">Expired reservations</p>
+              </Stat>
+              <Stat className="total-revenue">
+                <p className="statnumber">
+                  {reservationsMetrics.inProcessReservations}
+                </p>
+                <p className="stattext">In process reservations</p>
+              </Stat>
+            </TotalStats>
+            <h1
+              style={{
+                display: "flex",
+                width: "100%",
+                color: "white",
+                justifyContent: "center",
+              }}
+            >
+              Most Selected Shifts
+            </h1>
+            <TotalStats
+              className="totalReservations"
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+              }}
+            >
+              {Object.entries(mostSelectedShifts).map(
+                ([shiftString, valor]) => {
+                  const shiftMatch = shiftString.match(
+                    /Shift\(shiftId=(\d+), startingHour=(\d+:\d+), finishingHour=(\d+:\d+)\)/
+                  );
+
+                  if (shiftMatch) {
+                    const shiftObject = {
+                      shiftId: parseInt(shiftMatch[1], 10),
+                      startingHour: shiftMatch[2],
+                      finishingHour: shiftMatch[3],
+                    };
+                    if (valor > 0) {
+                      return (
+                        <Stat className="total-revenue" key={shiftString}>
+                          <p className="statnumber">
+                            {shiftObject.startingHour} -{" "}
+                            {shiftObject.finishingHour}
+                          </p>
+                          <p className="stattext">{valor} reservations</p>
+                        </Stat>
+                      );
+                    } else {
+                      return <></>;
+                    }
+                  } else {
+                    return <></>;
+                  }
+                }
+              )}
+            </TotalStats>
+            <h1
+              style={{
+                display: "flex",
+                width: "100%",
+                color: "white",
+                justifyContent: "center",
+              }}
+            >
+              Busiest Shifts
+            </h1>
+            <TotalStats
+              className="totalReservations"
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+              }}
+            >
+              {Object.entries(busiestShifts).map(([shiftString, valor]) => {
+                const shiftMatch = shiftString.match(
+                  /Shift\(shiftId=(\d+), startingHour=(\d+:\d+), finishingHour=(\d+:\d+)\)/
+                );
+
+                if (shiftMatch) {
+                  const shiftObject = {
+                    shiftId: parseInt(shiftMatch[1], 10),
+                    startingHour: shiftMatch[2],
+                    finishingHour: shiftMatch[3],
+                  };
+                  if (valor > 0) {
+                    return (
+                      <Stat className="total-revenue" key={shiftString}>
+                        <p className="statnumber">
+                          {shiftObject.startingHour} -{" "}
+                          {shiftObject.finishingHour}
+                        </p>
+                        <p className="stattext">{valor} people</p>
+                      </Stat>
+                    );
+                  } else {
+                    return <></>;
+                  }
+                } else {
+                  return <></>;
+                }
+              })}
+            </TotalStats>
           </Graphs>
         )}
       </MainContent>

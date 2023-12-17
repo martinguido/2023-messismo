@@ -927,7 +927,8 @@ function Dashboard() {
                     />
                   </>
                 )}
-              </DoughnutDiv>
+                </DoughnutDiv>
+                
             </RevenueDoughnutDiv>
             <h1
               style={{

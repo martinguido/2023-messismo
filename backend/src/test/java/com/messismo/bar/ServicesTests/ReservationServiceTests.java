@@ -377,11 +377,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(upcomingReservations);
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(37.5, result.get("Used reservations percentage"));
-        assertEquals(3, result.get("Expired reservations"));
-        assertEquals(5, result.get("In Process reservations"));
-        assertEquals(2, result.get("Upcoming reservations"));
-        assertEquals(10, result.get("Total reservations"));
+        assertEquals(37.5, result.get("usedReservationsPercentage"));
+        assertEquals(3, result.get("expiredReservations"));
+        assertEquals(5, result.get("inProcessReservations"));
+        assertEquals(2, result.get("upcomingReservations"));
+        assertEquals(10, result.get("totalReservations"));
     }
 
 
@@ -405,11 +405,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(upcomingReservations);
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(50.00, result.get("Used reservations percentage"));
-        assertEquals(2, result.get("Expired reservations"));
-        assertEquals(0, result.get("In Process reservations"));
-        assertEquals(2, result.get("Upcoming reservations"));
-        assertEquals(4, result.get("Total reservations"));
+        assertEquals(50.00, result.get("usedReservationsPercentage"));
+        assertEquals(2, result.get("expiredReservations"));
+        assertEquals(0, result.get("inProcessReservations"));
+        assertEquals(2, result.get("upcomingReservations"));
+        assertEquals(4, result.get("totalReservations"));
 
     }
 
@@ -436,11 +436,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(upcomingReservations);
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(37.5, result.get("Used reservations percentage"));
-        assertEquals(3, result.get("Expired reservations"));
-        assertEquals(5, result.get("In Process reservations"));
-        assertEquals(0, result.get("Upcoming reservations"));
-        assertEquals(8, result.get("Total reservations"));
+        assertEquals(37.5, result.get("usedReservationsPercentage"));
+        assertEquals(3, result.get("expiredReservations"));
+        assertEquals(5, result.get("inProcessReservations"));
+        assertEquals(0, result.get("upcomingReservations"));
+        assertEquals(8, result.get("totalReservations"));
     }
 
     @Test
@@ -469,11 +469,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(upcomingReservations);
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(0.00, result.get("Used reservations percentage"));
-        assertEquals(3, result.get("Expired reservations"));
-        assertEquals(5, result.get("In Process reservations"));
-        assertEquals(2, result.get("Upcoming reservations"));
-        assertEquals(10, result.get("Total reservations"));
+        assertEquals(0.00, result.get("usedReservationsPercentage"));
+        assertEquals(3, result.get("expiredReservations"));
+        assertEquals(5, result.get("inProcessReservations"));
+        assertEquals(2, result.get("upcomingReservations"));
+        assertEquals(10, result.get("totalReservations"));
     }
 
     @Test
@@ -492,11 +492,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(upcomingReservations);
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(0.00, result.get("Used reservations percentage"));
-        assertEquals(0, result.get("Expired reservations"));
-        assertEquals(0, result.get("In Process reservations"));
-        assertEquals(2, result.get("Upcoming reservations"));
-        assertEquals(2, result.get("Total reservations"));
+        assertEquals(0.00, result.get("usedReservationsPercentage"));
+        assertEquals(0, result.get("expiredReservations"));
+        assertEquals(0, result.get("inProcessReservations"));
+        assertEquals(2, result.get("upcomingReservations"));
+        assertEquals(2, result.get("totalReservations"));
     }
 
     @Test
@@ -521,11 +521,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(upcomingReservations);
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(40.0, result.get("Used reservations percentage"));
-        assertEquals(0, result.get("Expired reservations"));
-        assertEquals(5, result.get("In Process reservations"));
-        assertEquals(2, result.get("Upcoming reservations"));
-        assertEquals(7, result.get("Total reservations"));
+        assertEquals(40.0, result.get("usedReservationsPercentage"));
+        assertEquals(0, result.get("expiredReservations"));
+        assertEquals(5, result.get("inProcessReservations"));
+        assertEquals(2, result.get("upcomingReservations"));
+        assertEquals(7, result.get("totalReservations"));
     }
 
 
@@ -538,11 +538,11 @@ public class ReservationServiceTests {
         when(reservationRepository.findAllByState("Upcoming")).thenReturn(new ArrayList<>());
         Map<String, Object> result = reservationService.getReservationsMetric();
 
-        assertEquals(0.00, result.get("Used reservations percentage"));
-        assertEquals(0, result.get("Expired reservations"));
-        assertEquals(0, result.get("In Process reservations"));
-        assertEquals(0, result.get("Upcoming reservations"));
-        assertEquals(0, result.get("Total reservations"));
+        assertEquals(0.00, result.get("usedReservationsPercentage"));
+        assertEquals(0, result.get("expiredReservations"));
+        assertEquals(0, result.get("inProcessReservations"));
+        assertEquals(0, result.get("upcomingReservations"));
+        assertEquals(0, result.get("totalReservations"));
     }
 
     @Test

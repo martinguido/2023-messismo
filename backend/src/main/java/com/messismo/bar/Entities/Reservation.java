@@ -36,7 +36,7 @@ public class Reservation {
     private String clientEmail;
 
     @Column(name = "client_phone")
-    private Integer clientPhone;
+    private String clientPhone;
 
     @Column(name = "capacity")
     private Integer capacity;
@@ -51,7 +51,7 @@ public class Reservation {
     private Boolean used;
 
 
-    public Reservation(Shift shift, LocalDate reservationDate, String clientEmail, Integer clientPhone, Integer capacity, String comment) {
+    public Reservation(Shift shift, LocalDate reservationDate, String clientEmail, String clientPhone, Integer capacity, String comment) {
         if (capacity < 0) {
             throw new IllegalArgumentException("Capacity must be greater than 0");
         }
@@ -59,7 +59,7 @@ public class Reservation {
             throw new IllegalArgumentException("Missing phone and email");
         }
         if (clientPhone != null) {
-            if (clientPhone < 0) {
+            if (Integer.parseInt(clientPhone) < 0) {
                 throw new IllegalArgumentException("Phone must be greater than 0");
             } else {
                 this.clientPhone = clientPhone;

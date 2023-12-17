@@ -57,7 +57,7 @@ public class ReservationServiceTests {
     public void testGetAllReservations() {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        List<Reservation> expectedReservations = List.of(new Reservation(existingShift, LocalDate.of(2023, 1, 1), "guidomartin7@gmail.com", 156683434, 2, "Birthday"), new Reservation(existingShift, LocalDate.of(2023, 2, 1), "martin2@mail.com", 1554209090, 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
+        List<Reservation> expectedReservations = List.of(new Reservation(existingShift, LocalDate.of(2023, 1, 1), "guidomartin7@gmail.com", "156683434", 2, "Birthday"), new Reservation(existingShift, LocalDate.of(2023, 2, 1), "martin2@mail.com", "1554209090", 2, "Birthday2"), new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 1, 1), "martin3@mail.com", null, 2, "Birthday3"));
         when(reservationRepository.findAll()).thenReturn(expectedReservations);
 
         List<Reservation> result = reservationService.getAllReservations();
@@ -70,7 +70,7 @@ public class ReservationServiceTests {
     public void testDeleteReservationSuccessfully() throws Exception {
 
         Shift existingShift = new Shift(1L, LocalTime.of(15, 0), LocalTime.of(16, 0));
-        Reservation existingReservation = new Reservation(existingShift, LocalDate.of(2023, 1, 1), null, 1566785465,2, "Birthday");
+        Reservation existingReservation = new Reservation(existingShift, LocalDate.of(2023, 1, 1), null, "1566785465",2, "Birthday");
         when(reservationRepository.findById(any())).thenReturn(Optional.of(existingReservation));
 
         DeleteReservationRequestDTO requestDTO = new DeleteReservationRequestDTO(1L);
@@ -298,12 +298,12 @@ public class ReservationServiceTests {
         Shift shift3 = new Shift(LocalTime.of(17, 0), LocalTime.of(19, 0));
         List<Shift> allShifts = List.of(shift1, shift2,shift3);
         when(shiftRepository.findAll()).thenReturn(allShifts);
-        Reservation reservation1 = new Reservation(shift1, localDate, null, 1566785465,25, "Birthday");
-        Reservation reservation3 = new Reservation(shift1, localDate, null, 1566785465,20, "Birthday");
-        Reservation reservation4 = new Reservation(shift1, localDate, null, 1566785465,5, "Birthday");
-        Reservation reservation2 = new Reservation(shift2, LocalDate.of(2023, 12, 1), null, 1566785465,2, "Birthday");
-        Reservation reservation5 = new Reservation(shift2, LocalDate.of(2023, 12, 1), null, 1566785465,20, "Birthday");
-        Reservation reservation6 = new Reservation(shift2, LocalDate.of(2023, 12, 2), null, 1566785465,49, "Birthday");
+        Reservation reservation1 = new Reservation(shift1, localDate, null, "1566785465",25, "Birthday");
+        Reservation reservation3 = new Reservation(shift1, localDate, null, "1566785465",20, "Birthday");
+        Reservation reservation4 = new Reservation(shift1, localDate, null, "1566785465",5, "Birthday");
+        Reservation reservation2 = new Reservation(shift2, LocalDate.of(2023, 12, 1), null, "1566785465",2, "Birthday");
+        Reservation reservation5 = new Reservation(shift2, LocalDate.of(2023, 12, 1), null, "1566785465",20, "Birthday");
+        Reservation reservation6 = new Reservation(shift2, LocalDate.of(2023, 12, 2), null, "1566785465",49, "Birthday");
         List<Reservation> allReservations = List.of(reservation1, reservation2,reservation3,reservation4,reservation5,reservation6);
         when(reservationRepository.findAll()).thenReturn(allReservations);
 
@@ -331,9 +331,9 @@ public class ReservationServiceTests {
 
         LocalDate localDate = LocalDate.now();
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
-        Reservation reservation1 = new Reservation(shift1, localDate, null, 1566785465,25, "Birthday");
-        Reservation reservation3 = new Reservation(shift1, localDate, null, 1566785465,20, "Birthday");
-        Reservation reservation4 = new Reservation(shift1, localDate, null, 1566785465,5, "Birthday");
+        Reservation reservation1 = new Reservation(shift1, localDate, null, "1566785465",25, "Birthday");
+        Reservation reservation3 = new Reservation(shift1, localDate, null, "1566785465",20, "Birthday");
+        Reservation reservation4 = new Reservation(shift1, localDate, null, "1566785465",5, "Birthday");
         when(reservationRepository.findAllByShift(shift1)).thenReturn(List.of(reservation1, reservation3, reservation4));
         Integer result = reservationService.getQuantityForAShift(shift1);
 
@@ -356,18 +356,18 @@ public class ReservationServiceTests {
 
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
-        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone(15550343).build();
-        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(true).clientPhone(1555034443).build();
-        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone(1555043343).build();
-        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(true).clientPhone(1555430343).build();
-        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone(1555453443).build();
+        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone("15550343").build();
+        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(true).clientPhone("1555034443").build();
+        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone("1555043343").build();
+        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(true).clientPhone("1555430343").build();
+        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone("1555453443").build();
 
-        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(true).clientPhone(1568837531).build();
-        Reservation reservation31 = Reservation.builder().state("Expired").capacity(2).reservationId(8L).reservationDate(LocalDate.now()).clientEmail("example8@gmail.com").shift(shift2).used(false).clientPhone(15043343).build();
+        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(true).clientPhone("1568837531").build();
+        Reservation reservation31 = Reservation.builder().state("Expired").capacity(2).reservationId(8L).reservationDate(LocalDate.now()).clientEmail("example8@gmail.com").shift(shift2).used(false).clientPhone("15043343").build();
 
-        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone(1568837531).build();
+        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone("1568837531").build();
 
         List<Reservation> inProcessReservations = Arrays.asList(reservation1,reservation2,reservation3,reservation4,reservation5);
         List<Reservation> expiredReservations = Arrays.asList(reservation11,reservation21,reservation31);
@@ -391,11 +391,11 @@ public class ReservationServiceTests {
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
 
-        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(true).clientPhone(1568837531).build();
+        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(true).clientPhone("1568837531").build();
 
-        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone(1568837531).build();
+        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone("1568837531").build();
 
         List<Reservation> inProcessReservations = new ArrayList<>();
         List<Reservation> expiredReservations = Arrays.asList(reservation11,reservation21);
@@ -418,15 +418,15 @@ public class ReservationServiceTests {
 
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
-        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone(15550343).build();
-        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(true).clientPhone(1555034443).build();
-        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone(1555043343).build();
-        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(true).clientPhone(1555430343).build();
-        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone(1555453443).build();
+        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone("15550343").build();
+        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(true).clientPhone("1555034443").build();
+        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone("1555043343").build();
+        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(true).clientPhone("1555430343").build();
+        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone("1555453443").build();
 
-        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(true).clientPhone(1568837531).build();
-        Reservation reservation31 = Reservation.builder().state("Expired").capacity(2).reservationId(8L).reservationDate(LocalDate.now()).clientEmail("example8@gmail.com").shift(shift2).used(false).clientPhone(15043343).build();
+        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(true).clientPhone("1568837531").build();
+        Reservation reservation31 = Reservation.builder().state("Expired").capacity(2).reservationId(8L).reservationDate(LocalDate.now()).clientEmail("example8@gmail.com").shift(shift2).used(false).clientPhone("15043343").build();
 
         List<Reservation> inProcessReservations = Arrays.asList(reservation1,reservation2,reservation3,reservation4,reservation5);
         List<Reservation> expiredReservations = Arrays.asList(reservation11,reservation21,reservation31);
@@ -448,18 +448,18 @@ public class ReservationServiceTests {
 
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
-        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone(15550343).build();
-        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(false).clientPhone(1555034443).build();
-        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone(1555043343).build();
-        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(false).clientPhone(1555430343).build();
-        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone(1555453443).build();
+        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone("15550343").build();
+        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(false).clientPhone("1555034443").build();
+        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone("1555043343").build();
+        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(false).clientPhone("1555430343").build();
+        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone("1555453443").build();
 
-        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(false).clientPhone(1568837531).build();
-        Reservation reservation31 = Reservation.builder().state("Expired").capacity(2).reservationId(8L).reservationDate(LocalDate.now()).clientEmail("example8@gmail.com").shift(shift2).used(false).clientPhone(15043343).build();
+        Reservation reservation11 = Reservation.builder().state("Expired").capacity(4).reservationId(6L).reservationDate(LocalDate.now()).clientEmail("example6@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation21 = Reservation.builder().state("Expired").capacity(1).reservationId(7L).reservationDate(LocalDate.now()).clientEmail("example7@gmail.com").shift(shift2).used(false).clientPhone("1568837531").build();
+        Reservation reservation31 = Reservation.builder().state("Expired").capacity(2).reservationId(8L).reservationDate(LocalDate.now()).clientEmail("example8@gmail.com").shift(shift2).used(false).clientPhone("15043343").build();
 
-        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone(1568837531).build();
+        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone("1568837531").build();
 
         List<Reservation> inProcessReservations = Arrays.asList(reservation1,reservation2,reservation3,reservation4,reservation5);
         List<Reservation> expiredReservations = Arrays.asList(reservation11,reservation21,reservation31);
@@ -481,8 +481,8 @@ public class ReservationServiceTests {
 
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
 
-        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone(1568837531).build();
+        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone("1568837531").build();
 
         List<Reservation> inProcessReservations = new ArrayList<>();
         List<Reservation> expiredReservations =new ArrayList<>();
@@ -504,14 +504,14 @@ public class ReservationServiceTests {
 
         Shift shift1 = new Shift(LocalTime.of(10, 0), LocalTime.of(12, 0));
         Shift shift2 = new Shift(LocalTime.of(12, 0), LocalTime.of(14, 0));
-        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone(15550343).build();
-        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(true).clientPhone(1555034443).build();
-        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone(1555043343).build();
-        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(true).clientPhone(1555430343).build();
-        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone(1555453443).build();
+        Reservation reservation1 = Reservation.builder().state("In Process").capacity(5).reservationId(1L).reservationDate(LocalDate.now()).clientEmail("example@gmail.com").shift(shift1).used(false).clientPhone("15550343").build();
+        Reservation reservation2 = Reservation.builder().state("In Process").capacity(3).reservationId(2L).reservationDate(LocalDate.now()).clientEmail("example2@gmail.com").shift(shift2).used(true).clientPhone("1555034443").build();
+        Reservation reservation3 = Reservation.builder().state("In Process").capacity(1).reservationId(3L).reservationDate(LocalDate.now()).clientEmail("example3@gmail.com").shift(shift2).used(false).clientPhone("1555043343").build();
+        Reservation reservation4 = Reservation.builder().state("In Process").capacity(4).reservationId(4L).reservationDate(LocalDate.now()).clientEmail("example4@gmail.com").shift(shift1).used(true).clientPhone("1555430343").build();
+        Reservation reservation5 = Reservation.builder().state("In Process").capacity(7).reservationId(5L).reservationDate(LocalDate.now()).clientEmail("example5@gmail.com").shift(shift1).used(false).clientPhone("1555453443").build();
 
-        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone(155450343).build();
-        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone(1568837531).build();
+        Reservation reservation12 = Reservation.builder().state("Upcoming").capacity(2).reservationId(9L).reservationDate(LocalDate.now()).clientEmail("example9@gmail.com").shift(shift1).used(false).clientPhone("155450343").build();
+        Reservation reservation22 = Reservation.builder().state("Upcoming").capacity(1).reservationId(10L).reservationDate(LocalDate.now()).clientEmail("example10@gmail.com").shift(shift1).used(true).clientPhone("1568837531").build();
 
         List<Reservation> inProcessReservations = Arrays.asList(reservation1,reservation2,reservation3,reservation4,reservation5);
         List<Reservation> expiredReservations = new ArrayList<>();

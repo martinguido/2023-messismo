@@ -51,10 +51,10 @@ public class ReservationService {
                 throw new BarCapacityExceededException("The selected capacity for the reservation exceeds bar capacity");
             }
             System.out.println("CHECK2");
-            Integer clientPhoneCorrected = null;
+            String clientPhoneCorrected = null;
             if (newReservationRequestDTO.getClientPhone() != null && !newReservationRequestDTO.getClientPhone().isEmpty()) {
                 System.out.println("ENTRA ACA");
-                clientPhoneCorrected = Integer.parseInt(newReservationRequestDTO.getClientPhone());
+                clientPhoneCorrected = newReservationRequestDTO.getClientPhone();
                 System.out.println("NO SE ROMPE");
             }
             System.out.println("LLEGA HASTA CREAR LA RESERVA");

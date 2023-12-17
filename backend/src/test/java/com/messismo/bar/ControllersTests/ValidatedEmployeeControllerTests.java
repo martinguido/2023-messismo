@@ -449,7 +449,7 @@ public class ValidatedEmployeeControllerTests {
     @Test
     public void testGetAllReservationsSuccessful() {
 
-        List<Reservation> mockReservations = List.of(new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 12, 1 ), "martin@mail.com", 15000055, 5, "Birthdays"), new Reservation( new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 12, 1), "martin@mail.com", 15000055, 5, "Birthdays"));
+        List<Reservation> mockReservations = List.of(new Reservation(new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 12, 1 ), "martin@mail.com", "15000055", 5, "Birthdays"), new Reservation( new Shift(LocalTime.of(14, 0), LocalTime.of(15, 0)), LocalDate.of(2023, 12, 1), "martin@mail.com", "15000055", 5, "Birthdays"));
         when(reservationService.getAllReservations()).thenReturn(mockReservations);
         ResponseEntity<?> response = validatedEmployeeController.getAllReservations();
 

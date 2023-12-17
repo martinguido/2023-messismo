@@ -76,12 +76,11 @@ public class InitialConfiguration {
 
 
     private void addSampleShifts(ShiftService shiftService) throws Exception {
-        LocalTime currentTime = LocalTime.now();
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(10, 0)).finishingHour(LocalTime.of(11, 0)).build());
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(12, 0)).finishingHour(LocalTime.of(13, 0)).build());
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(13, 0)).finishingHour(LocalTime.of(14, 0)).build());
         shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(14, 0)).finishingHour(LocalTime.of(15, 0)).build());
-        shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(currentTime.getHour(),0)).finishingHour(LocalTime.of(currentTime.getHour()+3, 0)).build());
+        shiftService.addShift(NewShiftRequestDTO.builder().startingHour(LocalTime.of(17,0)).finishingHour(LocalTime.of(20, 0)).build());
     }
 
     private void addSampleBar(BarService barService) throws Exception {

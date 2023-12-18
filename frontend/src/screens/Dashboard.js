@@ -927,11 +927,11 @@ function Dashboard() {
                     />
                   </>
                 )}
-                </DoughnutDiv>
-                
+              </DoughnutDiv>
             </RevenueDoughnutDiv>
             <h1
               style={{
+                marginTop: "38%",
                 display: "flex",
                 width: "100%",
                 color: "white",
@@ -997,35 +997,42 @@ function Dashboard() {
                 display: "flex",
               }}
             >
-              {Object.entries(mostSelectedShifts).map(
-                ([shiftString, valor]) => {
-                  const shiftMatch = shiftString.match(
-                    /Shift\(shiftId=(\d+), startingHour=(\d+:\d+), finishingHour=(\d+:\d+)\)/
-                  );
+              {Object.keys(mostSelectedShifts).length === 0 ? (
+                <p style={{ color: "white", marginBottom: "2%" }}>
+                  No shifts to display
+                </p>
+              ) : (
+                Object.entries(mostSelectedShifts).map(
+                  ([shiftString, valor]) => {
+                    const shiftMatch = shiftString.match(
+                      /Shift\(shiftId=(\d+), startingHour=(\d+:\d+), finishingHour=(\d+:\d+)\)/
+                    );
 
-                  if (shiftMatch) {
-                    const shiftObject = {
-                      shiftId: parseInt(shiftMatch[1], 10),
-                      startingHour: shiftMatch[2],
-                      finishingHour: shiftMatch[3],
-                    };
-                    if (valor > 0) {
-                      return (
-                        <Stat className="total-revenue" key={shiftString}>
-                          <p className="statnumber">
-                            {shiftObject.startingHour} -{" "}
-                            {shiftObject.finishingHour}
-                          </p>
-                          <p className="stattext">{valor} reservations</p>
-                        </Stat>
-                      );
+                    if (shiftMatch) {
+                      const shiftObject = {
+                        shiftId: parseInt(shiftMatch[1], 10),
+                        startingHour: shiftMatch[2],
+                        finishingHour: shiftMatch[3],
+                      };
+
+                      if (valor > 0) {
+                        return (
+                          <Stat className="total-revenue" key={shiftString}>
+                            <p className="statnumber">
+                              {shiftObject.startingHour} -{" "}
+                              {shiftObject.finishingHour}
+                            </p>
+                            <p className="stattext">{valor} reservations</p>
+                          </Stat>
+                        );
+                      } else {
+                        return <></>;
+                      }
                     } else {
                       return <></>;
                     }
-                  } else {
-                    return <></>;
                   }
-                }
+                )
               )}
             </TotalStats>
             <h1
@@ -1046,34 +1053,41 @@ function Dashboard() {
                 display: "flex",
               }}
             >
-              {Object.entries(busiestShifts).map(([shiftString, valor]) => {
-                const shiftMatch = shiftString.match(
-                  /Shift\(shiftId=(\d+), startingHour=(\d+:\d+), finishingHour=(\d+:\d+)\)/
-                );
+              {Object.keys(busiestShifts).length === 0 ? (
+                <p style={{ color: "white", marginBottom: "2%" }}>
+                  No shifts to display
+                </p>
+              ) : (
+                Object.entries(busiestShifts).map(([shiftString, valor]) => {
+                  const shiftMatch = shiftString.match(
+                    /Shift\(shiftId=(\d+), startingHour=(\d+:\d+), finishingHour=(\d+:\d+)\)/
+                  );
 
-                if (shiftMatch) {
-                  const shiftObject = {
-                    shiftId: parseInt(shiftMatch[1], 10),
-                    startingHour: shiftMatch[2],
-                    finishingHour: shiftMatch[3],
-                  };
-                  if (valor > 0) {
-                    return (
-                      <Stat className="total-revenue" key={shiftString}>
-                        <p className="statnumber">
-                          {shiftObject.startingHour} -{" "}
-                          {shiftObject.finishingHour}
-                        </p>
-                        <p className="stattext">{valor} people</p>
-                      </Stat>
-                    );
+                  if (shiftMatch) {
+                    const shiftObject = {
+                      shiftId: parseInt(shiftMatch[1], 10),
+                      startingHour: shiftMatch[2],
+                      finishingHour: shiftMatch[3],
+                    };
+
+                    if (valor > 0) {
+                      return (
+                        <Stat className="total-revenue" key={shiftString}>
+                          <p className="statnumber">
+                            {shiftObject.startingHour} -{" "}
+                            {shiftObject.finishingHour}
+                          </p>
+                          <p className="stattext">{valor} people</p>
+                        </Stat>
+                      );
+                    } else {
+                      return <></>;
+                    }
                   } else {
                     return <></>;
                   }
-                } else {
-                  return <></>;
-                }
-              })}
+                })
+              )}
             </TotalStats>
           </Graphs>
         )}

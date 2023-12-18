@@ -893,7 +893,7 @@ const ProductsList = () => {
                       value="no-data"
                       disabled
                     >
-                      No hay turnos disponibles para esa fecha
+                      No shifts available for selected date
                     </MenuItem>
                   ) : (
                     shifts.map((shift) => (
